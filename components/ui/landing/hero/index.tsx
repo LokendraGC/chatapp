@@ -1,3 +1,4 @@
+import { Send, User } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 
@@ -54,7 +55,8 @@ const Hero = () => {
 
                         <div className="flex-1 p-6 overflow-y-auto space-y-6 bg-zinc-950/30">
                             <div className="flex flex-col w-full items-start">
-                                <div className="flex max-w-[85%] gap-3 items-start"> {/* change to items-center if you want */}
+
+                                <div className="flex max-w-[85%] gap-3 items-start">
 
                                     {/* Avatar */}
                                     <div className="shrink-0">
@@ -68,12 +70,12 @@ const Hero = () => {
                                     </div>
 
                                     {/* Message */}
-                                    <div className="space-y-2">
-                                        <div className="p-4 rounded-2xl text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-[24px]">
+                                    <div className="relative mt-4">
+                                        <div className="p-4 rounded-2xl text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
                                             Hi there, How can I help you today?
                                         </div>
 
-                                        <div className='flex flex-wrap gap-2 pt-1 ml-1'>
+                                        <div className='flex flex-wrap gap-2 pt-1 mt-1 ml-1'>
                                             <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-xs font-medium cursor-default">FAQ</span>
                                             <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-xs font-medium cursor-default">Pricing</span>
                                             <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-xs font-medium cursor-default">Support</span>
@@ -84,6 +86,55 @@ const Hero = () => {
 
                                 </div>
 
+
+                                <div className="flex flex-col w-full items-end">
+                                    <div className="flex max-w-[85%] gap-3 flex-row-reverse">
+                                        <div className='w-8 h-8 rounded-full flex items-center justify-center border border-white/5 bg-zinc-800'>
+                                            <User className='w-4 h-4 text-zinc-400' />
+                                        </div>
+
+                                        <div className='p-4 rounded-2xl text-sm leading-relaxed shadow-sm bg-zinc-800 text-zinc-300 rounded-tr-sm'>
+                                            Hello! I have a question about your pricing plans.
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div className="flex max-w-[85%] gap-3 items-start">
+
+                                    {/* Avatar */}
+                                    <div className="shrink-0">
+                                        <Image
+                                            src="/images/avatar.jpg"
+                                            width={40}
+                                            height={40}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                            alt="User Avatar"
+                                        />
+                                    </div>
+
+                                    {/* Message */}
+                                    <div className="relative ml-1 mt-4">
+                                        <div className="p-4 rounded-2xl text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
+                                            Chatbot support pricing varies widely depending on the features, complexity, and provider. Basic rule-based chatbots often come at low monthly costs or even free tiers with limited interactions, making them affordable for small businesses
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div className='p-4 bg-[#0A0A0E] border-t border-white/5 shrink-0'>
+                            <div className="relative">
+                                <div className='min-h-12.5 w-full px-4 py-3 text-sm bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-500 flex items-center justify-between'>
+                                    <span>Type a message...</span>
+                                    <button className='h-4 w-4 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-500 cursor-default'>
+                                        <Send  className='h-4 w-4'/>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
