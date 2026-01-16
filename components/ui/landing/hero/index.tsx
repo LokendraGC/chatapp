@@ -62,9 +62,9 @@ const Hero = () => {
                                     <div className="shrink-0">
                                         <Image
                                             src="/images/avatar.jpg"
-                                            width={40}
-                                            height={40}
-                                            className="w-10 h-10 rounded-full object-cover"
+                                            width={30}
+                                            height={30}
+                                            className="w-8 h-8 rounded-full object-cover"
                                             alt="User Avatar"
                                         />
                                     </div>
@@ -101,14 +101,13 @@ const Hero = () => {
                                 </div>
 
                                 <div className="flex max-w-[85%] gap-3 items-start">
-
                                     {/* Avatar */}
                                     <div className="shrink-0">
                                         <Image
                                             src="/images/avatar.jpg"
-                                            width={40}
-                                            height={40}
-                                            className="w-10 h-10 rounded-full object-cover"
+                                            width={30}
+                                            height={30}
+                                            className="w-8 h-8 rounded-full object-cover"
                                             alt="User Avatar"
                                         />
                                     </div>
