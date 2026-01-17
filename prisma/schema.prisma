@@ -25,3 +25,16 @@ model User {
 
   @@map("user") // Ensures the table name stays lowercase "user" in the DB
 }
+
+// metadata
+model MetaData {
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  user_email      String   @unique
+  business_name   String
+  website_url     String
+  external_links  String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("metadata")
+}

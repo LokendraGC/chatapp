@@ -35,9 +35,9 @@ const Navbar = async () => {
         <div className="hidden md:flex items-center gap-8 text-sm font-light text-zinc-300">
           <SignedIn>
             <div className="flex items-center gap-4">
-              <button className="h-11 cursor-pointer px-8 rounded-full border border-zinc-800  text-zinc-300 text-sm font-medium hover:text-white transition-all flex items-center gap-2 bg-black/30">
-                Dashboard
-              </button>
+              <Link href="/dashboard" className="h-11 cursor-pointer px-8 rounded-full border border-zinc-800  text-zinc-300 text-sm font-medium hover:text-white transition-all flex items-center gap-2 bg-black/30">
+                <span>Dashboard</span>
+              </Link>
             </div>
           </SignedIn>
           <SignedOut>
