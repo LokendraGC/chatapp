@@ -9,8 +9,7 @@ import AddKnowledgeModal from "@/components/ui/dashboard/knowledge/addKnowledgeM
 export default function KnowledgePage() {
   const [defaultTab, setDefaultTab] = useState("website");
   const [isAddWebsiteModalOpen, setIsAddWebsiteModalOpen] = useState(false);
-  const [knowledgeStoringLoad, setKnowledgeStoringLoad] = useState(false);
-  const [knowledgeSourceLoading, setKnowledgeSourceLoading] = useState(false);
+  const [knowledgeStoringLoading, setKnowledgeStoringLoading] = useState(false);
   const [knowledgeSources, setKnowledgeSources] = useState<KnowledgeSource[]>(
     []
   );
@@ -21,8 +20,53 @@ export default function KnowledgePage() {
   };
 
   const handleImport = async (data: any) => {
-    setKnowledgeStoringLoad(true);
-  }
+    setKnowledgeStoringLoading(true);
+
+    try {
+      let response;
+
+      if (data.type === "upload" && data.file) {
+        const formData = new FormData();
+        formData.append("type", "upload");
+        formData.append("file", data.file);
+
+        response = await fetch("/api/knowledge/store", {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          method: "POST",
+          body: formData,
+        });
+
+      } else {
+        response = await fetch("/api/knowledge/store", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+      }
+
+      if( !response.ok ){
+        throw new Error('Failed to store knowledge');
+      }
+
+      const res = await fetch('/api/knowledge/fetch', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const newData = await res.json();
+      setKnowledgeSources(newData.sources);
+      setIsAddWebsiteModalOpen(false); 
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setKnowledgeStoringLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto animate-in fade-in-0 duration-300">
@@ -56,7 +100,7 @@ export default function KnowledgePage() {
         defaultTab={defaultTab}
         setDefaultTab={setDefaultTab}
         onImport={handleImport}
-        isLoading={knowledgeStoringLoad}
+        isLoading={knowledgeStoringLoading}
         existingSources={knowledgeSources}
       />
     </div>
