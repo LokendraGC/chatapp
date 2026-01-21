@@ -1,4 +1,5 @@
-import { summarizeMarkdown } from "@/lib/openAI";
+import { summarizeMarkdown } from "@/lib/gemini";
+import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -37,6 +38,28 @@ export async function POST(req: Request) {
 
         const markDown = await summarizeMarkdown(formattedContent);
         formattedContent = markDown;
+
+        await prisma.knowledgeSource.create({
+          data: {
+            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            type: "upload",
+            name: file.name,
+            status: "active",
+            content: formattedContent,
+            meta_data: JSON.stringify({
+              fileName: file.name,
+              rowCount: lines.length,
+              fileType: file.type,
+              fileSize: file.size,
+              headers: headers,
+            }),
+          },
+        });
+
+        return NextResponse.json(
+          { message: "Knowledge source stored successfully" },
+          { status: 200 }
+        );
       }
     } else {
       body = await req.json();
@@ -69,7 +92,41 @@ export async function POST(req: Request) {
         // console.log("Website HTML content:", html);
 
         const markDown = await summarizeMarkdown(html);
-        console.log("Summarized markdown:", markDown);
+
+        await prisma.knowledgeSource.create({
+          data: {
+            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            type: "website",
+            name: body.url,
+            source_url: body.url,
+            status: "active",
+            content: markDown,
+          },
+        });
+      } else if (type === "text") {
+        const { title, content } = body;
+        let textContent: string;
+        if (content.length > 500) {
+          const markDown = await summarizeMarkdown(content);
+          textContent = markDown;
+        } else {
+          textContent = content;
+        }
+
+        await prisma.knowledgeSource.create({
+          data: {
+            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            type: "text",
+            name: title,
+            status: "active",
+            content: textContent,
+          },
+        });
+
+        return NextResponse.json(
+          { message: "Knowledge source stored successfully" },
+          { status: 200 }
+        );
       }
     }
 

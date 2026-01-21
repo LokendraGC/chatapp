@@ -21,9 +21,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // TODO: Fetch knowledge sources from database
-    // For now, return empty array until knowledge source model is added to Prisma
-    const sources: any[] = [];
+    const sources = await prisma.knowledgeSource.findMany({
+      where: {
+        user_email: user.email,
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
 
     return NextResponse.json(
       {

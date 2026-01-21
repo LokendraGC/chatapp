@@ -5,6 +5,7 @@ import QuickActions from "@/components/ui/dashboard/knowledge/quickActions";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import AddKnowledgeModal from "@/components/ui/dashboard/knowledge/addKnowledgeModal";
+import KnowledgeSources from "@/components/ui/dashboard/knowledge/KnowledgeSources";
 
 export default function KnowledgePage() {
   const [defaultTab, setDefaultTab] = useState("website");
@@ -14,9 +15,19 @@ export default function KnowledgePage() {
     []
   );
 
+  const [selectedSource, setSelectedSource] = useState<KnowledgeSource | null>(
+    null
+  );
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
   const openModal = (tab: string) => {
     setDefaultTab(tab);
     setIsAddWebsiteModalOpen(true);
+  };
+
+  const handleSourceClick = (source: KnowledgeSource) => {
+    setSelectedSource(source);
+    setIsSheetOpen(true);
   };
 
   const handleImport = async (data: any) => {
@@ -37,7 +48,6 @@ export default function KnowledgePage() {
           method: "POST",
           body: formData,
         });
-
       } else {
         response = await fetch("/api/knowledge/store", {
           method: "POST",
@@ -48,19 +58,19 @@ export default function KnowledgePage() {
         });
       }
 
-      if( !response.ok ){
-        throw new Error('Failed to store knowledge');
+      if (!response.ok) {
+        throw new Error("Failed to store knowledge");
       }
 
-      const res = await fetch('/api/knowledge/fetch', {
-        method: 'GET',
+      const res = await fetch("/api/knowledge/fetch", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
       const newData = await res.json();
       setKnowledgeSources(newData.sources);
-      setIsAddWebsiteModalOpen(false); 
+      setIsAddWebsiteModalOpen(false);
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -93,6 +103,14 @@ export default function KnowledgePage() {
 
       {/* Quick Actions */}
       <QuickActions onOpenModal={openModal} />
+
+      {/* Knowledge Sources */}
+      <KnowledgeSources
+        sources={knowledgeSources}
+        onSourceClick={handleSourceClick}
+        isLoading={knowledgeStoringLoading}
+      />
+
       {/* Add Knowledge Modal */}
       <AddKnowledgeModal
         isOpen={isAddWebsiteModalOpen}
