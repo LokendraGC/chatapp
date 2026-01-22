@@ -3,14 +3,17 @@
 import { Button } from "@/components/ui/button";
 import QuickActions from "@/components/ui/dashboard/knowledge/quickActions";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddKnowledgeModal from "@/components/ui/dashboard/knowledge/addKnowledgeModal";
 import KnowledgeSources from "@/components/ui/dashboard/knowledge/KnowledgeSources";
+import SourceDetailsPage from "@/components/ui/dashboard/knowledge/SourceDetailsPage";
 
 export default function KnowledgePage() {
   const [defaultTab, setDefaultTab] = useState("website");
   const [isAddWebsiteModalOpen, setIsAddWebsiteModalOpen] = useState(false);
   const [knowledgeStoringLoading, setKnowledgeStoringLoading] = useState(false);
+  const [knowSourcesLoading, setKnowSourcesLoading] = useState(false);
+
   const [knowledgeSources, setKnowledgeSources] = useState<KnowledgeSource[]>(
     []
   );
@@ -29,6 +32,22 @@ export default function KnowledgePage() {
     setSelectedSource(source);
     setIsSheetOpen(true);
   };
+
+  useEffect(() => {
+    const fetchKnowledgeSources = async () => {
+      setKnowSourcesLoading(true);
+      try {
+        const res = await fetch("/api/knowledge/fetch");
+        const data = await res.json();
+        setKnowledgeSources(data.sources);
+      } catch (error) {
+        console.error("Error fetching knowledge sources:", error);
+      } finally {
+        setKnowSourcesLoading(false);
+      }
+    };
+    fetchKnowledgeSources();
+  }, []);
 
   const handleImport = async (data: any) => {
     setKnowledgeStoringLoading(true);
@@ -108,7 +127,7 @@ export default function KnowledgePage() {
       <KnowledgeSources
         sources={knowledgeSources}
         onSourceClick={handleSourceClick}
-        isLoading={knowledgeStoringLoading}
+        isLoading={knowSourcesLoading || knowledgeStoringLoading}
       />
 
       {/* Add Knowledge Modal */}
@@ -118,8 +137,14 @@ export default function KnowledgePage() {
         defaultTab={defaultTab}
         setDefaultTab={setDefaultTab}
         onImport={handleImport}
-        isLoading={knowledgeStoringLoading}
+        isLoading={knowSourcesLoading}
         existingSources={knowledgeSources}
+      />
+
+      <SourceDetailsPage 
+      isOpen={isSheetOpen}
+      setIsOpen={setIsSheetOpen}
+      selectedSource={selectedSource}
       />
     </div>
   );

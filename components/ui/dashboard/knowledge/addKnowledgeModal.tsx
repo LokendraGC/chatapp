@@ -231,7 +231,7 @@ export default function AddKnowledgeModal({
                 <Label>Content *</Label>
                 <Textarea
                   placeholder="Enter your content here..."
-                  className="bg-white/5 border-white/10 mt-1 min-h-32"
+                  className="bg-white/5 border-white/10 mt-1 min-h-32 max-h-64 overflow-y-auto"
                   value={docsContent}
                   onChange={(e) => setDocsContent(e.target.value)}
                 />
