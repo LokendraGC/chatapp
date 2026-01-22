@@ -17,9 +17,16 @@ function SheetTrigger({
 }
 
 function SheetClose({
+  className,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+  return (
+    <SheetPrimitive.Close
+      data-slot="sheet-close"
+      className={cn("cursor-pointer", className)}
+      {...props}
+    />
+  )
 }
 
 function SheetPortal({

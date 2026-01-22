@@ -13,3 +13,16 @@ interface KnowledgeSource {
   last_updated: string | null;
   created_at: string | null;
 }
+
+
+interface SectionFormData {
+  name: string;
+  description: string;
+  tone: Tone;
+  allowedTopics: string;
+  blockedTopics: string;
+  fallbackBehavior: string;
+}
+
+type SectionStatus = "active" | "draft" | "disabled";
+type Tone = "strict" | "neutral" | "friendly" | "empathetic";
