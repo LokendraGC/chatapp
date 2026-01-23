@@ -2,6 +2,7 @@ import Sidebar from "@/components/ui/dashboard/sidebar";
 import { cookies } from "next/headers";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import ToastProvider from "@/components/ui/toast-provider";
 
 export const metadata = {
   title: "K xa Hajur chat app",
@@ -60,6 +61,7 @@ export default async function DashboardLayout({
       ) : (
         children
       )}
+      <ToastProvider />
     </div>
   );
 }

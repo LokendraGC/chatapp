@@ -36,6 +36,11 @@ const TONE_OPTIONS: ToneOption[] = [
     description: "Only answer if fully confident. No Small talk",
   },
   {
+    value: "neutral",
+    label: "Neutral",
+    description: "Professional and concise.",
+  },
+  {
     value: "friendly",
     label: "Friendly",
     description: "Warm and conversational. Good for general FAQ.",
@@ -186,7 +191,9 @@ export default function SectionFormFields({
           </h4>
           <RadioGroup
             value={formData.tone}
-            onValueChange={(value) => setFormData({ ...formData, tone: value as Tone })}
+            onValueChange={(value) =>
+              setFormData({ ...formData, tone: value as Tone })
+            }
             className="grid grid-cols-1 gap-2"
             disabled={isDissabled}
           >
@@ -207,7 +214,9 @@ export default function SectionFormFields({
                   } ${isDissabled ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <RadioGroupItem
-                    className={`border-white/10 ${isSelected ? "border-white/20" : ""}`}
+                    className={`border-white/10 ${
+                      isSelected ? "border-white/20" : ""
+                    }`}
                     value={option.value}
                     id={option.value}
                   />
@@ -228,7 +237,11 @@ export default function SectionFormFields({
                     </div>
 
                     {option.description && (
-                      <p className={`text-xs mt-1 ${isSelected ? "text-zinc-400" : "text-zinc-500"}`}>
+                      <p
+                        className={`text-xs mt-1 ${
+                          isSelected ? "text-zinc-400" : "text-zinc-500"
+                        }`}
+                      >
                         {option.description}
                       </p>
                     )}
@@ -237,6 +250,39 @@ export default function SectionFormFields({
               );
             })}
           </RadioGroup>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-vs Scope Rules">
+            Scope Rules
+          </h4>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-zinc-300 text-xs">Allowed Topics</Label>
+              <Input
+                placeholder="e.g. pricing, returns, etc."
+                className="bg-white/2 border-white/10 text-white placeholder:text-zinc-500"
+                value={formData.allowedTopics}
+                onChange={(e) =>
+                  setFormData({ ...formData, allowedTopics: e.target.value })
+                }
+                disabled={isDissabled}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-zinc-300 text-xs">Blocked Topics</Label>
+              <Input
+                placeholder="e.g. competitors etc."
+                className="bg-white/2 border-white/10 text-white placeholder:text-zinc-500"
+                value={formData.blockedTopics}
+                onChange={(e) =>
+                  setFormData({ ...formData, blockedTopics: e.target.value })
+                }
+                disabled={isDissabled}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

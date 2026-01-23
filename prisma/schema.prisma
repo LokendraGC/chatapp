@@ -28,29 +28,44 @@ model User {
 
 // metadata
 model MetaData {
-  id              String   @id @default(dbgenerated("gen_random_uuid()"))
-  user_email      String   @unique
-  business_name   String
-  website_url     String
-  external_links  String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
+  user_email     String   @unique
+  business_name  String
+  website_url    String
+  external_links String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   @@map("metadata")
 }
 
 // knowledge source
 model KnowledgeSource {
-  id          String   @id @default(dbgenerated("gen_random_uuid()"))
-  user_email  String
-  type        String
-  name        String
-  status      String   @default("active")
-  source_url  String?
-  content     String?
-  meta_data   String?
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  user_email   String
+  type         String
+  name         String
+  status       String   @default("active")
+  source_url   String?
+  content      String?
+  meta_data    String?
   last_updated DateTime @default(now()) @updatedAt
-  created_at  DateTime @default(now())
+  created_at   DateTime @default(now())
 
   @@map("knowledge_source")
+}
+
+model Section {
+  id                String   @id @default(dbgenerated("gen_random_uuid()"))
+  user_email        String
+  name              String
+  description       String
+  tone              String
+  allowed_topics    String?
+  blocked_topics    String?
+  status            String   @default("draft")
+  source_ids        String[]
+  created_at        DateTime @default(now())
+
+  @@map("section")
 }
