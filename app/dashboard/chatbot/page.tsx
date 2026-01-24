@@ -1,9 +1,15 @@
 "use client";
 
-import ApartmentConfig from "@/components/ui/dashboard/chatbot/ApartmentConfig";
 import ChatSimulator from "@/components/ui/dashboard/chatbot/ChatSimulator";
+import EmbedCodeConfig from "@/components/ui/dashboard/chatbot/EmbedCodeConfig";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+
+const ApartmentConfig = dynamic(
+  () => import("@/components/ui/dashboard/chatbot/ApartmentConfig"),
+  { ssr: false }
+);
 
 interface ChatBotMetaData {
   id: string;
@@ -34,9 +40,11 @@ export default function ChatbotPage() {
       try {
         setLoading(true);
         const metaRes = await fetch("/api/chatbot/fetch");
-        const metaData = await metaRes.json();
+        const response = await metaRes.json();
 
-        if (metaData) {
+        if (response && response.data) {
+          const metaData = response.data;
+          setMetadata(metaData);
           setPrimaryColor(metaData.color || "#4f46e5");
           setWelcomeMessage(
             metaData.welcome_message || "Hi there, How can I help you today?"
@@ -115,6 +123,52 @@ export default function ChatbotPage() {
     setIsTyping(false);
   };
 
+  const hasChanges = metadata
+    ? primaryColor !== (metadata.color || "#4f46e5") ||
+      welcomeMessage !==
+        (metadata.welcome_message || "Hi there, How can I help you today?")
+    : false;
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/chatbot/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          color: primaryColor,
+          welcome_message: welcomeMessage,
+        }),
+      });
+
+      if (res.ok) {
+        const response = await res.json();
+        if (response.success && response.data) {
+          // Update the metadata state with the new values while preserving other fields
+          setMetadata((prev) => 
+            prev ? { ...prev, ...response.data } : null
+          );
+        }
+      } else {
+        throw new Error("Failed to save metadata" + res.statusText);
+      }
+    } catch (error) {
+      console.error("Error saving metadata:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
       <div className="flex justify-between items-center shrink-0">
@@ -149,7 +203,17 @@ export default function ChatbotPage() {
         <div className="lg:col-span-5 h-full min-h-0 overflow-hidden flex flex-col">
           <ScrollArea className="h-full pr-4">
             <div className="space-y-6 pb-8">
-              <ApartmentConfig />
+              <ApartmentConfig
+                primaryColor={primaryColor}
+                setPrimaryColor={setPrimaryColor}
+                welcomeMessage={welcomeMessage}
+                setWelcomeMessage={setWelcomeMessage}
+                handleSave={handleSave}
+                isSaving={isSaving}
+                hasChanges={hasChanges}
+              />
+
+              <EmbedCodeConfig chatbotId={metadata?.id || undefined} />
             </div>
           </ScrollArea>
         </div>
