@@ -69,3 +69,14 @@ model Section {
 
   @@map("section")
 }
+
+
+model ChatBotMetadata {
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  user_email    String
+  color         String?  @default("#4f39f6")
+  welcome_message String? @default("Hi there, How can I help you today?")
+  created_at    DateTime @default(now())
+
+  @@map("chatbot_metadata")
+}
