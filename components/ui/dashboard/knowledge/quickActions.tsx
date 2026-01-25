@@ -29,24 +29,6 @@ export default function QuickActions({
 
       <Button
         variant="outline"
-        onClick={() => onOpenModal("upload")}
-        className="h-auto py-8 px-6 flex flex-col items-center bg-[#050509] justify-center border border-white/10 hover:bg-white/2 hover:border-indigo-500 transition-all duration-300 hover:text-white"
-      >
-        <div className="p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 group-hover:bg-indigo-500/20 duration-300 transition-colors">
-          <Upload className="w-6 h-6 text-emerald-400" />
-        </div>
-        <div className="space-y-1.5 text-center w-full">
-          <span className="text-sm font-medium block whitespace-normal">
-            Upload Document
-          </span>
-          <p className="text-xs text-zinc-500 font-normal leading-relaxed whitespace-normal wrap-break-word">
-            Upload a document to your knowledge base to train your chatbot.
-          </p>
-        </div>
-      </Button>
-
-      <Button
-        variant="outline"
         onClick={() => onOpenModal("text")}
         className="h-auto py-8 px-6 flex flex-col items-center bg-[#050509] justify-center border border-white/10 hover:bg-white/2 hover:border-indigo-500 transition-all duration-300 hover:text-white"
       >
@@ -59,6 +41,24 @@ export default function QuickActions({
           </span>
           <p className="text-xs text-zinc-500 font-normal leading-relaxed whitespace-normal wrap-break-word">
             Manually add a text to your knowledge base to train your chatbot.
+          </p>
+        </div>
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={() => onOpenModal("upload")}
+        className="h-auto py-8 px-6 flex flex-col items-center bg-[#050509] justify-center border border-white/10 hover:bg-white/2 hover:border-indigo-500 transition-all duration-300 hover:text-white"
+      >
+        <div className="p-3 rounded-full bg-indigo-500/10 border border-indigo-500/20 group-hover:bg-indigo-500/20 duration-300 transition-colors">
+          <Upload className="w-6 h-6 text-emerald-400" />
+        </div>
+        <div className="space-y-1.5 text-center w-full">
+          <span className="text-sm font-medium block whitespace-normal">
+            Upload Document
+          </span>
+          <p className="text-xs text-zinc-500 font-normal leading-relaxed whitespace-normal wrap-break-word">
+            Upload a document to your knowledge base to train your chatbot.
           </p>
         </div>
       </Button>

@@ -34,7 +34,7 @@ export default async function DashboardLayout({
 
       // If only business_name is in cookie, fetch full metadata from DB
       if (cookieData.business_name && !cookieData.website_url && userEmail) {
-        const fullMetadata = await prisma.metaData.findUnique({
+        const [fullMetadata] = await prisma.metaData.findMany({
           where: {
             user_email: userEmail,
           },

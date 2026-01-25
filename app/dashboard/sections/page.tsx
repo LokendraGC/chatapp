@@ -105,18 +105,18 @@ const SectionsPage = () => {
       setIsLoadingSections(true);
       const response = await fetch("/api/section/fetch");
       const data = await response.json();
-      const transformedSections = data.response.map((section: Section) => ({
+      const transformedSections = data.response.map((section: any) => ({
         id: section.id,
         name: section.name,
         description: section.description,
         sourceCount: section.source_ids?.length || 0,
         tone: section.tone as Tone,
         status: section.status as SectionStatus,
-        allowedTopics: section.allowed_topics,
-        blockedTopics: section.blocked_topics,
-        sourceIds: section.source_ids,
+        allowedTopics: section.allowed_topics || "",
+        blockedTopics: section.blocked_topics || "",
+        sourceIds: section.source_ids || [],
         scopeLabel: section.allowed_topics || "General",
-      }));
+      })) as Section[];
       setSections(transformedSections);
     } catch (error) {
       console.error("Error fetching sections:", error);
@@ -156,6 +156,7 @@ const SectionsPage = () => {
     };
     fetchKnowledgeSources();
   }, []);
+
 
   const isPreviewMode = selectedSection?.id !== "new";
 
@@ -200,11 +201,11 @@ const SectionsPage = () => {
       name: section.name,
       description: section.description,
       tone: section.tone as Tone,
-      allowedTopics: section.allowed_topics || "",
-      blockedTopics: section.blocked_topics || "",
+      allowedTopics: section.allowedTopics || "",
+      blockedTopics: section.blockedTopics || "",
       fallbackBehavior: "escalate",
     });
-    setSelectedSources(section.source_ids || []);
+    setSelectedSources(section.sourceIds || []);
     setIsSheetOpen(true);
   };
 

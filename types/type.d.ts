@@ -32,10 +32,10 @@ interface Section {
   name: string;
   description: string;
   sourceCount: number;
-  source_ids?: string[];
+  sourceIds?: string[];
   tone: Tone;
   scopeLabel: string;
-  allowed_topics?: string;
-  blocked_topics?: string;
+  allowedTopics?: string;
+  blockedTopics?: string;
   status: SectionStatus;
 }

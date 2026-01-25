@@ -79,7 +79,51 @@ export default function ChatbotPage() {
     }
   }, [messages, isTyping]);
 
-  const handleSend = async () => {};
+  const handleSend = async () => {
+    if (!input.trim()) {
+      return;
+    }
+
+    const currentSection = sections.find(
+      (section) => section.name === activeSection
+    );
+    const sourceIds = currentSection?.sourceIds || [];
+
+    const userMessage = {
+      role: "user",
+      content: input,
+      section: activeSection,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput("");
+    setIsTyping(true);
+
+    const res = await fetch("/api/chat/test", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: [...messages, userMessage],
+        knowledge_source_ids: sourceIds,
+      }),
+    });
+    if (!res.ok) {
+      setIsTyping(false);
+      return;
+    }
+    const data = await res.json();
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        role: "assistant",
+        content: data.reply,
+        section: null,
+      },
+    ]);
+    setIsTyping(false);
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -147,9 +191,7 @@ export default function ChatbotPage() {
         const response = await res.json();
         if (response.success && response.data) {
           // Update the metadata state with the new values while preserving other fields
-          setMetadata((prev) => 
-            prev ? { ...prev, ...response.data } : null
-          );
+          setMetadata((prev) => (prev ? { ...prev, ...response.data } : null));
         }
       } else {
         throw new Error("Failed to save metadata" + res.statusText);
