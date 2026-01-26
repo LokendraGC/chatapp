@@ -13,9 +13,8 @@ export default function EmbedCodeConfig({
 }) {
   const [copied, setCopied] = useState(false);
 
-  const embedCode = `<script src="https://chatbot.yourdomain.com/embed.js?id=${
-    chatbotId || "..."
-  }" defer ></script>`;
+  const embedCode = `<script src="http://localhost:3000/widget.js"
+  data-id="${chatbotId}"></script>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(embedCode);
@@ -64,7 +63,6 @@ export default function EmbedCodeConfig({
               embed the chatbot on your website.
             </span>
           </div>
-
         </div>
       </CardContent>
     </Card>

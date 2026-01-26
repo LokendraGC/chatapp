@@ -22,7 +22,7 @@ import { Plus, Trash } from "lucide-react";
 import { Badge } from "../../badge";
 import { Label } from "../../label";
 import { Input } from "../../input";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "../../avatar";
 import { cn } from "@/lib/utils";
 

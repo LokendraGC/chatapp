@@ -24,16 +24,46 @@ export async function POST(req: Request) {
       );
     }
 
+    const client = await clerkClient();
+    let clerkOrganizationId: string | null = null;
 
-    const organizationId = clerkUser.id;
+    try {
+
+      console.log("clerkUser.id:", clerkUser.id);
+
+      const memberships = await client.users.getOrganizationMembershipList({
+        userId: clerkUser.id,
+      });
+
+      const membership = memberships.data[0];
+
+      console.log("Membership role:", membership?.role);
+
+
+      if (!membership) {
+        return NextResponse.json(
+          { error: "User is not part of any organization" },
+          { status: 400 }
+        );
+      }
+
+      clerkOrganizationId = membership.organization.id;
+    } catch (orgError: any) {
+
+      return NextResponse.json(
+        { error: "User is not part of any organization" },
+        { status: 400 }
+      );
+    }
 
     // Check if member exists locally
     const existingMember = await prisma.teamMember.findFirst({
       where: {
         user_email: email,
-        organization_id: organizationId,
+        organization_id: clerkOrganizationId,
       },
     });
+
 
     if (existingMember) {
       return NextResponse.json(
@@ -42,52 +72,42 @@ export async function POST(req: Request) {
       );
     }
 
-    const client = await clerkClient();
     let invitation: any = null;
-    let clerkOrganizationId: string | null = null;
-
-    try {
-      // Try to get user's organization memberships
-      const organizationMemberships = await client.users.getOrganizationMembershipList({
-        userId: clerkUser.id,
-      });
-      clerkOrganizationId = organizationMemberships.data[0]?.organization.id || null;
-    } catch (orgError: any) {
-      // If we can't get organizations (403/404), that's okay - we'll continue without Clerk invitation
-      console.log("Could not get organization memberships:", orgError?.status || orgError?.message);
-      clerkOrganizationId = null;
-    }
-
 
     console.log("clerkOrganizationId", clerkOrganizationId);
     // 2️⃣ Create Clerk invitation (only if we have a valid organization)
+    // Inside your POST function where you create the Clerk invitation:
     if (clerkOrganizationId) {
       try {
         // Get the base URL from headers
         const headersList = await headers();
         const host = headersList.get("host") || "localhost:3000";
-        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-        const redirectUrl = `${protocol}://${host}/`; // Redirect to home page after sign-up
+        const protocol =
+          process.env.NODE_ENV === "production" ? "https" : "http";
+        const redirectUrl = `${protocol}://${host}/`;
 
         invitation = await client.organizations.createOrganizationInvitation({
           organizationId: clerkOrganizationId,
           emailAddress: email,
-          role: "org:member", 
+          role: "org:member",
           redirectUrl: redirectUrl,
         });
+        
       } catch (inviteError: any) {
-        // If invitation fails (404 means org doesn't exist), continue without it
-        console.log("Could not create Clerk invitation:", inviteError?.status || inviteError?.message);
+        console.error(
+          "Could not create Clerk invitation:",
+          inviteError?.status || inviteError?.message,
+          inviteError
+        );
         invitation = null;
       }
     }
-
     // 3️⃣ Create team member in database (this always happens, even without Clerk invitation)
     const newMember = await prisma.teamMember.create({
       data: {
         name,
         user_email: email,
-        organization_id: organizationId,
+        organization_id: clerkOrganizationId,
         clerk_invitation_id: invitation?.id || null,
         status: "pending",
       },
@@ -124,7 +144,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    
+
     // Handle invalid resource ID error
     if (error?.message?.includes("A valid resource ID is required")) {
       return NextResponse.json(
@@ -132,7 +152,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    
+
     // Handle Clerk 404 Not Found errors (organization doesn't exist)
     if (error?.status === 404 || error?.clerkError) {
       // If it's a database error, that's serious. If it's just Clerk, we can continue
