@@ -52,7 +52,7 @@ export default function EmbedCodeConfig({
       <CardContent className="space-y-4">
         <div className="relative group">
           <div className="bg-[#050509] border border-white/10 rounded-lg p-4 overflow-hidden">
-            <pre className="text-zinc-400 font-mono block overflow-x-auto text-[11px] leading-relaxed whitespace-pre-wrap">
+            <pre className="text-zinc-400 font-mono block overflow-x-auto text-[12px] leading-relaxed whitespace-pre-wrap">
               {embedCode}
             </pre>
           </div>
