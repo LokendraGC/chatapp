@@ -1,6 +1,7 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -23,8 +24,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get organization ID from the current user (same as team/fetch route)
-    // This is used for our database, not for Clerk
+
     const organizationId = clerkUser.id;
 
     // Check if member exists locally
@@ -42,7 +42,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1️⃣ Try to get/create Clerk organization and invitation (optional)
     const client = await clerkClient();
     let invitation: any = null;
     let clerkOrganizationId: string | null = null;
@@ -59,13 +58,22 @@ export async function POST(req: Request) {
       clerkOrganizationId = null;
     }
 
+
+    console.log("clerkOrganizationId", clerkOrganizationId);
     // 2️⃣ Create Clerk invitation (only if we have a valid organization)
     if (clerkOrganizationId) {
       try {
+        // Get the base URL from headers
+        const headersList = await headers();
+        const host = headersList.get("host") || "localhost:3000";
+        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+        const redirectUrl = `${protocol}://${host}/`; // Redirect to home page after sign-up
+
         invitation = await client.organizations.createOrganizationInvitation({
           organizationId: clerkOrganizationId,
           emailAddress: email,
-          role: "basic_member",
+          role: "org:member", 
+          redirectUrl: redirectUrl,
         });
       } catch (inviteError: any) {
         // If invitation fails (404 means org doesn't exist), continue without it
