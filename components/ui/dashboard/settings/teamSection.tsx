@@ -23,7 +23,7 @@ import { Badge } from "../../badge";
 import { Label } from "../../label";
 import { Input } from "../../input";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback } from "../../avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../avatar";
 import { cn } from "@/lib/utils";
 
 interface TeamMember {
@@ -184,50 +184,52 @@ export default function TeamSection() {
                 <div className="grid gap-4">
                   {team.map((member) => (
                     <div
-                      className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5"
+                      className="flex items-center gap-4 p-3 rounded-lg bg-white/5 border border-white/5"
                       key={member.id}
                     >
-                      {member.name}
-                      <div className="flex items-center gap-2">
+                      {/* Avatar at the start */}
+                      <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarFallback className="bg-zinc-500 text-zinc-400 text-sm">
-                            {member.name?.slice(0, 2).toUpperCase() || "U"}
+                          {member.image && (
+                            <AvatarImage src={member.image} alt={member.name || "User"} />
+                          )}
+                          <AvatarFallback className="bg-zinc-600 text-white text-xs font-medium">
+                            {member.name?.slice(0, 2).toUpperCase() || member.user_email?.slice(0, 2).toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
-
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-zinc-500 text-sm">
-                              {member.name || "Unknown"}
-                            </p>
-
-                            <Badge
-                              variant="secondary"
-                              className={cn(
-                                "capitalize border mx-1 mb-1",
-                                member.status === "active"
-                                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20"
-                                  : "bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20"
-                              )}
-                            >
-                              {member.status}
-                            </Badge>
-                          </div>
-
-                          <p className="text-zinc-500 text-sm">
-                            {member.user_email || "Unknown"}
+                        <div className="flex flex-col">
+                          <p className="text-white text-sm font-medium">
+                            {member.name || "Unknown"}
                           </p>
                         </div>
                       </div>
 
+                      {/* Email in the center */}
+                      <div className="flex-1 flex items-center justify-center">
+                        <p className="text-zinc-300 text-sm">
+                          {member.user_email || "Unknown"}
+                        </p>
+                      </div>
+
+                      {/* Role on the right */}
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="secondary"
-                          className="text-zinc-500 text-sm capitalize border mx-1 mb-1"
+                          className={cn(
+                            "text-sm capitalize border",
+                            member.status === "active"
+                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20"
+                              : "bg-yellow-500/10 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/20"
+                          )}
+                        >
+                          {member.status}
+                        </Badge>
+                        <Badge
+                          variant="secondary"
+                          className="text-zinc-500 text-sm capitalize border"
                         >
                           {member.role || "User"}
                         </Badge>
-
                       </div>
                     </div>
                   ))}
