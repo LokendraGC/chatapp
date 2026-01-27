@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 
 interface ChatBotMetaData {
@@ -148,16 +149,16 @@ const EmbedPage = () => {
         // Find the ScrollArea viewport
         const scrollArea = scrollContainerRef.current.querySelector('[data-slot="scroll-area"]');
         const viewport = scrollArea?.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
-        
+
         if (viewport) {
           // Use multiple attempts to ensure scrolling works
           const attemptScroll = () => {
             viewport.scrollTop = viewport.scrollHeight;
           };
-          
+
           // Immediate attempt
           attemptScroll();
-          
+
           // Delayed attempts to handle async rendering
           requestAnimationFrame(attemptScroll);
           setTimeout(attemptScroll, 50);
@@ -165,7 +166,7 @@ const EmbedPage = () => {
         }
       }
     };
-    
+
     scrollToBottom();
   }, [messages, isTyping, isOpen]);
 
@@ -406,14 +407,17 @@ const EmbedPage = () => {
         {/* Input Area */}
         <div className="p-4 border-t border-white/5 bg-[#0E0E12] shrink-0">
           <div className="flex gap-2">
-            <textarea
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              className="flex-1 bg-zinc-800/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-zinc-200 placeholder-zinc-500 resize-none focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20"
-              rows={1}
-              style={{ minHeight: "44px", maxHeight: "100px" }}
+              disabled={!activeSection}
+              placeholder={
+                activeSection
+                  ? "Type a message ... "
+                  : "Please select a section to start"
+              }
+              className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-white bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleSend}
