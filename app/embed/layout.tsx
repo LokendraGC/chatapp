@@ -1,6 +1,6 @@
 const EmbedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="bg-[#050509] min-h-screen flex flex-col p-0 antialiased text-zinc-100 selection:bg-zinc-800 font-sans">
+    <div className="w-full h-full bg-transparent antialiased text-zinc-100 selection:bg-zinc-800 font-sans overflow-hidden">
       {children}
     </div>
   );

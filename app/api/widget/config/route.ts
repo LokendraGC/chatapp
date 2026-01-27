@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { jwtVerify } from "jose";
+import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
@@ -18,36 +19,46 @@ export async function GET(req: Request) {
         status: 400,
       });
     }
-    
-    const widgetId = payload.widgedId;
-    const ownerEmail = payload.ownerEmail;
-    const sessionID = payload.sessionID;
+
+    const widgetId = payload.widgedId as string;
+    const ownerEmail = payload.ownerEmail as string;
+    const sessionID = payload.sessionID as string;
 
     const metadata = await prisma.chatBotMetadata.findUnique({
       where: {
-        id: widgetId as string,
+        id: widgetId,
       },
     });
 
     if (!metadata) {
-        return new Response(JSON.stringify({ error: "Bot not found" }), {
-            status: 404,
-        });
+      return new Response(JSON.stringify({ error: "Bot not found" }), {
+        status: 404,
+      });
     }
 
-    const userSections = await prisma.section.findMany({
+    // Get sections for the widget owner (from token, not current user)
+    const sections = await prisma.section.findMany({
       where: {
-        user_email: ownerEmail as string,
+        user_email: ownerEmail,
+        status: "active", // Only get active sections
+      },
+      orderBy: {
+        created_at: "desc",
       },
     });
 
-    return new Response(JSON.stringify({
+    return new Response(
+      JSON.stringify({
         metadata,
-        userSections,
-    }), {
+        sections, // Changed from userSections to sections
+      }),
+      {
         status: 200,
-    });
-    
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     console.error("[K Xa Hajur] Error getting widget config:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {

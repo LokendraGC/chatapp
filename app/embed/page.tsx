@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertCircle, Bot, ChevronDown, MessageCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AlertCircle, Bot, ChevronDown, MessageCircle, User } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -40,11 +41,33 @@ const EmbedPage = () => {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Make sure parent body is transparent
-    document.body.style.backgroundColor = "transparent";
-    document.documentElement.style.backgroundColor = "transparent";
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
+    // Make sure parent body is transparent and properly sized
+    if (typeof document !== "undefined") {
+      document.body.style.backgroundColor = "transparent";
+      document.body.style.margin = "0";
+      document.body.style.padding = "0";
+      document.body.style.width = "100%";
+      document.body.style.height = "100%";
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.backgroundColor = "transparent";
+      document.documentElement.style.margin = "0";
+      document.documentElement.style.padding = "0";
+      document.documentElement.style.width = "100%";
+      document.documentElement.style.height = "100%";
+      document.documentElement.style.overflow = "hidden";
+    }
+
+    if (typeof window !== "undefined") {
+      window.parent.postMessage(
+        {
+          type: "resize",
+          width: "60px",
+          height: "60px",
+          borderRadius: "30px",
+        },
+        "*"
+      );
+    }
   }, []);
 
   const toggleOpen = () => {
@@ -89,6 +112,8 @@ const EmbedPage = () => {
           throw new Error("Failed to fetch config");
         }
         const data = await response.json();
+
+        console.log(data);
         setMetaData(data.metadata);
         setSections(data.sections || []);
 
@@ -153,11 +178,13 @@ const EmbedPage = () => {
     }
   };
 
+  console.log(sections);
+
   const primaryColor = metaData?.color || "#4f46ef";
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center w-14 h-14">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
       </div>
     );
@@ -165,7 +192,7 @@ const EmbedPage = () => {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="w-full h-full flex items-center justify-center">
         <button
           onClick={toggleOpen}
           className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 transition-all text-white hover:scale-105"
@@ -178,9 +205,30 @@ const EmbedPage = () => {
     );
   }
 
+  const handleClickSection = (sectionName: string) => {
+    setActiveSection(sectionName);
+    const userMsg = {
+      role: "user",
+      content: `I want to talk about ${sectionName}`,
+      section: null,
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setInput("");
+    setTimeout(() => {
+      const botResponse = {
+        role: "assistant",
+        content: `You can ask me any question related to ${sectionName}`,
+        section: sectionName,
+      };
+      setMessages((prev) => [...prev, botResponse]);
+      setIsTyping(false);
+    }, 900);
+  };
+
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <div className="w-[380px] h-[600px] bg-[#0A0A0E] rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col">
+    <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full bg-[#0A0A0E] rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-[#0E0E12] shrink-0">
           <div className="flex items-center gap-3">
@@ -214,50 +262,78 @@ const EmbedPage = () => {
         {/* Messages Container */}
         <div
           ref={scrollViewportRef}
-          className="flex-1 overflow-y-auto bg-gradient-to-b from-[#0A0A0E] to-[#0E0E12] p-4"
+          className="flex-1 overflow-y-auto bg-linear-to-b from-[#0A0A0E] to-[#0E0E12] p-4"
         >
           <div className="space-y-4">
             {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+              <div key={index} className="space-y-2">
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    message.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : message.isWelcome
-                      ? "bg-gradient-to-r from-zinc-800 to-zinc-900 text-zinc-200 border border-white/5 rounded-bl-none"
-                      : "bg-zinc-800/50 text-zinc-200 border border-white/5 rounded-bl-none"
-                  }`}
+                  className={cn(
+                    "flex w-full gap-2",
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  )}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  {message.role !== "user" && (
+                    <div className="relative shrink-0">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: primaryColor }}
+                      >
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
+                      message.role === "user"
+                        ? "bg-zinc-800 text-zinc-100 rounded-tr-sm"
+                        : "bg-white text-zinc-900 rounded-tl-sm"
+                    )}
+                  >
+                    {message.content}
+                  </div>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/5 bg-zinc-800">
+                      <User className="w-4 h-4 text-zinc-400" />
+                    </div>
+                  )}
                 </div>
+                {message.isWelcome && sections.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pl-10 animate-in fade-in slide-in-from-top-1 duration-300">
+                    {sections.map((section) => (
+                      <button
+                        key={section.id}
+                        onClick={() => handleClickSection(section.name)}
+                        className="px-3 py-1 rounded-full border border-white/20 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
+                      >
+                        {section.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-zinc-800/50 border border-white/5 rounded-bl-none">
-                  <div className="flex gap-1">
-                    <div
-                      className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0ms" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "150ms" }}
-                    ></div>
-                    <div
-                      className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "300ms" }}
-                    ></div>
-                  </div>
+          {isTyping && (
+            <div className="flex w-full gap-2 justify-start">
+              <div className="relative shrink-0">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  <Bot className="w-4 h-4 text-white" />
                 </div>
+                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
               </div>
-            )}
+              <div className="max-w-[80%] p-4 rounded-2xl bg-white text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
+              </div>
+            </div>
+          )}
           </div>
         </div>
 
@@ -294,6 +370,5 @@ const EmbedPage = () => {
     </div>
   );
 };
-
 
 export default EmbedPage;

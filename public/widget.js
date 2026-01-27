@@ -50,16 +50,16 @@
         iframe.style.border = "none";
         iframe.style.zIndex = "999999";
         iframe.style.borderRadius = "30px";
-
+        iframe.style.overflow = "hidden";
         iframe.style.backgroundColor = "transparent";
         iframe.style.transition = "all 0.3s ease";
 
         document.body.appendChild(iframe);
 
         window.addEventListener("message", function (event) {
-          if (event.data.type === "resize") {
-            iframe.style.width = event.data.width + "px";
-            iframe.style.height = event.data.height + "px";
+          if ( event.data && event.data.type === "resize") {
+            iframe.style.width = event.data.width;
+            iframe.style.height = event.data.height;
             iframe.style.borderRadius = event.data.borderRadius || "12px";
 
             if (event.data.boxShadow) {
