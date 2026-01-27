@@ -2,8 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import { AlertCircle, Bot, ChevronDown, MessageCircle, User } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 interface ChatBotMetaData {
   id: string;
@@ -38,7 +41,7 @@ const EmbedPage = () => {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Make sure parent body is transparent and properly sized
@@ -140,35 +143,97 @@ const EmbedPage = () => {
   }, [token]);
 
   useEffect(() => {
-    if (scrollViewportRef.current) {
-      scrollViewportRef.current.scrollTop =
-        scrollViewportRef.current.scrollHeight;
-    }
+    const scrollToBottom = () => {
+      if (scrollContainerRef.current) {
+        // Find the ScrollArea viewport
+        const scrollArea = scrollContainerRef.current.querySelector('[data-slot="scroll-area"]');
+        const viewport = scrollArea?.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
+        
+        if (viewport) {
+          // Use multiple attempts to ensure scrolling works
+          const attemptScroll = () => {
+            viewport.scrollTop = viewport.scrollHeight;
+          };
+          
+          // Immediate attempt
+          attemptScroll();
+          
+          // Delayed attempts to handle async rendering
+          requestAnimationFrame(attemptScroll);
+          setTimeout(attemptScroll, 50);
+          setTimeout(attemptScroll, 150);
+        }
+      }
+    };
+    
+    scrollToBottom();
   }, [messages, isTyping, isOpen]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim()) {
+      return;
+    }
+
+    const currentSection = sections.find(
+      (section) => section.name === activeSection
+    );
+    const sourceIds = currentSection?.source_ids || [];
+
+    console.log("Source IDs:", sourceIds);
 
     const userMessage = {
       role: "user",
       content: input,
-      timestamp: new Date().toISOString(),
+      section: activeSection,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
-        role: "assistant",
-        content: `I received: "${input}". This is a demo response.`,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
+
+    try {
+
+      const res = await fetch("/api/chat/public", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          knowledge_source_ids: sourceIds,
+        }),
+      });
+
+      console.log(res);
+
+      if (res.ok) {
+        const data = await res.json();
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: data.reply,
+            section: null,
+          },
+        ]);
+      } else {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            role: "assistant",
+            content: "I'm sorry, I couldn't generate a response. Please try again.",
+            section: null,
+          },
+        ]);
+      }
+
+    } catch (error) {
+      console.error("Error in sending message:", error);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -177,8 +242,6 @@ const EmbedPage = () => {
       handleSend();
     }
   };
-
-  console.log(sections);
 
   const primaryColor = metaData?.color || "#4f46ef";
 
@@ -261,80 +324,83 @@ const EmbedPage = () => {
 
         {/* Messages Container */}
         <div
-          ref={scrollViewportRef}
+          ref={scrollContainerRef}
           className="flex-1 overflow-y-auto bg-linear-to-b from-[#0A0A0E] to-[#0E0E12] p-4"
         >
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div key={index} className="space-y-2">
-                <div
-                  className={cn(
-                    "flex w-full gap-2",
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  )}
-                >
-                  {message.role !== "user" && (
-                    <div className="relative shrink-0">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: primaryColor }}
-                      >
-                        <Bot className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
-                    </div>
-                  )}
+          <ScrollArea className="h-full p-6 relative bg-zinc-950/30">
+
+            <div className="space-y-4">
+              {messages.map((message, index) => (
+                <div key={index} className="space-y-2">
                   <div
                     className={cn(
-                      "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
-                      message.role === "user"
-                        ? "bg-zinc-800 text-zinc-100 rounded-tr-sm"
-                        : "bg-white text-zinc-900 rounded-tl-sm"
+                      "flex w-full gap-2",
+                      message.role === "user" ? "justify-end" : "justify-start"
                     )}
                   >
-                    {message.content}
+                    {message.role !== "user" && (
+                      <div className="relative shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: primaryColor }}
+                        >
+                          <Bot className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+                      </div>
+                    )}
+                    <div
+                      className={cn(
+                        "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
+                        message.role === "user"
+                          ? "bg-zinc-800 text-zinc-100 rounded-tr-sm"
+                          : "bg-white text-zinc-900 rounded-tl-sm"
+                      )}
+                    >
+                      {message.content}
+                    </div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/5 bg-zinc-800">
+                        <User className="w-4 h-4 text-zinc-400" />
+                      </div>
+                    )}
                   </div>
-                  {message.role === "user" && (
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/5 bg-zinc-800">
-                      <User className="w-4 h-4 text-zinc-400" />
+                  {message.isWelcome && sections.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pl-10 animate-in fade-in slide-in-from-top-1 duration-300">
+                      {sections.map((section) => (
+                        <button
+                          key={section.id}
+                          onClick={() => handleClickSection(section.name)}
+                          className="px-3 py-1 rounded-full border border-white/20 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
+                        >
+                          {section.name}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
-                {message.isWelcome && sections.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pl-10 animate-in fade-in slide-in-from-top-1 duration-300">
-                    {sections.map((section) => (
-                      <button
-                        key={section.id}
-                        onClick={() => handleClickSection(section.name)}
-                        className="px-3 py-1 rounded-full border border-white/20 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
-                      >
-                        {section.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
 
-          {isTyping && (
-            <div className="flex w-full gap-2 justify-start">
-              <div className="relative shrink-0">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  <Bot className="w-4 h-4 text-white" />
+              {isTyping && (
+                <div className="flex w-full gap-2 justify-start">
+                  <div className="relative shrink-0">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: primaryColor }}
+                    >
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+                  </div>
+                  <div className="max-w-[80%] p-4 rounded-2xl bg-white text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
+                  </div>
                 </div>
-                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
-              </div>
-              <div className="max-w-[80%] p-4 rounded-2xl bg-white text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
-              </div>
+              )}
             </div>
-          )}
-          </div>
+          </ScrollArea >
         </div>
 
         {/* Input Area */}
@@ -352,11 +418,10 @@ const EmbedPage = () => {
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${
-                input.trim()
-                  ? "hover:brightness-110"
-                  : "opacity-50 cursor-not-allowed"
-              }`}
+              className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${input.trim()
+                ? "hover:brightness-110"
+                : "opacity-50 cursor-not-allowed"
+                }`}
               style={{
                 backgroundColor: input.trim() ? primaryColor : "#374151",
                 color: "white",
@@ -365,6 +430,16 @@ const EmbedPage = () => {
               Send
             </button>
           </div>
+
+          <div className="mt-2 text-center">
+            <Link
+              href={"/"}
+              className="text-[12px] text-zinc-600 font-medium hover:text-zinc-500 transition-colors"
+            >
+              Powered by K Xa Hajur
+            </Link>
+          </div>
+
         </div>
       </div>
     </div>

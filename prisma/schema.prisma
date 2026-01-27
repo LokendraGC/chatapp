@@ -85,3 +85,36 @@ model TeamMember {
 
   @@map("team_member")
 }
+
+
+model Conversation {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Text
+  user_email String?  @db.Text
+  visitor_ip String?  @db.Text
+  name       String?  @db.Text
+  chatbot_id String   @db.Text
+  created_at String?  @default(dbgenerated("now()")) @db.Text
+  
+  @@map("conversation")
+}
+
+model Message {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Text
+  conversation_id String   @db.Text
+  role            String   @db.Text
+  content         String   @db.Text
+  created_at      DateTime @default(now()) @db.Timestamptz
+  
+  @@map("messages")
+}
+
+model Widget {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Text
+  organization_id  String   @db.Text
+  name             String   @db.Text
+  allowed_domains  String[] @db.Text
+  status           String   @default("active") @db.Text
+  created_at       String?  @default(dbgenerated("now()")) @db.Text
+  
+  @@map("widgets")
+}
