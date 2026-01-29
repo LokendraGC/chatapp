@@ -33,7 +33,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const botIds = chatbotMetadata.map((bot) => bot.id);
+        const botIds = chatbotMetadata.map((bot: { id: string }) => bot.id);
 
         const messages = await prisma.message.findMany({
             where: {

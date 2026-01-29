@@ -34,7 +34,7 @@ export async function GET(req: Request) {
             total: 0,
         }
 
-        knowledgeByType.forEach((item) => {
+        knowledgeByType.forEach((item: { type: string; _count: { _all: number } }) => {
             if (item.type === "website") knowledgeStats.website += item._count._all;
             if (item.type === "upload") knowledgeStats.upload += item._count._all;
             if (item.type === "text") knowledgeStats.text += item._count._all;
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
 
         const sectionStats = {
             total: recentSections.length,
-            list: recentSections.map((section) => {
+            list: recentSections.map((section: { name: string; source_ids: string[]; tone: string }) => {
                 return {
                     name: section.name,
                     sourceCount: section.source_ids?.length || 0,
@@ -62,7 +62,7 @@ export async function GET(req: Request) {
         }
 
         const totalSection = recentSections.length;
-        const totalSource = recentSections.reduce((acc, section) => acc + (section.source_ids?.length || 0), 0);
+        const totalSource = recentSections.reduce((acc: number, section: { source_ids: string[] }) => acc + (section.source_ids?.length || 0), 0);
         const botIds = bots.map((bot) => bot.id);
 
 

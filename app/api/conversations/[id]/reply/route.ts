@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -33,7 +33,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         if (chatbotMetadata.length === 0) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        const botIds = chatbotMetadata.map((bot) => bot.id);
+        const botIds = chatbotMetadata.map((bot: { id: string }) => bot.id);
 
         if (!chatbotMetadata) {
             return NextResponse.json({ error: "Bot not found" }, { status: 404 });
