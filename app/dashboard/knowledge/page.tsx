@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import QuickActions from "@/components/ui/dashboard/knowledge/quickActions";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import AddKnowledgeModal from "@/components/ui/dashboard/knowledge/addKnowledgeModal";
 import KnowledgeSources from "@/components/ui/dashboard/knowledge/KnowledgeSources";
 import SourceDetailsPage from "@/components/ui/dashboard/knowledge/SourceDetailsPage";
@@ -33,19 +34,20 @@ export default function KnowledgePage() {
     setIsSheetOpen(true);
   };
 
+  const fetchKnowledgeSources = async () => {
+    setKnowSourcesLoading(true);
+    try {
+      const res = await fetch("/api/knowledge/fetch");
+      const data = await res.json();
+      setKnowledgeSources(data.sources);
+    } catch (error) {
+      console.error("Error fetching knowledge sources:", error);
+    } finally {
+      setKnowSourcesLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchKnowledgeSources = async () => {
-      setKnowSourcesLoading(true);
-      try {
-        const res = await fetch("/api/knowledge/fetch");
-        const data = await res.json();
-        setKnowledgeSources(data.sources);
-      } catch (error) {
-        console.error("Error fetching knowledge sources:", error);
-      } finally {
-        setKnowSourcesLoading(false);
-      }
-    };
     fetchKnowledgeSources();
   }, []);
 
@@ -56,14 +58,14 @@ export default function KnowledgePage() {
       let response;
 
       if (data.type === "upload" && data.file) {
+        setKnowledgeStoringLoading(true);
+
         const formData = new FormData();
         formData.append("type", "upload");
         formData.append("file", data.file);
 
         response = await fetch("/api/knowledge/store", {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+
           method: "POST",
           body: formData,
         });
@@ -78,7 +80,8 @@ export default function KnowledgePage() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to store knowledge");
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData?.details ?? errData?.error ?? "Failed to store knowledge");
       }
 
       const res = await fetch("/api/knowledge/fetch", {
@@ -90,8 +93,13 @@ export default function KnowledgePage() {
       const newData = await res.json();
       setKnowledgeSources(newData.sources);
       setIsAddWebsiteModalOpen(false);
-    } catch (err: any) {
+
+      const fileName = data.type === "upload" && data.file ? data.file.name : data.url ?? data.title ?? "Source";
+      toast.success(`"${fileName}" added to knowledge base.`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to store knowledge";
       console.error(err);
+      toast.error(message);
     } finally {
       setKnowledgeStoringLoading(false);
     }
@@ -137,14 +145,15 @@ export default function KnowledgePage() {
         defaultTab={defaultTab}
         setDefaultTab={setDefaultTab}
         onImport={handleImport}
-        isLoading={knowSourcesLoading}
+        isLoading={knowSourcesLoading || knowledgeStoringLoading}
         existingSources={knowledgeSources}
       />
 
-      <SourceDetailsPage 
-      isOpen={isSheetOpen}
-      setIsOpen={setIsSheetOpen}
-      selectedSource={selectedSource}
+      <SourceDetailsPage
+        isOpen={isSheetOpen}
+        setIsOpen={setIsSheetOpen}
+        selectedSource={selectedSource}
+        onDelete={fetchKnowledgeSources}
       />
     </div>
   );

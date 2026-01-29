@@ -13,6 +13,7 @@ import {
 } from "../../table";
 import { Skeleton } from "../../skeleton";
 import { Badge } from "../../badge";
+import { useState, useMemo } from "react";
 
 type SourceType = "website" | "docs" | "text" | "upload";
 type SourceStatus = "active" | "training" | "error" | "excluded";
@@ -74,12 +75,31 @@ export default function KnowledgeSources({
   onSourceClick,
   isLoading,
 }: KnowledgeSourceProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter sources based on search query
+  const filteredSources = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return sources;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return sources.filter((source) => {
+      const nameMatch = source.name?.toLowerCase().includes(query);
+      const urlMatch = source.source_url?.toLowerCase().includes(query);
+      const typeMatch = source.type?.toLowerCase().includes(query);
+      const statusMatch = source.status?.toLowerCase().includes(query);
+      
+      return nameMatch || urlMatch || typeMatch || statusMatch;
+    });
+  }, [sources, searchQuery]);
+
   return (
     <Card className="border-white/5 bg-[#0a0a0e]">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-medium text-white">
-            Sources
+            Sources {searchQuery && `(${filteredSources.length})`}
           </CardTitle>
 
           <div className="flex items-center gap-2">
@@ -87,8 +107,10 @@ export default function KnowledgeSources({
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
               <Input
                 type="text"
-                placeholder="Search sources"
-                className="pl-10 bg-white/2 border-white/10 w-50 md:w-64 text-white"
+                placeholder="Search sources..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white/2 border-white/10 w-50 md:w-64 text-white placeholder:text-zinc-500"
               />
             </div>
 
@@ -145,8 +167,8 @@ export default function KnowledgeSources({
                   </TableCell>
                 </TableRow>
               ))
-            ) : sources.length > 0 ? (
-              sources.map((source, index) => (
+            ) : filteredSources.length > 0 ? (
+              filteredSources.map((source, index) => (
                 <TableRow
                   key={source.id || index}
                   className="border-white/5 hover:bg-white/2 cursor-pointer transition-colors"
@@ -191,6 +213,15 @@ export default function KnowledgeSources({
                   </TableCell>
                 </TableRow>
               ))
+            ) : searchQuery ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="h-32 text-center text-zinc-500"
+                >
+                  No sources found matching "{searchQuery}"
+                </TableCell>
+              </TableRow>
             ) : (
               <TableRow>
                 <TableCell

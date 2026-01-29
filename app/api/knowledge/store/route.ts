@@ -2,6 +2,8 @@ import { summarizeMarkdown } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import path from "path";
+import { pathToFileURL } from "url";
 
 export async function POST(req: Request) {
   const clerkUser = await currentUser();
@@ -11,12 +13,11 @@ export async function POST(req: Request) {
 
   try {
     const contentType = req.headers.get("Content-Type");
-    let type: string;
-    let body: any;
 
+    // Handle FormData (file upload)
     if (contentType?.includes("multipart/form-data")) {
       const formData = await req.formData();
-      type = formData.get("type") as string;
+      const type = formData.get("type") as string;
 
       if (type === "upload") {
         const file = formData.get("file") as File;
@@ -28,47 +29,213 @@ export async function POST(req: Request) {
           );
         }
 
-        const fileContent = await file.text();
+        const fileName = file.name;
+        const fileType = file.type;
+        let extractedText = "";
+        let formattedContent = "";
 
-        const lines = fileContent
-          .split("\n")
-          .filter((line) => line.trim() !== "");
-        const headers = lines[0]?.split(",").map((header) => header.trim());
-        let formattedContent: any = "";
+        // Handle PDF files - use pdfjs-dist with Node.js polyfills
+        if (fileType === "application/pdf" || fileName.toLowerCase().endsWith('.pdf')) {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
 
-        const markDown = await summarizeMarkdown(formattedContent);
-        formattedContent = markDown;
+            // Polyfill DOMMatrix/Path2D/ImageData for pdfjs-dist in Node.js (minimal shim)
+            const g = globalThis as Record<string, unknown>;
+            if (typeof g.DOMMatrix === "undefined") {
+              g.DOMMatrix = class DOMMatrix {
+                a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
+                constructor(_init?: string | number[]) {}
+                translate() { return this; }
+                scale() { return this; }
+                multiply() { return this; }
+                invertSelf() { return this; }
+                transformPoint() { return { x: 0, y: 0 }; }
+              };
+            }
+            if (typeof g.Path2D === "undefined") {
+              g.Path2D = class Path2D { constructor(_path?: string) {} };
+            }
+            if (typeof g.ImageData === "undefined") {
+              g.ImageData = class ImageData {
+                width: number;
+                height: number;
+                data: Uint8ClampedArray;
+                constructor(w: number, h: number) {
+                  this.width = w;
+                  this.height = h;
+                  this.data = new Uint8ClampedArray(w * h * 4);
+                }
+              };
+            }
 
-        await prisma.knowledgeSource.create({
+            const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+            // Required: set worker to legacy build worker (file URL for Node.js)
+            const workerPath = path.join(
+              process.cwd(),
+              "node_modules",
+              "pdfjs-dist",
+              "legacy",
+              "build",
+              "pdf.worker.mjs"
+            );
+            pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
+
+            const loadingTask = pdfjs.getDocument({
+              data: uint8Array,
+              verbosity: 0,
+              disableFontFace: true,
+            });
+            const pdfDocument = await loadingTask.promise;
+            const numPages = pdfDocument.numPages;
+
+            const textParts: string[] = [];
+            for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+              const page = await pdfDocument.getPage(pageNum);
+              const textContent = await page.getTextContent();
+              const pageText = textContent.items
+                .map((item) => ("str" in item ? item.str : ""))
+                .join(" ");
+              textParts.push(pageText);
+            }
+            extractedText = textParts.join("\n\n");
+
+            console.log("PDF extraction successful:", {
+              fileName,
+              textLength: extractedText.length,
+              numPages,
+            });
+
+            if (!extractedText || extractedText.trim().length === 0) {
+              extractedText = `PDF file: ${fileName}. No extractable text found.`;
+              console.warn("PDF has no extractable text:", fileName);
+            }
+          } catch (pdfError: unknown) {
+            const msg = pdfError instanceof Error ? pdfError.message : String(pdfError);
+            console.error("PDF parsing error:", pdfError);
+            extractedText = `PDF file: ${fileName}. Error extracting text: ${msg}`;
+          }
+        }
+        // Handle CSV files
+        else if (fileType === "text/csv" || fileName.toLowerCase().endsWith('.csv')) {
+          try {
+            const fileContent = await file.text();
+            const lines = fileContent
+              .split("\n")
+              .filter((line) => line.trim() !== "");
+
+            if (lines.length > 0) {
+              const headers = lines[0]?.split(",").map((header) => header.trim());
+
+              // Parse CSV rows
+              const rows = lines.slice(1).map(line => {
+                const values = line.split(",");
+                const row: any = {};
+                headers?.forEach((header, index) => {
+                  row[header] = values[index]?.trim() || '';
+                });
+                return row;
+              });
+
+              // Format CSV content for summarization
+              extractedText = `CSV File: ${fileName}\n`;
+              extractedText += `Headers: ${headers?.join(', ')}\n`;
+              extractedText += `Rows: ${rows.length}\n`;
+              extractedText += `Sample data: ${JSON.stringify(rows.slice(0, 3), null, 2)}`;
+
+              // Store full data in metadata
+              formattedContent = JSON.stringify({
+                fileName,
+                headers,
+                rowCount: rows.length,
+                data: rows.slice(0, 50) // Limit to first 50 rows for storage
+              });
+            } else {
+              extractedText = `Empty CSV file: ${fileName}`;
+            }
+          } catch (csvError: any) {
+            console.error("CSV parsing error:", csvError);
+            extractedText = `CSV file: ${fileName}. Error: ${csvError.message}`;
+          }
+        }
+        // Handle text files (TXT, etc.)
+        else if (fileType.includes("text/plain") || fileName.toLowerCase().endsWith('.txt')) {
+          extractedText = await file.text();
+        }
+        // Handle other text-based files
+        else if (fileType.includes("text/")) {
+          extractedText = await file.text();
+        }
+        // Unsupported file type
+        else {
+          return NextResponse.json(
+            {
+              error: "Unsupported file type",
+              details: `File type ${fileType} is not supported. Please upload PDF, CSV, or text files.`
+            },
+            { status: 400 }
+          );
+        }
+
+        // If we haven't set formattedContent yet (for non-CSV files), store full extracted text
+        // so the full PDF/document is available to the chatbot (capped to avoid DB size issues)
+        const MAX_CONTENT_CHARS = 500_000;
+        if (!formattedContent && extractedText) {
+          formattedContent =
+            extractedText.length <= MAX_CONTENT_CHARS
+              ? extractedText
+              : extractedText.slice(0, MAX_CONTENT_CHARS) + "\n\n[Document truncated at " + MAX_CONTENT_CHARS + " characters.]";
+        }
+
+        // If still no content (e.g., empty file)
+        if (!formattedContent) {
+          formattedContent = `Uploaded file: ${fileName}`;
+        }
+
+        // Save to database
+        const knowledgeSource = await prisma.knowledgeSource.create({
           data: {
-            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            user_email: clerkUser.emailAddresses[0]?.emailAddress || "unknown@example.com",
             type: "upload",
-            name: file.name,
+            name: fileName,
             status: "active",
             content: formattedContent,
             meta_data: JSON.stringify({
-              fileName: file.name,
-              rowCount: lines.length,
-              fileType: file.type,
+              fileName: fileName,
+              fileType: fileType,
               fileSize: file.size,
-              headers: headers,
+              lastModified: file.lastModified,
+              originalTextLength: extractedText.length,
+              processed: true,
+              isPDF: fileType === "application/pdf" || fileName.toLowerCase().endsWith('.pdf'),
+              isCSV: fileType === "text/csv" || fileName.toLowerCase().endsWith('.csv'),
+              isText: fileType.includes("text/"),
             }),
           },
         });
 
+        console.log("Knowledge source created:", {
+          id: knowledgeSource.id,
+          name: knowledgeSource.name,
+          contentLength: formattedContent.length,
+          type: fileType
+        });
+
         return NextResponse.json(
-          { message: "Knowledge source stored successfully" },
+          {
+            message: "Knowledge source stored successfully",
+            fileName: fileName,
+            sourceId: knowledgeSource.id,
+            contentType: fileType
+          },
           { status: 200 }
         );
       }
     } else {
-      body = await req.json();
-      type = body.type;
-      if (type === "text") {
-        const { title, content } = body;
-        const markDown = await summarizeMarkdown(content);
-        console.log(markDown);
-      }
+      // Handle JSON requests (website and text)
+      const body = await req.json();
+      const type = body.type;
+
       if (type === "website") {
         const zenURL = new URL("https://api.zenrows.com/v1/");
         zenURL.searchParams.set("apikey", process.env.ZENROWS_API_KEY!);
@@ -89,8 +256,6 @@ export async function POST(req: Request) {
         }
 
         const html = await res.text();
-        // console.log("Website HTML content:", html);
-
         const markDown = await summarizeMarkdown(html);
 
         await prisma.knowledgeSource.create({
@@ -103,9 +268,19 @@ export async function POST(req: Request) {
             content: markDown,
           },
         });
+
+        return NextResponse.json(
+          {
+            message: "Website knowledge source stored successfully",
+            url: body.url
+          },
+          { status: 200 }
+        );
+
       } else if (type === "text") {
         const { title, content } = body;
         let textContent: string;
+
         if (content.length > 500) {
           const markDown = await summarizeMarkdown(content);
           textContent = markDown;
@@ -124,20 +299,33 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json(
-          { message: "Knowledge source stored successfully" },
+          {
+            message: "Text knowledge source stored successfully",
+            title: title
+          },
           { status: 200 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Invalid type parameter. Use 'website' or 'text'." },
+          { status: 400 }
         );
       }
     }
 
+    // If we get here, it means the type wasn't "upload" in the form data
     return NextResponse.json(
-      { message: "Knowledge source stored successfully" },
-      { status: 200 }
+      { error: "Invalid request type" },
+      { status: 400 }
     );
+
   } catch (err: any) {
-    console.error(err);
+    console.error("Error in POST /api/knowledge/store:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        details: err.message
+      },
       { status: 500 }
     );
   }

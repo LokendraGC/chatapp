@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Bot, Loader2, MoreHorizontal, Search, Send, User } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 
 
 interface Conversation {
@@ -56,10 +56,22 @@ export default function ConversationsPage() {
     fetchConversations();
   }, []);
 
-  const filteredConversations = conversations.filter((conversation) =>
-    conversation?.user?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    conversation.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter conversations based on search query
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return conversations;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return conversations.filter((conversation) => {
+      const userMatch = conversation?.user?.toLowerCase().includes(query);
+      const messageMatch = conversation.lastMessage?.toLowerCase().includes(query);
+      const emailMatch = conversation.userEmail?.toLowerCase().includes(query);
+      const ipMatch = conversation.visitorIp?.toLowerCase().includes(query);
+      
+      return userMatch || messageMatch || emailMatch || ipMatch;
+    });
+  }, [conversations, searchQuery]);
 
 
   useEffect(() => {
@@ -169,8 +181,10 @@ export default function ConversationsPage() {
             <Search className="absolute left-3 top-1/2 h-4 -translate-y-1/2 text-zinc-400" />
             <Input
               type="text"
-              placeholder="Search sources"
-              className="pl-10 bg-white/2 border-white/10 w-full text-white"
+              placeholder="Search conversations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white/2 border-white/10 w-full text-white placeholder:text-zinc-500"
             />
           </div>
 
@@ -225,6 +239,12 @@ export default function ConversationsPage() {
                         </button>
                       ))
                     }
+                  </>
+                ) : searchQuery ? (
+                  <>
+                    <div className="flex items-center justify-center py-10">
+                      <p className="text-zinc-500">No conversations found matching "{searchQuery}"</p>
+                    </div>
                   </>
                 ) : (
                   <>

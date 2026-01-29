@@ -150,6 +150,7 @@ const SectionsPage = () => {
         const res = await fetch("/api/knowledge/fetch");
         const data = await res.json();
         setKnowledgeSources(data.sources);
+        
       } catch (error) {
         console.error("Error fetching knowledge sources:", error);
       }

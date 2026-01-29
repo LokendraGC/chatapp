@@ -1,8 +1,10 @@
 "use client";
 
+import DashboardOverview from "@/components/ui/dashboard/DashboardOverview";
 import InitialForm from "@/components/ui/dashboard/initialform";
 import Sidebar from "@/components/ui/dashboard/sidebar";
 import { Spinner } from "@/components/ui/spinner";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
@@ -21,21 +23,20 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex w-full items-center justify-center p-4">
-        <Spinner />
+      <div className="flex w-full items-center justify-center p-4">
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex w-full">
+    <div className="flex-1 w-full">
       {!metadata ? (
         <div className="w-full flex items-center justify-center p-4 min-h-screen">
           <InitialForm />
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center">
-        </div>
+        <DashboardOverview />
       )}
     </div>
   );

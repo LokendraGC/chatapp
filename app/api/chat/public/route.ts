@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
 
         let sessionID: string | undefined;
-        let widgetID: string | undefined;
+        let widgetId: string | undefined;
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -43,14 +43,15 @@ export async function POST(req: Request) {
         try {
             const { payload } = await jwtVerify(token, secret);
             sessionID = payload.sessionID as string;
-            widgetID = payload.widgetID as string;
+            // Fix: Use widgedId (with typo) to match what's stored in JWT
+            widgetId = payload.widgedId as string;
 
             // Add debugging logs
             console.log("JWT payload:", payload);
             console.log("sessionID from token:", sessionID);
-            console.log("widgetID from token:", widgetID);
+            console.log("widgetId from token:", widgetId);
 
-            if (!sessionID || !widgetID) {
+            if (!sessionID || !widgetId) {
                 return NextResponse.json(
                     { error: "Missing session or widget ID in token" },
                     { status: 401 }
@@ -105,7 +106,7 @@ export async function POST(req: Request) {
                         id: sessionID,
                         visitor_ip: ip,
                         name: visitorName,
-                        chatbot_id: widgetID
+                        chatbot_id: widgetId
                     }
                 });
 
@@ -203,21 +204,30 @@ export async function POST(req: Request) {
             
             `;
 
+            // Convert messages array to conversation history string
+            const conversationHistory = messages
+                .map((msg: { role: string; content: string }) => {
+                    const roleLabel = msg.role === "user" ? "User" : "Assistant";
+                    return `${roleLabel}: ${msg.content}`;
+                })
+                .join("\n\n");
+
+            // Build the full prompt with conversation history
+            const fullPrompt = `${systemPrompt}${conversationHistory ? `\n\nCONVERSATION HISTORY:\n${conversationHistory}\n\nAssistant:` : ""}`;
 
             try {
                 const completion = await ai.models.generateContent({
                     model: "gemini-3-flash-preview",
-                    contents: systemPrompt,
+                    contents: fullPrompt,
                     config: {
                         temperature: 0.7,
-                        maxOutputTokens: 200,
+                        maxOutputTokens: 1000, // Increased from 200 to allow complete responses
                     },
                 });
 
-                let reply = completion.text?.trim() ?? "I'm sorry, couldn't generate a response.";
+                let reply = completion.text?.trim() ?? "I'm sorry, I couldn't generate a response. Please try again.";
 
                 if (reply && !reply.match(/[.!?]$/) && reply.length > 0) {
-
                     console.warn("Response might be incomplete:", reply);
                 }
 
@@ -245,15 +255,10 @@ export async function POST(req: Request) {
             } catch (error) {
                 console.error("Error in generating response:", error);
                 return NextResponse.json(
-                    { error: "Internal server error" },
+                    { error: "Internal server error", details: error instanceof Error ? error.message : String(error) },
                     { status: 500 }
                 );
             }
-
-            return NextResponse.json(
-                { success: true, message: "Message processed" },
-                { status: 200 }
-            );
 
         } catch (dbError) {
             console.error("Database error:", dbError);
@@ -266,7 +271,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("Error in public chat:", error);
         return NextResponse.json(
-            { error: "Internal server error" },
+            { error: "Internal server error", details: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
     }
