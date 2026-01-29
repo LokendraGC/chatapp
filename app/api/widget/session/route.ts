@@ -1,5 +1,12 @@
 import prisma from "@/lib/prisma";
 import { SignJWT } from "jose";
+import { NextResponse } from "next/server";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
 function getRequestOrigin(req: Request): string | null {
   const origin = req.headers.get("Origin");
@@ -23,6 +30,7 @@ export async function POST(req: Request) {
     if (!widget_id || typeof widget_id !== "string" || widget_id.trim() === "") {
       return new Response(JSON.stringify({ error: "Widget ID is required" }), {
         status: 400,
+        headers: corsHeaders,
       });
     }
 
@@ -35,6 +43,7 @@ export async function POST(req: Request) {
     if (!bot) {
       return new Response(JSON.stringify({ error: "Bot not found" }), {
         status: 404,
+        headers: corsHeaders,
       });
     }
 
@@ -69,7 +78,7 @@ export async function POST(req: Request) {
           error: "Embedding not allowed on this domain",
           allowed_domains: allowedOrigins,
         }),
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -91,12 +100,22 @@ export async function POST(req: Request) {
 
     return new Response(JSON.stringify({ token }), {
       status: 200,
+      headers: corsHeaders,
     });
-    
   } catch (error) {
     console.error("[K Xa Hajur] Error creating session:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
+      headers: corsHeaders,
     });
   }
+}
+
+
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }
