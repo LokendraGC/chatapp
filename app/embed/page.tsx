@@ -259,7 +259,7 @@ const EmbedPage = () => {
       <div className="w-full h-full flex items-center justify-center">
         <button
           onClick={toggleOpen}
-          className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 transition-all text-white hover:scale-105"
+          className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 transition-all text-white hover:scale-105 cursor-pointer"
           style={{ backgroundColor: primaryColor }}
           aria-label="Open chat"
         >
@@ -316,7 +316,7 @@ const EmbedPage = () => {
 
           <button
             onClick={toggleOpen}
-            className="p-2 rounded-lg transition-colors hover:bg-white/10 text-zinc-400 hover:text-white"
+            className="p-2 rounded-lg transition-colors hover:bg-white/10 text-zinc-400 hover:text-white cursor-pointer"
             aria-label="Minimize chat"
           >
             <ChevronDown className="w-4 h-4" />
