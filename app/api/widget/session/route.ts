@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // Domain restriction: only allow MetaData.website_url origin or localhost
+    // Domain restriction: only allow MetaData.website_url origin, localhost, or app's own domain
     const requestOrigin = getRequestOrigin(req);
     const allowedOrigins: string[] = [
       "http://localhost:3000",
@@ -55,6 +55,19 @@ export async function POST(req: Request) {
       "http://127.0.0.1:3000",
       "https://127.0.0.1:3000",
     ];
+
+    // Always allow the app's own domain (e.g. https://kxahajur.vercel.app so /test works)
+    const appSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (appSiteUrl?.trim()) {
+      try {
+        const appOrigin = new URL(appSiteUrl.trim()).origin;
+        if (!allowedOrigins.includes(appOrigin)) {
+          allowedOrigins.push(appOrigin);
+        }
+      } catch {
+        // ignore invalid URL
+      }
+    }
 
     const metadata = await prisma.metaData.findUnique({
       where: { user_email: bot.user_email },
