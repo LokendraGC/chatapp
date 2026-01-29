@@ -65,7 +65,7 @@ const Integration = () => {
                   &lt;<span className="text-pink-400">script</span>
                   <span className="text-indigo-400"> src</span>=
                   <span className="text-emerald-400">
-                    &quot;https://kxahajur.chatbot.app/init.js&quot;
+                    &quot;{process.env.NEXT_PUBLIC_SITE_URL}/widget.js&quot;
                   </span>
                   &gt;&lt;/<span className="text-pink-400">script</span>&gt;
                 </div>

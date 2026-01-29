@@ -13,7 +13,7 @@ export default function EmbedCodeConfig({
 }) {
   const [copied, setCopied] = useState(false);
 
-  const embedCode = `<script src="http://localhost:3000/widget.js"
+  const embedCode = `<script src="${process.env.NEXT_PUBLIC_SITE_URL}/widget.js"
   data-id="${chatbotId}"></script>`;
 
   const handleCopy = () => {

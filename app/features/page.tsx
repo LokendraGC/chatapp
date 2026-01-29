@@ -8,10 +8,10 @@ export default function FeaturesPage() {
             <div className="mx-auto mt-20 max-w-5xl px-4 py-12 md:py-16">
                 {/* Top banner */}
                 <div className="mb-10 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent px-5 py-4 shadow-lg shadow-amber-500/10">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-amber-300">
                         Site in active development
                     </p>
-                    <p className="mt-2 text-sm text-amber-100/90">
+                    <p className="mt-2 text-base text-amber-100/90">
                         This site is still under active development. For now, you can read
                         about the key features and properties of the{" "}
                         <span className="font-semibold text-white">K Xa Hajur Chatbot</span>{" "}
@@ -24,7 +24,7 @@ export default function FeaturesPage() {
                     <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
                         K Xa Hajur Chatbot
                     </h1>
-                    <p className="max-w-2xl text-sm text-zinc-400 md:text-base">
+                    <p className="max-w-2xl text-base text-zinc-400 md:text-lg">
                         An AI-powered customer support chatbot built on Next.js and Google
                         Gemini, with retrieval-augmented generation (RAG), knowledge base
                         management, and an embeddable widget for your website.
@@ -34,10 +34,10 @@ export default function FeaturesPage() {
                 {/* Technology & AI model */}
                 <section className="mb-12 grid gap-6 md:grid-cols-2">
                     <div className="rounded-2xl border border-white/5 bg-zinc-950/70 p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+                        <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-zinc-300">
                             Technology Stack
                         </h2>
-                        <ul className="mt-3 space-y-1.5 text-sm text-zinc-400">
+                        <ul className="mt-3 space-y-1.5 text-base text-zinc-400">
                             <li>
                                 <span className="font-medium text-zinc-100">Framework:</span>{" "}
                                 Next.js 16.1.1 (App Router) with React 19.2.3
@@ -64,14 +64,14 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/15 via-indigo-500/5 to-transparent p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-200">
+                        <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-indigo-200">
                             AI Model
                         </h2>
-                        <div className="mt-3 space-y-1.5 text-sm text-indigo-100/90">
+                        <div className="mt-3 space-y-1.5 text-base text-indigo-100/90">
                             <p>
                                 <span className="font-medium text-white">Primary Model:</span>{" "}
                                 Google Gemini 3 Flash Preview{" "}
-                                <span className="text-xs text-indigo-200/80">
+                                <span className="text-sm text-indigo-200/80">
                                     (gemini-3-flash-preview)
                                 </span>
                             </p>
@@ -89,7 +89,7 @@ export default function FeaturesPage() {
                                 <span className="font-medium text-white">Context Limit:</span>{" "}
                                 ~6,000 tokens (~24,000 characters)
                             </p>
-                            <p className="mt-2 text-xs text-indigo-100/80">
+                            <p className="mt-2 text-sm text-indigo-100/80">
                                 Roughly,{" "}
                                 <span className="font-semibold text-white">4 characters</span>{" "}
                                 ≈ <span className="font-semibold text-white">1 token</span> in
@@ -102,10 +102,10 @@ export default function FeaturesPage() {
                 {/* File uploads & sections */}
                 <section className="mb-12 grid gap-6 md:grid-cols-2">
                     <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-200">
+                        <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-emerald-200">
                             File Uploads & Web Scraping
                         </h2>
-                        <ul className="mt-3 space-y-1.5 text-sm text-emerald-100/90">
+                        <ul className="mt-3 space-y-1.5 text-base text-emerald-100/90">
                             <li>
                                 <span className="font-medium text-white">Max size:</span> 10 MB
                                 per file
@@ -124,7 +124,7 @@ export default function FeaturesPage() {
                             <li>
                                 Web pages are scraped using ZenRows, converted to markdown, then
                                 passed to Gemini to:
-                                <ul className="mt-1 list-disc pl-5 text-xs text-emerald-100/80">
+                                <ul className="mt-1 list-disc pl-5 text-sm text-emerald-100/80">
                                     <li>Remove navigation, menus, CTAs, and ads</li>
                                     <li>Keep only factual, informational content</li>
                                     <li>Compress aggressively while preserving meaning</li>
@@ -134,14 +134,14 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className="rounded-2xl border border-purple-500/30 bg-purple-500/5 p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-purple-200">
+                        <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-purple-200">
                             Sections & Tone Control
                         </h2>
-                        <p className="mt-3 text-sm text-purple-100/90">
+                        <p className="mt-3 text-base text-purple-100/90">
                             Sections let you configure different behaviors and scopes for your
                             chatbot.
                         </p>
-                        <div className="mt-3 grid gap-2 text-xs text-purple-50/90 sm:grid-cols-2">
+                        <div className="mt-3 grid gap-2 text-sm text-purple-50/90 sm:grid-cols-2">
                             <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-2.5">
                                 <p className="font-semibold text-white">Tone Options</p>
                                 <ul className="mt-1.5 space-y-0.5">
@@ -185,10 +185,10 @@ export default function FeaturesPage() {
 
                 {/* RAG explanation */}
                 <section className="mb-12 rounded-2xl border border-blue-500/25 bg-blue-500/5 p-5">
-                    <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-200">
+                    <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-blue-200">
                         Retrieval-Augmented Generation (RAG)
                     </h2>
-                    <p className="mt-3 text-sm text-blue-50/90">
+                    <p className="mt-3 text-base text-blue-50/90">
                         The chatbot uses{" "}
                         <span className="font-semibold text-white">
                             Retrieval-Augmented Generation
@@ -196,14 +196,14 @@ export default function FeaturesPage() {
                         to answer questions from your own data.
                     </p>
                     <div className="mt-4 grid gap-4 md:grid-cols-3">
-                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-xs text-blue-50/90">
+                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-sm text-blue-50/90">
                             <p className="font-semibold text-white">1. Retrieval</p>
                             <p className="mt-1.5">
                                 Fetch relevant knowledge sources from the database: PDFs,
                                 website content, and text notes.
                             </p>
                         </div>
-                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-xs text-blue-50/90">
+                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-sm text-blue-50/90">
                             <p className="font-semibold text-white">2. Augmentation</p>
                             <p className="mt-1.5">
                                 Inject that content into the prompt as{" "}
@@ -211,7 +211,7 @@ export default function FeaturesPage() {
                                 instructions and conversation history.
                             </p>
                         </div>
-                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-xs text-blue-50/90">
+                        <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 text-sm text-blue-50/90">
                             <p className="font-semibold text-white">3. Generation</p>
                             <p className="mt-1.5">
                                 Gemini 3 Flash Preview generates a final answer from the
@@ -224,10 +224,10 @@ export default function FeaturesPage() {
                 {/* Features & pricing overview */}
                 <section className="mb-12 grid gap-6 md:grid-cols-[1.4fr,1fr]">
                     <div className="rounded-2xl border border-white/5 bg-zinc-950/70 p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+                        <h2 className="text-base font-semibold uppercase tracking-[0.16em] text-zinc-300">
                             Product Features
                         </h2>
-                        <ul className="mt-3 space-y-1.5 text-sm text-zinc-400">
+                        <ul className="mt-3 space-y-1.5 text-base text-zinc-400">
                             <li>Knowledge base management (files, URLs, and raw text)</li>
                             <li>Conversation history and session tracking</li>
                             <li>Embeddable website widget with JWT-based sessions</li>
@@ -238,10 +238,10 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className="rounded-2xl border border-teal-500/30 bg-teal-500/5 p-5">
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-200">
+                        <h3 className="text-base font-semibold uppercase tracking-[0.16em] text-teal-200">
                             Gemini Pricing Snapshot (2026)
                         </h3>
-                        <ul className="mt-3 space-y-1.5 text-xs text-teal-50/90">
+                        <ul className="mt-3 space-y-1.5 text-sm text-teal-50/90">
                             <li>
                                 <span className="font-semibold text-white">
                                     Input tokens:
@@ -261,7 +261,7 @@ export default function FeaturesPage() {
                                 ≈ $1.00 per 1M tokens
                             </li>
                         </ul>
-                        <p className="mt-3 text-xs text-teal-50/80">
+                        <p className="mt-3 text-sm text-teal-50/80">
                             Charges occur when the app calls the Gemini API for chat responses
                             and for summarizing new knowledge sources (web pages, long text,
                             and files).
@@ -271,10 +271,10 @@ export default function FeaturesPage() {
 
                 {/* Simple text flow for quick understanding */}
                 <section className="mb-4 rounded-2xl border border-white/10 bg-zinc-950/80 p-5">
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+                    <h3 className="text-base font-semibold uppercase tracking-[0.16em] text-zinc-300">
                         End-to-End Chat Flow (High Level)
                     </h3>
-                    <pre className="mt-3 overflow-x-auto whitespace-pre text-[11px] leading-relaxed text-zinc-400">
+                    <pre className="mt-3 overflow-x-auto whitespace-pre text-sm leading-relaxed text-zinc-400">
                         {`User Question
    │
    ▼
@@ -290,7 +290,7 @@ export default function FeaturesPage() {
  Assistant Answer`}
                     </pre>
                 </section>
-            </div>
+        </div>
             <Footer />
         </main>
     );

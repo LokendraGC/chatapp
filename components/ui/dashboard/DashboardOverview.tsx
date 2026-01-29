@@ -127,7 +127,7 @@ export default function DashboardOverview() {
                                         )}
                                     >
                                         <CardContent className="p-4 flex items-center justify-between gap-3">
-                                            <div className="min-w-0 flex-1">
+                                            <div className="min-w-0 flex-1 min-h-12 flex flex-col justify-center">
                                                 <span
                                                     className={cn(
                                                         "text-sm font-medium block",
@@ -136,25 +136,31 @@ export default function DashboardOverview() {
                                                 >
                                                     {step.label}
                                                 </span>
-                                                {step.complete && (
-                                                    <span className="inline-flex items-center gap-1 mt-1 text-xs text-emerald-500">
-                                                        <Check className="size-3.5" /> Done
+                                                {step.complete ? (
+                                                    <span className="inline-flex items-center gap-1.5 mt-1.5 text-xs font-medium text-emerald-400">
+                                                        <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/20">
+                                                            <Icon className="size-3 text-emerald-400" />
+                                                        </span>
+                                                        Done
                                                     </span>
+                                                ) : (
+                                                    <span className="mt-1.5 h-5" aria-hidden />
                                                 )}
                                             </div>
                                             <div
                                                 className={cn(
                                                     "shrink-0 size-10 rounded-lg border flex items-center justify-center transition-colors duration-200",
                                                     step.complete
-                                                        ? "border-emerald-500/40 bg-emerald-500/10"
+                                                        ? "border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_12px_rgba(52,211,153,0.15)]"
                                                         : cn("group-hover:scale-105", accentStyles.iconWrap)
                                                 )}
                                             >
-                                                {step.complete ? (
-                                                    <Check className={cn("size-5", "text-emerald-400")} />
-                                                ) : (
-                                                    <Icon className={cn("size-5", accentStyles.icon)} />
-                                                )}
+                                                <Icon
+                                                    className={cn(
+                                                        "size-5",
+                                                        step.complete ? "text-emerald-400" : accentStyles.icon
+                                                    )}
+                                                />
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -369,7 +375,7 @@ export default function DashboardOverview() {
                             <div className="relative group">
                                 <pre className="bg-[#050509] p-4 rounded-lg text-xs text-zinc-400">
                                     <code className="text-[10px] text-zinc-400 font-mono block">
-                                        {`<script src="http://localhost:3000/widget.js" \n data-id="${data?.botId || "..."}" \n defer>\n</script>`}
+                                        {`<script src="${process.env.NEXT_PUBLIC_SITE_URL}/widget.js" \n data-id="${data?.botId || "..."}" \n defer>\n</script>`}
                                     </code>
                                 </pre>
 

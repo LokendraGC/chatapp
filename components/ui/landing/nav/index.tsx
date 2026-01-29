@@ -15,19 +15,22 @@ const Navbar = async () => {
         </Link>
 
         {/* Center nav links: desktop only */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-light text-zinc-300">
+        <div className="hidden md:flex items-center gap-10 text-[15px] font-medium text-zinc-200">
           <Link
             href="/features"
-            className="hover:text-white transition-colors duration-200"
+            className="inline-block py-2 transition-all duration-200 hover:text-white hover:scale-105 hover:[text-shadow:0_0_12px_rgba(129,140,248,0.5)]"
           >
             Features
           </Link>
-          <Link href="/features" className="hover:text-white transition-colors">
+          <Link
+            href="/features"
+            className="inline-block py-2 transition-all duration-200 hover:text-white hover:scale-105 hover:[text-shadow:0_0_12px_rgba(129,140,248,0.5)]"
+          >
             Integration
           </Link>
           <Link
             href="/features"
-            className="hover:text-white transition-colors duration-200"
+            className="inline-block py-2 transition-all duration-200 hover:text-white hover:scale-105 hover:[text-shadow:0_0_12px_rgba(129,140,248,0.5)]"
           >
             Pricing
           </Link>

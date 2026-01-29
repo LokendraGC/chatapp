@@ -15,7 +15,7 @@
     // Get the current origin to build the API URL dynamically
     const origin = window.location.origin;
     
-    fetch(origin + "/api/widget/session", {
+    fetch(process.env.NEXT_PUBLIC_SITE_URL + "/api/widget/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +38,7 @@
 
         var iframe = document.createElement("iframe");
         iframe.src =
-          origin + "/embed?token=" +
+          process.env.NEXT_PUBLIC_SITE_URL + "/embed?token=" +
           encodeURIComponent(data.token);
 
         iframe.setAttribute("title", "Support Chat");
