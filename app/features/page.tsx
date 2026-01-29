@@ -238,9 +238,9 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className="rounded-2xl border border-teal-500/30 bg-teal-500/5 p-5">
-                        <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-200">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-200">
                             Gemini Pricing Snapshot (2026)
-                        </h2>
+                        </h3>
                         <ul className="mt-3 space-y-1.5 text-xs text-teal-50/90">
                             <li>
                                 <span className="font-semibold text-white">
@@ -271,9 +271,9 @@ export default function FeaturesPage() {
 
                 {/* Simple text flow for quick understanding */}
                 <section className="mb-4 rounded-2xl border border-white/10 bg-zinc-950/80 p-5">
-                    <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
                         End-to-End Chat Flow (High Level)
-                    </h2>
+                    </h3>
                     <pre className="mt-3 overflow-x-auto whitespace-pre text-[11px] leading-relaxed text-zinc-400">
                         {`User Question
    │
