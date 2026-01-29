@@ -361,40 +361,43 @@ export default function DashboardOverview() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-white/5 bg-[#0A0A0E]" id="widget">
-                        <CardHeader>
-                            <CardTitle className="text-base font-medium text-white">
-                                Install Widget
-                            </CardTitle>
-                            <CardDescription>
-                                Add this snippet to your website appropriate page.
-                            </CardDescription>
-                        </CardHeader>
-
-                        <CardContent>
-                            <div className="relative group">
-                                <pre className="bg-[#050509] p-4 rounded-lg text-xs text-zinc-400">
-                                    <code className="text-[10px] text-zinc-400 font-mono block">
-                                        {`<script src="${process.env.NEXT_PUBLIC_SITE_URL}/widget.js" \n data-id="${data?.botId || "..."}" \n defer>\n</script>`}
-                                    </code>
-                                </pre>
-
+                    <Card className="border-white/5 bg-[#0A0A0E] overflow-hidden" id="widget">
+                        <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <Code className="w-4 h-4 text-amber-400/80" />
+                                    <div>
+                                        <CardTitle className="text-base font-medium text-white">
+                                            Install Widget
+                                        </CardTitle>
+                                        <CardDescription className="text-zinc-500 text-xs mt-0.5">
+                                            Paste this snippet before <code className="text-zinc-400 bg-white/5 px-1 rounded">&lt;/body&gt;</code> on your site.
+                                        </CardDescription>
+                                    </div>
+                                </div>
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="absolute top-2 right-2 h-7 w-7 bg-white/10 hover:bg-white/20 text-white border-none"
+                                    size="sm"
+                                    className="h-8 text-zinc-400 hover:text-white hover:bg-white/5 shrink-0"
                                     onClick={handleCopy}
                                 >
                                     {copied ? (
-                                        <Check className="w-3 h-3" />
+                                        <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-500" />
                                     ) : (
-                                        <Copy className="w-3 h-3" />
+                                        <Copy className="w-3.5 h-3.5 mr-1.5" />
                                     )}
+                                    {copied ? "Copied" : "Copy"}
                                 </Button>
+                            </div>
+                        </CardHeader>
 
+                        <CardContent className="pt-0">
+                            <div className="bg-[#050509] border border-white/10 rounded-lg p-4 overflow-hidden">
+                                <pre className="text-zinc-400 font-mono text-[12px] leading-relaxed whitespace-pre-wrap break-all overflow-x-auto pr-2 min-h-16">
+                                    <code>{`<script src="${origin || process.env.NEXT_PUBLIC_SITE_URL || ""}/widget.js" data-id="${data?.botId || "..."}" defer></script>`}</code>
+                                </pre>
                             </div>
                         </CardContent>
-
                     </Card>
 
                 </div>
