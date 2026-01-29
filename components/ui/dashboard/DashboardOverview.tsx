@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Spinner } from "../spinner";
-import { ArrowRight, ArrowUp, ArrowUpRight, Check, Copy, FileText, Globe, Loader2, MoreHorizontal, Plus, Upload } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowUpRight, BookOpen, Check, Code, Copy, FileText, Globe, LayoutDashboard, Loader2, MoreHorizontal, Plus, Upload } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../card";
@@ -53,21 +53,27 @@ export default function DashboardOverview() {
     };
 
     const setupSteps = [
-        { label: "Website Scanned", complete: true, href: "#" },
+        { label: "Website Scanned", complete: true, href: "#", icon: Globe, accent: "blue" },
         {
             label: "Knowledge Added",
             complete: counts.knowledge > 0,
             href: "/dashboard/knowledge",
+            icon: BookOpen,
+            accent: "emerald",
         },
         {
             label: "Sections Configured",
             complete: false,
             href: "/dashboard/sections",
+            icon: LayoutDashboard,
+            accent: "violet",
         },
         {
             label: "Widget Installed",
             complete: false,
             href: "#widget",
+            icon: Code,
+            accent: "amber",
         },
     ];
 
@@ -81,38 +87,80 @@ export default function DashboardOverview() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {
-                        setupSteps.map((step, index) => (
-                            <Link
-                                href={step.href}
-                                key={index}
-                                className="block group">
-                                <Card
-                                    className={cn(
-                                        "border-white/5 bg-white/2 hover:bg-white/4 transition-colors",
-                                        step.complete
-                                            ? "opacity-60"
-                                            : "border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10"
-                                    )}
+                        setupSteps.map((step, index) => {
+                            const Icon = step.icon;
+                            const accent = step.accent as "blue" | "emerald" | "violet" | "amber";
+                            const accentStyles = {
+                                blue: {
+                                    card: "border-blue-500/20 hover:border-blue-500/40 hover:border-b-blue-400 border-b-2 border-b-transparent hover:shadow-[0_4px_0_0_rgba(96,165,250,0.4)]",
+                                    iconWrap: "border-blue-500/40 bg-blue-500/10",
+                                    icon: "text-blue-400",
+                                },
+                                emerald: {
+                                    card: "border-emerald-500/20 hover:border-emerald-500/40 hover:border-b-emerald-400 border-b-2 border-b-transparent hover:shadow-[0_4px_0_0_rgba(52,211,153,0.4)]",
+                                    iconWrap: "border-emerald-500/40 bg-emerald-500/10",
+                                    icon: "text-emerald-400",
+                                },
+                                violet: {
+                                    card: "border-violet-500/20 hover:border-violet-500/40 hover:border-b-violet-400 border-b-2 border-b-transparent hover:shadow-[0_4px_0_0_rgba(167,139,250,0.4)]",
+                                    iconWrap: "border-violet-500/40 bg-violet-500/10",
+                                    icon: "text-violet-400",
+                                },
+                                amber: {
+                                    card: "border-amber-500/20 hover:border-amber-500/40 hover:border-b-amber-400 border-b-2 border-b-transparent hover:shadow-[0_4px_0_0_rgba(251,191,36,0.4)]",
+                                    iconWrap: "border-amber-500/40 bg-amber-500/10",
+                                    icon: "text-amber-400",
+                                },
+                            }[accent];
+                            return (
+                                <Link
+                                    href={step.href}
+                                    key={index}
+                                    className="block group"
                                 >
-
-                                    <CardContent className="p-4 flex items-center justify-between">
-                                        <span
-                                            className={cn(
-                                                "text-sm font-medium",
-                                                step.complete ? "□ text-zinc-500" : "■ text-white"
-                                            )}
-                                        >
-                                            {step.label}
-                                        </span>
-
-                                        {step.complete ? <Check className="size-4 text-emerald-500" /> :
-                                            <ArrowUpRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />}
-
-                                    </CardContent>
-
-                                </Card>
-                            </Link>
-                        ))
+                                    <Card
+                                        className={cn(
+                                            "relative overflow-hidden rounded-xl border bg-[#0A0A0E]/80 transition-all duration-200",
+                                            step.complete
+                                                ? "opacity-75 border-white/5 bg-white/5 hover:bg-white/10"
+                                                : cn("bg-white/5", accentStyles.card)
+                                        )}
+                                    >
+                                        <CardContent className="p-4 flex items-center justify-between gap-3">
+                                            <div className="min-w-0 flex-1">
+                                                <span
+                                                    className={cn(
+                                                        "text-sm font-medium block",
+                                                        step.complete ? "text-zinc-500" : "text-white"
+                                                    )}
+                                                >
+                                                    {step.label}
+                                                </span>
+                                                {step.complete && (
+                                                    <span className="inline-flex items-center gap-1 mt-1 text-xs text-emerald-500">
+                                                        <Check className="size-3.5" /> Done
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div
+                                                className={cn(
+                                                    "shrink-0 size-10 rounded-lg border flex items-center justify-center transition-colors duration-200",
+                                                    step.complete
+                                                        ? "border-emerald-500/40 bg-emerald-500/10"
+                                                        : cn("group-hover:scale-105", accentStyles.iconWrap)
+                                                )}
+                                            >
+                                                {step.complete ? (
+                                                    <Check className={cn("size-5", "text-emerald-400")} />
+                                                ) : (
+                                                    <Icon className={cn("size-5", accentStyles.icon)} />
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            );
+                        })
                     }
                 </div>
             </section>
