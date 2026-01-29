@@ -6,6 +6,7 @@ import {
   ClerkProvider,
 } from "@clerk/nextjs";
 
+
 const inter = Inter({
   variable: "--font-inter",
 

@@ -17,8 +17,6 @@ export default function ToastProvider() {
       pauseOnHover
       theme="dark"
       toastClassName="!bg-[#0A0A0E] !border !border-white/10 !text-white"
-      bodyClassName="!text-white"
-      progressClassName="!bg-white/20"
     />
   );
 }

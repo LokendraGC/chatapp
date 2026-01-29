@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "clean": "node -e \"try { require('fs').rmSync('.next', { recursive: true, force: true }); console.log('Cleaned .next'); } catch (e) { console.warn('Clean skipped:', e.message); }\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
