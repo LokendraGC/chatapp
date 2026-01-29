@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 const Navbar = async () => {
@@ -14,25 +14,27 @@ const Navbar = async () => {
           </span>
         </Link>
 
+        {/* Center nav links: desktop only */}
         <div className="hidden md:flex items-center gap-8 text-sm font-light text-zinc-300">
           <Link
-            href="#features"
+            href="/features"
             className="hover:text-white transition-colors duration-200"
           >
             Features
           </Link>
-          <Link href="#features" className="hover:text-white transition-colors">
+          <Link href="/features" className="hover:text-white transition-colors">
             Integration
           </Link>
           <Link
-            href="#features"
+            href="/features"
             className="hover:text-white transition-colors duration-200"
           >
             Pricing
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-light text-zinc-300">
+        {/* Right auth actions: visible on mobile and desktop */}
+        <div className="flex items-center gap-3 md:gap-8 text-sm font-light text-zinc-300">
           <SignedIn>
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="h-11 cursor-pointer px-8 rounded-full border border-zinc-800  text-zinc-300 text-sm font-medium hover:text-white transition-all flex items-center gap-2 bg-black/30">
@@ -47,9 +49,12 @@ const Navbar = async () => {
                   Sign In
                 </button>
               </SignInButton>
-              <button className="cursor-pointer text-xs font-medium bg-white rounded-full text-black px-4 py-2 hover:bg-zinc-200 transition-colors duration-200">
-                Get Started
-              </button>
+
+              <SignUpButton>
+                <button className="cursor-pointer text-xs font-medium bg-white rounded-full text-black px-4 py-2 hover:bg-zinc-200 transition-colors duration-200">
+                  Get Started
+                </button>
+              </SignUpButton>
             </>
           </SignedOut>
         </div>

@@ -18,10 +18,10 @@ export const Footer = () => {
 
         {/* Center: Privacy and Terms */}
         <div className="flex items-center gap-6 text-sm text-zinc-400">
-          <Link href="/terms" className="hover:text-white transition-colors">
+          <Link href="/features" className="hover:text-white transition-colors">
             Terms
           </Link>
-          <Link href="/privacy" className="hover:text-white transition-colors">
+          <Link href="/features" className="hover:text-white transition-colors">
             Privacy Policy
           </Link>
         </div>
@@ -29,7 +29,7 @@ export const Footer = () => {
         {/* Right: Copyright */}
         <div className="flex items-center">
           <p className="text-sm text-zinc-500">
-            &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+            &copy; {new Date().getFullYear()} K Xa Hajur. All rights reserved.
           </p>
         </div>
       </div>

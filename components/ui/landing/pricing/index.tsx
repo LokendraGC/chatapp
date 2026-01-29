@@ -1,5 +1,6 @@
 import React from "react";
 import { Check } from "lucide-react";
+import Link from "next/link";
 
 export const Pricing = () => {
   return (
@@ -31,9 +32,9 @@ export const Pricing = () => {
               Community Support
             </li>
           </ul>
-          <button className="cursor-pointer w-full bg-transparent border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 mx-auto transition-all mt-auto">
-            Start Free
-          </button>
+          <Link href="/features" className="text-center cursor-pointer w-full bg-transparent border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 mx-auto transition-all mt-auto">
+            Start for Free
+          </Link>
         </div>
 
         <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/20 flex flex-col items-start text-left hover:bg-zinc-900/30 transition-colors h-full">
@@ -57,9 +58,9 @@ export const Pricing = () => {
               Priority Support
             </li>
           </ul>
-          <button className="cursor-pointer w-full bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-200 mx-auto transition-all mt-auto">
+          <Link href="/features" className="text-center cursor-pointer w-full bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-200 mx-auto transition-all mt-auto">
             Upgrade to Pro
-          </button>
+          </Link>
         </div>
       </div>
     </section>

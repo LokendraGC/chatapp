@@ -6,7 +6,7 @@ const Integration = () => {
       id="how-it-works"
       className="py-24 border-t border-white/5 bg-black/20"
     >
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center">
+      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-y-10 md:gap-y-0 md:gap-x-12">
         <div className="flex-1">
           <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">
             Drop-in simplicity.
@@ -65,7 +65,7 @@ const Integration = () => {
                   &lt;<span className="text-pink-400">script</span>
                   <span className="text-indigo-400"> src</span>=
                   <span className="text-emerald-400">
-                    &quot;https://oneminutesupport.com/init.js&quot;
+                    &quot;https://kxahajur.chatbot.app/init.js&quot;
                   </span>
                   &gt;&lt;/<span className="text-pink-400">script</span>&gt;
                 </div>
