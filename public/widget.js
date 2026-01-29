@@ -12,10 +12,16 @@
       return;
     }
 
-    // Get the current origin to build the API URL dynamically
-    const origin = window.location.origin;
-    
-    fetch(process.env.NEXT_PUBLIC_SITE_URL + "/api/widget/session", {
+    // Base URL = where this script was loaded from (so API/embed use same host)
+    var baseUrl = "";
+    try {
+      baseUrl = new URL(script.src).origin;
+    } catch (e) {
+      console.error("[K Xa Hajur] Could not get script origin", e);
+      return;
+    }
+
+    fetch(baseUrl + "/api/widget/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +44,7 @@
 
         var iframe = document.createElement("iframe");
         iframe.src =
-          process.env.NEXT_PUBLIC_SITE_URL + "/embed?token=" +
+          baseUrl + "/embed?token=" +
           encodeURIComponent(data.token);
 
         iframe.setAttribute("title", "Support Chat");
