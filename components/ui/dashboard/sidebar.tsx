@@ -75,9 +75,9 @@ export default function Sidebar({ metadata, email }: SidebarProps) {
           <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
             <div className="w-2.5 h-2.5 bg-black rounded-[1px]"></div>
           </div>
-          <span className="text-sm font-medium tracking-tight text-white/90">
+          <Link href={'/'} className="text-sm font-medium tracking-tight text-white/90">
             K Xa Hajur
-          </span>
+          </Link>
         </div>
       </div>
 
