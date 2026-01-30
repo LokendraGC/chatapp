@@ -2,7 +2,6 @@
 
 import DashboardOverview from "@/components/ui/dashboard/DashboardOverview";
 import InitialForm from "@/components/ui/dashboard/initialform";
-import Sidebar from "@/components/ui/dashboard/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
