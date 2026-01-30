@@ -7,6 +7,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../card";
 import { Button } from "../button";
+import { ScrollArea } from "../scroll-area";
 import { Badge } from "../badge";
 import { useRouter } from "next/navigation";
 
@@ -79,7 +80,7 @@ export default function DashboardOverview() {
 
 
     return (
-        <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto animate-in fade-in duration-500">
+        <div className="p-6 md:p-8 space-y-6 w-full animate-in fade-in duration-500">
             <section className="space-y-4">
                 <h3 className="text-lg font-medium text-white tracking-tight">
                     Setup Progress
@@ -312,8 +313,8 @@ export default function DashboardOverview() {
                 </div>
 
                 <div className="space-y-8">
-                    <Card className="border-white/5 bg-[#0A0A0E] min-h-80">
-                        <CardHeader className="pb-4">
+                    <Card className="border-white/5 bg-[#0A0A0E] min-h-80 flex flex-col overflow-hidden">
+                        <CardHeader className="pb-4 shrink-0">
                             <div className="flex items-center justify-between ">
                                 <CardTitle className="text-base font-medium text-white">
                                     Recent Chats
@@ -328,35 +329,39 @@ export default function DashboardOverview() {
                             </div>
                         </CardHeader>
 
-                        <CardContent className="px-2 pb-2">
-                            <div className="space-y-1">
-                                {chats.length === 0 ? (
-                                    <div className="p-4 text-center text-xs text-zinc-500">
-                                        No chats yet.
-                                    </div>
-                                ) : (
-                                    chats.map((chat: any, i: number) => (
-
-                                        <Link
-                                            key={i}
-                                            href={`/dashboard/conversations/`}
-                                            className="block p-2 rounded-lg hover:bg-white/2 transition-colors"
-                                        >
-                                            <div className="flex items-start justify-between mb-1">
-                                                <span className="text-sm font-medium text-zinc-200 truncate max-w-45">
-                                                    {chat.title}
-                                                </span>
-                                                <span className="text-xs text-zinc-500">
-                                                    {chat.time}
-                                                </span>
+                        <CardContent className="px-2 pb-2 flex-1 min-h-0">
+                            <div className="h-64">
+                                <ScrollArea className="h-full">
+                                    <div className="space-y-1 pr-2">
+                                        {chats.length === 0 ? (
+                                            <div className="p-4 text-center text-xs text-zinc-500">
+                                                No chats yet.
                                             </div>
-                                            <span className="text-xs text-zinc-500">
-                                                {chat.snippet}
-                                            </span>
-                                        </Link>
+                                        ) : (
+                                            chats.map((chat: any, i: number) => (
 
-                                    ))
-                                )}
+                                                <Link
+                                                    key={i}
+                                                    href={`/dashboard/conversations/`}
+                                                    className="block p-2 rounded-lg hover:bg-white/2 transition-colors"
+                                                >
+                                                    <div className="flex items-start justify-between mb-1">
+                                                        <span className="text-sm font-medium text-zinc-200 truncate max-w-45">
+                                                            {chat.title}
+                                                        </span>
+                                                        <span className="text-xs text-zinc-500">
+                                                            {chat.time}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-zinc-500">
+                                                        {chat.snippet}
+                                                    </span>
+                                                </Link>
+
+                                            ))
+                                        )}
+                                    </div>
+                                </ScrollArea>
                             </div>
                         </CardContent>
                     </Card>

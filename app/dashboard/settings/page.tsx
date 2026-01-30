@@ -66,7 +66,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-6 max-w-5xl mx-auto animate-in fade-in-0 duration-300 ">
+    <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300">
       <div>
         <h1 className="text-2xl font-semibold text-white tracking-tight">
           Settings

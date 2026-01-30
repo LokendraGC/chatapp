@@ -304,7 +304,7 @@ export default function ConversationsPage() {
                         <Loader2 className="w-6 h-6 animate-spin text-[#ffffff]" />
                       </div>
                     ) : (
-                      <div className="max-w-3xl mx-auto space-y-6 p-4 pb-4">
+                      <div className="w-full space-y-6 p-4 pb-4">
                         {currentMessages.map((msg, i) => (
                           <div
                             key={i}

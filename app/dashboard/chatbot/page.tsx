@@ -205,14 +205,14 @@ export default function ChatbotPage() {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
+      <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
+    <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div>
           <h1 className="text-2xl font-semibold text-white tracking-tight">
