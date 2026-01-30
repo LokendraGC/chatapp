@@ -63,13 +63,30 @@
         document.body.appendChild(iframe);
 
         window.addEventListener("message", function (event) {
-          if ( event.data && event.data.type === "resize") {
+          if (event.data && event.data.type === "resize") {
             iframe.style.width = event.data.width;
             iframe.style.height = event.data.height;
             iframe.style.borderRadius = event.data.borderRadius || "12px";
 
             if (event.data.boxShadow) {
               iframe.style.boxShadow = event.data.boxShadow;
+            }
+
+            var isMobile = window.innerWidth <= 768;
+            var isExpanded = event.data.width === "380px" || parseInt(event.data.width, 10) >= 300;
+
+            if (isMobile && isExpanded) {
+              iframe.style.left = "50%";
+              iframe.style.top = "50%";
+              iframe.style.transform = "translate(-50%, -50%)";
+              iframe.style.right = "auto";
+              iframe.style.bottom = "auto";
+            } else {
+              iframe.style.left = "auto";
+              iframe.style.top = "auto";
+              iframe.style.transform = "none";
+              iframe.style.right = "20px";
+              iframe.style.bottom = "20px";
             }
           }
         });

@@ -43,6 +43,7 @@ const EmbedPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lastTouchTimeRef = useRef<number>(0);
 
   useEffect(() => {
     // Make sure parent body is transparent and properly sized
@@ -117,7 +118,6 @@ const EmbedPage = () => {
         }
         const data = await response.json();
 
-        console.log(data);
         setMetaData(data.metadata);
         setSections(data.sections || []);
 
@@ -180,7 +180,6 @@ const EmbedPage = () => {
     );
     const sourceIds = currentSection?.source_ids || [];
 
-    console.log("Source IDs:", sourceIds);
 
     const userMessage = {
       role: "user",
@@ -206,8 +205,6 @@ const EmbedPage = () => {
           knowledge_source_ids: sourceIds,
         }),
       });
-
-      console.log(res);
 
       if (res.ok) {
         const data = await res.json();
@@ -254,13 +251,27 @@ const EmbedPage = () => {
     );
   }
 
+  const handleToggle = () => {
+    if (Date.now() - lastTouchTimeRef.current < 400) return;
+    lastTouchTimeRef.current = Date.now();
+    toggleOpen();
+  };
+
+  const handleToggleTouch = (e: React.TouchEvent) => {
+    e.preventDefault();
+    lastTouchTimeRef.current = Date.now();
+    toggleOpen();
+  };
+
   if (!isOpen) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center min-h-[44px] min-w-[44px] touch-manipulation">
         <button
-          onClick={toggleOpen}
-          className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 transition-all text-white hover:scale-105 cursor-pointer"
-          style={{ backgroundColor: primaryColor }}
+          type="button"
+          onClick={handleToggle}
+          onTouchEnd={handleToggleTouch}
+          className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-full flex items-center justify-center shadow-lg hover:brightness-110 active:scale-95 transition-all text-white hover:scale-105 cursor-pointer touch-manipulation select-none"
+          style={{ backgroundColor: primaryColor, WebkitTapHighlightColor: "transparent" }}
           aria-label="Open chat"
         >
           <MessageCircle className="w-8 h-8" />
@@ -315,11 +326,14 @@ const EmbedPage = () => {
           </div>
 
           <button
-            onClick={toggleOpen}
-            className="p-2 rounded-lg transition-colors hover:bg-white/10 text-zinc-400 hover:text-white cursor-pointer"
+            type="button"
+            onClick={handleToggle}
+            onTouchEnd={handleToggleTouch}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-white/10 active:scale-95 text-zinc-400 hover:text-white cursor-pointer touch-manipulation select-none"
+            style={{ WebkitTapHighlightColor: "transparent" }}
             aria-label="Minimize chat"
           >
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4 shrink-0" />
           </button>
         </div>
 
