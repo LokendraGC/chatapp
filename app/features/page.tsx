@@ -3,11 +3,11 @@ import { Footer } from "@/components/ui/landing/footer";
 
 export default function FeaturesPage() {
     return (
-        <main className="w-full flex flex-col relative z-10">
+        <main className="w-full max-w-[100vw] overflow-x-hidden flex flex-col relative z-10">
             <Navbar />
-            <div className="mx-auto mt-20 max-w-5xl px-4 py-12 md:py-16">
+            <div className="mx-auto mt-16 sm:mt-20 max-w-5xl w-full px-4 sm:px-6 py-10 sm:py-12 md:py-16">
                 {/* Top banner */}
-                <div className="mb-10 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent px-5 py-4 shadow-lg shadow-amber-500/10">
+                <div className="mb-10 rounded-2xl border border-amber-500/30 bg-linear-to-r from-amber-500/15 via-amber-500/5 to-transparent px-5 py-4 shadow-lg shadow-amber-500/10">
                     <p className="text-sm font-semibold uppercase tracking-[0.18em] text-amber-300">
                         Site in active development
                     </p>

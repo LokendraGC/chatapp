@@ -119,9 +119,23 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-background text-foreground;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+    overflow-x: hidden;
   }
+}
+
+/* Promote fixed elements to GPU layer for smoother mobile scroll */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .cl-internal-1dauvpw {

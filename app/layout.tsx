@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   description: "A chatbot to help you with your support needs.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +36,7 @@ export default function RootLayout({
         <body
           className={`${inter.variable} bg-[#050509] min-h-screen flex flex-col p-0 antialiased text-zinc-100 selection:bg-zinc-800 font-sans`}
         >
-          <div className="fixed inset-0 -z-20 pointer-events-none">
+          <div className="fixed inset-0 -z-20 pointer-events-none gpu-layer">
             <div className="w-full h-full opacity-20">
               <div
                 data-us-project="NMlvqnkICwYYJ6lYb064"
