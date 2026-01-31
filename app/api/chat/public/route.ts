@@ -1,6 +1,7 @@
 import { countConversationTokens } from "@/lib/countConversationTokens";
 import { summarizeMarkdown } from "@/lib/openAI";
 import prisma from "@/lib/prisma";
+import trimContextByChars from "@/lib/trimContextByChars";
 import { GoogleGenAI } from "@google/genai";
 import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
@@ -156,6 +157,9 @@ export async function POST(req: Request) {
                     );
                 }
             }
+
+            // Cap context size so Gemini input (and cost) stays bounded
+            context = trimContextByChars(context, 6000);
 
             // Token counting and message summarization
             const tokenCount = await countConversationTokens(messages, context);

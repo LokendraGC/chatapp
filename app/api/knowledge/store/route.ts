@@ -237,26 +237,52 @@ export async function POST(req: Request) {
       const type = body.type;
 
       if (type === "website") {
-        const zenURL = new URL("https://api.zenrows.com/v1/");
-        zenURL.searchParams.set("apikey", process.env.ZENROWS_API_KEY!);
-        zenURL.searchParams.set("url", body.url);
-        zenURL.searchParams.set("response_type", "markdown");
+        const apiKey = process.env.FIRECRAWL_API_KEY;
+        if (!apiKey) {
+          return NextResponse.json(
+            { error: "Firecrawl API key is not configured (FIRECRAWL_API_KEY)" },
+            { status: 500 }
+          );
+        }
 
-        const res = await fetch(zenURL.toString(), {
+        const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
+          method: "POST",
           headers: {
-            "User-Agent": "K Xa Hajur/1.0",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`,
           },
+          body: JSON.stringify({
+            url: body.url,
+            formats: ["markdown"],
+          }),
         });
 
         if (!res.ok) {
+          const errText = await res.text();
+          console.error("Firecrawl scrape error:", res.status, errText);
           return NextResponse.json(
             { error: "Failed to fetch website content" },
             { status: 500 }
           );
         }
 
-        const html = await res.text();
-        const markDown = await summarizeMarkdown(html);
+        const json = await res.json() as { success?: boolean; data?: { markdown?: string } };
+        if (!json?.success || !json?.data?.markdown) {
+          return NextResponse.json(
+            { error: "Invalid or empty response from scrape" },
+            { status: 500 }
+          );
+        }
+
+        let rawMarkdown = json.data.markdown;
+        // Strip standalone image lines (![alt](url)) to keep content text-focused for the chatbot
+        rawMarkdown = rawMarkdown.replace(/^!\[[^\]]*\]\([^)]+\)\s*$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+        const MAX_CONTENT_CHARS = 500_000;
+        const markDown =
+          rawMarkdown.length <= MAX_CONTENT_CHARS
+            ? rawMarkdown
+            : rawMarkdown.slice(0, MAX_CONTENT_CHARS) +
+              "\n\n[Content truncated at " + MAX_CONTENT_CHARS + " characters.]";
 
         await prisma.knowledgeSource.create({
           data: {
