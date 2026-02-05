@@ -215,10 +215,10 @@ export default function ChatbotPage() {
     <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
             Chatbot Playground
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Test your assistance, customize appearance, and get started.
           </p>
         </div>

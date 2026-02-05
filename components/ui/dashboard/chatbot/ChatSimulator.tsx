@@ -65,11 +65,11 @@ export default function ChatSimulator({
   }, [messages, isTyping]);
 
   return (
-    <Card className="flex-1 flex flex-col border-white/5 bg-[#0A0A0E] overflow-hidden relative shadow-2xl">
-      <div className="h-14 border-b border-white/5 flex items-center justify-between px-4">
+    <Card className="flex-1 flex flex-col border-border bg-card overflow-hidden relative shadow-sm">
+      <div className="h-14 border-b border-border flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-sm font-medium text-zinc-300">
+          <span className="text-sm font-medium text-muted-foreground">
             Test Environment
           </span>
         </div>
@@ -77,7 +77,7 @@ export default function ChatSimulator({
           variant="ghost"
           size="sm"
           onClick={handleReset}
-          className="text-zinc-400 hover:text-white hover:bg-white/10"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           <RefreshCw className="w-3.5 h-3.5 mr-2" />
           Reset
@@ -85,7 +85,7 @@ export default function ChatSimulator({
       </div>
 
       <div ref={scrollContainerRef} className="flex-1 min-h-0">
-        <ScrollArea className="h-full p-6 relative bg-zinc-950/30">
+        <ScrollArea className="h-full p-6 relative bg-muted/20">
         <div className="space-y-6 pb-4">
           {messages.map((msg, i) => (
             <div
@@ -103,15 +103,15 @@ export default function ChatSimulator({
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/5 bg-zinc-800",
-                    msg.role === "user" ? "bg-zinc-800" : "text-white"
+                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-border",
+                    msg.role === "user" ? "bg-muted" : "text-primary-foreground"
                   )}
                   style={
                     msg.role !== "user" ? { backgroundColor: primaryColor } : {}
                   }
                 >
                   {msg.role === "user" ? (
-                    <User className="w-4 h-4 text-zinc-400" />
+                    <User className="w-4 h-4 text-muted-foreground" />
                   ) : (
                     <BotIcon className="w-4 h-4 text-white" />
                   )}
@@ -122,9 +122,12 @@ export default function ChatSimulator({
                     className={cn(
                       "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm",
                       msg.role === "user"
-                        ? "bg-zinc-800 text-zinc-200 rounded-tr-sm"
-                        : "bg-white text-zinc-900 rounded-tl-sm"
+                        ? "bg-muted text-foreground rounded-tr-sm"
+                        : "text-white rounded-tl-sm"
                     )}
+                    style={
+                      msg.role !== "user" ? { backgroundColor: primaryColor } : {}
+                    }
                   >
                     {msg.content}
                   </div>
@@ -135,7 +138,7 @@ export default function ChatSimulator({
                         <button
                           key={section.id}
                           onClick={() => handleSectionClick(section.name)}
-                          className="px-3 py-1 rounded-full border text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
+                          className="px-3 py-1 rounded-full border border-border text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
                         >
                           {section.name}
                         </button>
@@ -157,10 +160,13 @@ export default function ChatSimulator({
                   <Bot className="w-4 h-4 text-white" />
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
+                <div
+                  className="p-4 rounded-2xl text-white rounded-tl-sm flex items-center gap-1.5"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" />
                 </div>
               </div>
             </div>
@@ -169,7 +175,7 @@ export default function ChatSimulator({
       </ScrollArea>
       </div>
 
-      <div className="p-4 bg-[#0A0A0E] border-t border-white/5">
+      <div className="p-4 bg-card border-t border-border">
         <div className="relative">
           <Textarea
             value={input}
@@ -181,7 +187,7 @@ export default function ChatSimulator({
                 ? "Type a message ... "
                 : "Please select a category above to start ... "
             }
-            className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-white bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-foreground bg-muted/30 border-border resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-muted-foreground"
           />
           <Button
             size="icon"
@@ -189,7 +195,7 @@ export default function ChatSimulator({
             disabled={!activeSection || !input.trim()}
             className={cn(
               "absolute right-2 bottom-2 h-8 w-8 transition-colors",
-              !activeSection || !input.trim() ? "bg-zinc-800 text-zinc-500" : ""
+              !activeSection || !input.trim() ? "bg-muted text-muted-foreground" : ""
             )}
             style={
               activeSection && input.trim()

@@ -245,6 +245,137 @@ export async function POST(req: Request) {
           );
         }
 
+        const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+        const MAX_CONTENT_CHARS = 500_000;
+
+        const cleanMarkdown = (raw: string) => {
+          let s = raw.replace(/^!\[[^\]]*\]\([^)]+\)\s*$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
+          return s.length <= MAX_CONTENT_CHARS
+            ? s
+            : s.slice(0, MAX_CONTENT_CHARS) + "\n\n[Content truncated at " + MAX_CONTENT_CHARS + " characters.]";
+        };
+
+        // Crawl whole domain: POST crawl → poll until completed → store each page
+        if (body.crawl === true) {
+          const crawlRes = await fetch("https://api.firecrawl.dev/v2/crawl", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              url: body.url,
+              limit: Math.min(Number(body.limit) || 100, 500),
+              crawlEntireDomain: true,
+              scrapeOptions: { formats: ["markdown"] },
+            }),
+          });
+
+          if (!crawlRes.ok) {
+            const errText = await crawlRes.text();
+            console.error("Firecrawl crawl start error:", crawlRes.status, errText);
+            return NextResponse.json(
+              { error: "Failed to start crawl", details: errText },
+              { status: 500 }
+            );
+          }
+
+          const crawlStart = await crawlRes.json() as { success?: boolean; id?: string };
+          if (!crawlStart?.success || !crawlStart?.id) {
+            return NextResponse.json(
+              { error: "Invalid response from crawl start" },
+              { status: 500 }
+            );
+          }
+
+          const crawlId = crawlStart.id;
+          const pollIntervalMs = 3000;
+          const maxWaitMs = 90_000;
+          let statusRes: Response;
+          let statusJson: { status?: string; data?: Array<{ markdown?: string; metadata?: { sourceURL?: string; title?: string } }>; next?: string | null };
+
+          let elapsed = 0;
+          while (elapsed < maxWaitMs) {
+            await new Promise((r) => setTimeout(r, pollIntervalMs));
+            elapsed += pollIntervalMs;
+
+            statusRes = await fetch(`https://api.firecrawl.dev/v2/crawl/${crawlId}`, {
+              headers: { "Authorization": `Bearer ${apiKey}` },
+            });
+            if (!statusRes.ok) {
+              return NextResponse.json(
+                { error: "Failed to get crawl status" },
+                { status: 500 }
+              );
+            }
+            statusJson = await statusRes.json() as typeof statusJson;
+
+            if (statusJson.status === "failed") {
+              return NextResponse.json(
+                { error: "Crawl failed" },
+                { status: 500 }
+              );
+            }
+            if (statusJson.status === "completed") break;
+          }
+
+          if (statusJson!.status !== "completed") {
+            return NextResponse.json(
+              { error: "Crawl timed out; try a lower limit or try again later", jobId: crawlId },
+              { status: 408 }
+            );
+          }
+
+          const allPages: Array<{ markdown?: string; metadata?: { sourceURL?: string; title?: string } }> = [];
+          let nextUrl: string | null = statusJson!.next ?? null;
+          let currentData = statusJson!.data ?? [];
+
+          const collectPage = (arr: typeof currentData) => {
+            for (const page of arr) {
+              if (page?.markdown) allPages.push(page);
+            }
+          };
+          collectPage(currentData);
+
+          while (nextUrl) {
+            const nextRes = await fetch(nextUrl, { headers: { "Authorization": `Bearer ${apiKey}` } });
+            if (!nextRes.ok) break;
+            const nextJson = await nextRes.json() as { data?: typeof currentData; next?: string | null };
+            currentData = nextJson.data ?? [];
+            collectPage(currentData);
+            nextUrl = nextJson.next ?? null;
+          }
+
+          let stored = 0;
+          for (const page of allPages) {
+            const sourceUrl = page.metadata?.sourceURL ?? body.url;
+            const name = page.metadata?.title || sourceUrl;
+            const markDown = cleanMarkdown(page.markdown!);
+            if (!markDown.trim()) continue;
+            await prisma.knowledgeSource.create({
+              data: {
+                user_email: userEmail,
+                type: "website",
+                name,
+                source_url: sourceUrl,
+                status: "active",
+                content: markDown,
+              },
+            });
+            stored++;
+          }
+
+          return NextResponse.json(
+            {
+              message: "Domain crawl completed and knowledge sources stored",
+              url: body.url,
+              pagesStored: stored,
+            },
+            { status: 200 }
+          );
+        }
+
+        // Single-page scrape (default)
         const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
           method: "POST",
           headers: {
@@ -274,19 +405,11 @@ export async function POST(req: Request) {
           );
         }
 
-        let rawMarkdown = json.data.markdown;
-        // Strip standalone image lines (![alt](url)) to keep content text-focused for the chatbot
-        rawMarkdown = rawMarkdown.replace(/^!\[[^\]]*\]\([^)]+\)\s*$/gm, "").replace(/\n{3,}/g, "\n\n").trim();
-        const MAX_CONTENT_CHARS = 500_000;
-        const markDown =
-          rawMarkdown.length <= MAX_CONTENT_CHARS
-            ? rawMarkdown
-            : rawMarkdown.slice(0, MAX_CONTENT_CHARS) +
-              "\n\n[Content truncated at " + MAX_CONTENT_CHARS + " characters.]";
+        const markDown = cleanMarkdown(json.data.markdown);
 
         await prisma.knowledgeSource.create({
           data: {
-            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            user_email: userEmail,
             type: "website",
             name: body.url,
             source_url: body.url,

@@ -100,66 +100,59 @@ export default function TeamSection() {
   };
 
   return (
-    <Card className="border-white/5 bg-[#0A0A0E]">
+    <Card className="border-border bg-card">
       <CardHeader className="flex flex-row justify-between items-center">
         <div>
-          <CardTitle className="text-base font-medium text-white">
+          <CardTitle className="text-base font-medium text-foreground">
             Team Members
           </CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardDescription className="text-muted-foreground">
             Invite your team members to collaborate on your workspace.
           </CardDescription>
         </div>
 
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-white text-black hover:bg-zinc-400">
+            <Button size="sm">
               <Plus className="w-4 h-4" />
               Add Member
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-106.5 bg-[#0E0E12] border-white/10 text-white">
+          <DialogContent className="sm:max-w-106.5 bg-card border-border">
             <DialogHeader>
-              <DialogTitle>Add Member</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-foreground">Add Member</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 Add a new member to your team.
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label className="text-zinc-500 text-xs">Name</Label>
+                <Label className="text-muted-foreground text-xs">Name</Label>
                 <Input
                   id="name"
                   placeholder="Enter name"
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
                 />
 
-                <Label className="text-zinc-500 text-xs">Email</Label>
+                <Label className="text-muted-foreground text-xs">Email</Label>
                 <Input
                   id="name"
                   placeholder="Enter email"
                   value={newMemberEmail}
                   onChange={(e) => setNewMemberEmail(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
               <DialogFooter>
-                <Button
-                  onClick={() => setOpenDialog(false)}
-                  className="border-white/10 text-zinc-500 hover:text-white hover:bg-white/5"
-                >
+                <Button variant="outline" onClick={() => setOpenDialog(false)}>
                   Cancel
                 </Button>
-                <Button
-                  className="bg-white text-black hover:bg-zinc-400"
-                  disabled={isAdding}
-                  onClick={handleAddMember}
-                >
+                <Button disabled={isAdding} onClick={handleAddMember}>
                   {isAdding ? "Adding..." : "Add Member"}
                 </Button>
               </DialogFooter>
@@ -171,20 +164,20 @@ export default function TeamSection() {
       <CardContent>
         <div className="space-y-4">
           {isLoading ? (
-            <div className="text-zinc-500 text-sm text-center py-4">
+            <div className="text-muted-foreground text-sm text-center py-4">
               Loading team members...
             </div>
           ) : (
             <div className="space-y-4">
               {team.length === 0 ? (
-                <div className="text-zinc-500 text-sm text-center py-4">
+                <div className="text-muted-foreground text-sm text-center py-4">
                   No team members found
                 </div>
               ) : (
                 <div className="grid gap-4">
                   {team.map((member) => (
                     <div
-                      className="flex items-center gap-4 p-3 rounded-lg bg-white/5 border border-white/5"
+                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border"
                       key={member.id}
                     >
                       {/* Avatar at the start */}
@@ -193,12 +186,12 @@ export default function TeamSection() {
                           {member.image && (
                             <AvatarImage src={member.image} alt={member.name || "User"} />
                           )}
-                          <AvatarFallback className="bg-zinc-600 text-white text-xs font-medium">
+                          <AvatarFallback className="bg-muted text-foreground text-xs font-medium">
                             {member.name?.slice(0, 2).toUpperCase() || member.user_email?.slice(0, 2).toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <p className="text-white text-sm font-medium">
+                          <p className="text-foreground text-sm font-medium">
                             {member.name || "Unknown"}
                           </p>
                         </div>
@@ -206,7 +199,7 @@ export default function TeamSection() {
 
                       {/* Email in the center */}
                       <div className="flex-1 flex items-center justify-center">
-                        <p className="text-zinc-300 text-sm">
+                        <p className="text-muted-foreground text-sm">
                           {member.user_email || "Unknown"}
                         </p>
                       </div>
@@ -226,7 +219,7 @@ export default function TeamSection() {
                         </Badge>
                         <Badge
                           variant="secondary"
-                          className="text-zinc-500 text-sm capitalize border"
+                          className="text-muted-foreground text-sm capitalize border border-border"
                         >
                           {member.role || "User"}
                         </Badge>

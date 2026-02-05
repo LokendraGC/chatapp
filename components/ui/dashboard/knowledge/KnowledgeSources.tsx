@@ -21,15 +21,15 @@ type SourceStatus = "active" | "training" | "error" | "excluded";
 export function getTypeIcon(type: SourceType) {
   switch (type) {
     case "website":
-      return <Globe className="h-4 w-4 text-blue-400" />;
+      return <Globe className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
     case "text":
-      return <FileText className="h-4 w-4 text-green-400" />;
+      return <FileText className="h-4 w-4 text-green-500 dark:text-green-400" />;
     case "upload":
-      return <Upload className="h-4 w-4 text-purple-400" />;
+      return <Upload className="h-4 w-4 text-purple-500 dark:text-purple-400" />;
     case "docs":
-      return <File className="h-4 w-4 text-orange-400" />;
+      return <File className="h-4 w-4 text-orange-500 dark:text-orange-400" />;
     default:
-      return <File className="h-4 w-4 text-zinc-400" />;
+      return <File className="h-4 w-4 text-muted-foreground" />;
   }
 }
 
@@ -95,29 +95,29 @@ export default function KnowledgeSources({
   }, [sources, searchQuery]);
 
   return (
-    <Card className="border-white/5 bg-[#0a0a0e]">
+    <Card className="border-border bg-card">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium text-white">
+          <CardTitle className="text-base font-medium text-foreground">
             Sources {searchQuery && `(${filteredSources.length})`}
           </CardTitle>
 
           <div className="flex items-center gap-2">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search sources..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/2 border-white/10 w-50 md:w-64 text-white placeholder:text-zinc-500"
+                className="pl-10 bg-muted/30 border-border w-50 md:w-64 text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <Button
               variant="ghost"
               size="icon"
-              className="text-zinc-400 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted"
             >
               <Filter className="h-4 w-4" />
             </Button>
@@ -127,20 +127,20 @@ export default function KnowledgeSources({
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow className="border-white/5 hover:bg-transparent">
-              <TableHead className="text-xs uppercase font-medium text-zinc-500">
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-xs uppercase font-medium text-muted-foreground">
                 Name
               </TableHead>
-              <TableHead className="text-xs uppercase font-medium text-zinc-500">
+              <TableHead className="text-xs uppercase font-medium text-muted-foreground">
                 Type
               </TableHead>
-              <TableHead className="text-xs uppercase font-medium text-zinc-500">
+              <TableHead className="text-xs uppercase font-medium text-muted-foreground">
                 Status
               </TableHead>
-              <TableHead className="text-xs uppercase font-medium text-zinc-500">
+              <TableHead className="text-xs uppercase font-medium text-muted-foreground">
                 Last Updated
               </TableHead>
-              <TableHead className="text-xs uppercase font-medium text-zinc-500">
+              <TableHead className="text-xs uppercase font-medium text-muted-foreground">
                 Actions
               </TableHead>
             </TableRow>
@@ -149,21 +149,21 @@ export default function KnowledgeSources({
           <TableBody>
             {isLoading ? (
               Array.from({ length: 10 }).map((_, index) => (
-                <TableRow key={index} className="border-white/5">
+                <TableRow key={index} className="border-border">
                   <TableCell>
-                    <Skeleton className="h-4 w-32 bg-white/10" />
+                    <Skeleton className="h-4 w-32 bg-muted" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-4 w-20 bg-white/10" />
+                    <Skeleton className="h-4 w-20 bg-muted" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-4 w-16 bg-white/10" />
+                    <Skeleton className="h-4 w-16 bg-muted" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-4 w-24 bg-white/10" />
+                    <Skeleton className="h-4 w-24 bg-muted" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-4 w-16 bg-white/10" />
+                    <Skeleton className="h-4 w-16 bg-muted" />
                   </TableCell>
                 </TableRow>
               ))
@@ -171,29 +171,29 @@ export default function KnowledgeSources({
               filteredSources.map((source, index) => (
                 <TableRow
                   key={source.id || index}
-                  className="border-white/5 hover:bg-white/2 cursor-pointer transition-colors"
+                  className="border-border hover:bg-muted/30 cursor-pointer transition-colors"
                   onClick={() => onSourceClick(source)}
                 >
-                  <TableCell className="font-medium text-zinc-200">
+                  <TableCell className="font-medium text-foreground">
                     <div className="flex items-center gap-3">
                       {getTypeIcon(source.type as SourceType)}
                       <div className="flex flex-col">
                         <span>{source.name}</span>
                         {source.source_url && (
-                          <span className="text-xs text-zinc-500 font-normal truncate max-w-md">
+                          <span className="text-xs text-muted-foreground font-normal truncate max-w-md">
                             {source.source_url}
                           </span>
                         )}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-zinc-400 capitalize">
+                  <TableCell className="text-muted-foreground capitalize">
                     {source.type}
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(source.status as SourceStatus)}
                   </TableCell>
-                  <TableCell className="text-zinc-400 text-sm">
+                  <TableCell className="text-muted-foreground text-sm">
                     {source.last_updated
                       ? new Date(source.last_updated).toLocaleDateString()
                       : "-"}
@@ -202,13 +202,13 @@ export default function KnowledgeSources({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-zinc-400 hover:text-white hover:bg-white/5"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted"
                       onClick={(e) => {
                         e.stopPropagation();
                         onSourceClick(source);
                       }}
                     >
-                     View
+                      View
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -217,7 +217,7 @@ export default function KnowledgeSources({
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="h-32 text-center text-zinc-500"
+                  className="h-32 text-center text-muted-foreground"
                 >
                   No sources found matching "{searchQuery}"
                 </TableCell>
@@ -226,7 +226,7 @@ export default function KnowledgeSources({
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="h-32 text-center text-zinc-500"
+                  className="h-32 text-center text-muted-foreground"
                 >
                   No knowledge sources added yet
                 </TableCell>

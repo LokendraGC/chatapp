@@ -32,8 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
+          suppressHydrationWarning
           className={`${inter.variable} bg-[#050509] min-h-screen flex flex-col p-0 antialiased text-zinc-100 selection:bg-zinc-800 font-sans`}
         >
           <div className="fixed inset-0 -z-20 pointer-events-none gpu-layer">

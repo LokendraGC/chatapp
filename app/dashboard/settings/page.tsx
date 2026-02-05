@@ -68,20 +68,20 @@ export default function SettingsPage() {
   return (
     <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300">
       <div>
-        <h1 className="text-2xl font-semibold text-white tracking-tight">
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">
           Settings
         </h1>
-        <p className="text-sm text-zinc-400 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Manage workspace preferences security and billing.
         </p>
       </div>
 
-      <Card className="border-white/5 bg-[#0A0A0E]">
+      <Card className="border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-base font-medium text-white">
+          <CardTitle className="text-base font-medium text-foreground">
             Workspace Settings
           </CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardDescription className="text-muted-foreground">
             Manage workspace preferences security and billing.
           </CardDescription>
         </CardHeader>
@@ -89,14 +89,14 @@ export default function SettingsPage() {
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-zinc-500 text-xs">Workspace Name</Label>
-              <div className="p-3 rounded-md bg-white/5 text-white border border-white/10">
+              <Label className="text-muted-foreground text-xs">Workspace Name</Label>
+              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
                 {organizationData?.business_name}
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-zinc-500">Primary Website</Label>
-              <div className="p-3 rounded-md bg-white/5 text-white border border-white/10">
+              <Label className="text-muted-foreground">Primary Website</Label>
+              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
                 {organizationData?.website_url}
               </div>
             </div>
@@ -104,15 +104,15 @@ export default function SettingsPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-zinc-500 text-xs">Default Language</Label>
-              <div className="p-3 rounded-md bg-white/5 text-white border border-white/10">
+              <Label className="text-muted-foreground text-xs">Default Language</Label>
+              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
                 English
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-zinc-500 text-xs">Timezone</Label>
-              <div className="p-3 rounded-md bg-white/5 text-white border border-white/10">
+              <Label className="text-muted-foreground text-xs">Timezone</Label>
+              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
                 GMT+5:45
               </div>
             </div>
@@ -122,12 +122,12 @@ export default function SettingsPage() {
 
       <TeamSection />
 
-      <Card className="border-white/5 bg-[#0A0A0E]">
+      <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="text-base font-medium text-red-500">
             Danger Zone
           </CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardDescription className="text-muted-foreground">
             Delete your workspace and all associated data. This action cannot be
             undone.
           </CardDescription>
@@ -135,10 +135,10 @@ export default function SettingsPage() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <p className="text-sm font-medium text-zinc-300">
+              <p className="text-sm font-medium text-foreground">
                 Delete Workspace
               </p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-muted-foreground">
                 Permanently delete all knowledge, conversations, and settings.
               </p>
             </div>
@@ -152,19 +152,19 @@ export default function SettingsPage() {
                 Delete Workspace
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#0A0A0E] border-white/10">
+            <AlertDialogContent className="bg-card border-border">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-white">
+                <AlertDialogTitle className="text-foreground">
                   Delete Workspace
                 </AlertDialogTitle>
-                <AlertDialogDescription className="text-zinc-400">
+                <AlertDialogDescription className="text-muted-foreground">
                   Are you sure you want to delete your workspace? This action cannot be undone and will permanently delete all knowledge, conversations, team members, and settings.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel 
-                  className="bg-white/5 border-white/10 text-zinc-300 hover:bg-white/5 hover:text-zinc-300"
+                <AlertDialogCancel
                   disabled={isDeleting}
+                  className="border border-border text-black bg-background hover:bg-muted"
                 >
                   Cancel
                 </AlertDialogCancel>

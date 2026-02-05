@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import ToastProvider from "@/components/ui/toast-provider";
+import { ThemeProvider } from "next-themes";
+import DashboardHeader from "@/components/ui/dashboard/header";
 
 export const metadata = {
   title: "K xa Hajur chat app",
@@ -14,6 +16,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   const clerkUser = await currentUser();
   const cookieStore = await cookies();
   const metaDataCookie = cookieStore.get("metadata");
@@ -47,18 +50,26 @@ export default async function DashboardLayout({
   const showSidebar = !!clerkUser && !!metadata;
 
   return (
-    <div className="bg-[#050509] min-h-screen flex flex-col p-0 antialiased text-zinc-100 selection:bg-zinc-800 font-sans">
-      {showSidebar ? (
-        <>
-          <Sidebar metadata={metadata} email={userEmail} />
-          <div className="flex-1 flex flex-col md:ml-64 relative min-h-screen transition-all duration-300 ease-in-out">
-            <main className="flex-1">{children}</main>
-          </div>
-        </>
-      ) : (
-        children
-      )}
-      <ToastProvider />
-    </div>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div suppressHydrationWarning className="bg-background text-foreground min-h-screen flex flex-col p-0 antialiased selection:bg-zinc-800 font-sans">
+        {showSidebar ? (
+          <>
+            <Sidebar metadata={metadata} email={userEmail} />
+            <div className="flex-1 flex flex-col md:ml-64 relative min-h-screen transition-all duration-300 ease-in-out bg-background">
+              <DashboardHeader metadata={metadata} email={userEmail} />
+              <main className="flex-1">{children}</main>
+            </div>
+          </>
+        ) : (
+          children
+        )}
+        <ToastProvider />
+      </div>
+    </ThemeProvider>
   );
 }

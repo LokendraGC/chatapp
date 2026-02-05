@@ -78,19 +78,19 @@ export default function SourceDetailsPage({
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="w-full sm:max-w-md border-l border-white/10 bg-[#0A0A0E] p-0 shadow-2xl">
+        <SheetContent className="w-full sm:max-w-md border-l border-border bg-card p-0 shadow-2xl">
           <div className="flex flex-col gap-4 h-full">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 text-xl text-white tracking-tight">
+              <SheetTitle className="flex items-center gap-2 text-xl text-foreground tracking-tight">
                 {getTypeIcon(selectedSource.type as SourceType)}
                 {selectedSource.name}
               </SheetTitle>
-              <SheetDescription className="text-sm text-zinc-400 truncate max-w-md">
+              <SheetDescription className="text-sm text-muted-foreground truncate max-w-md">
                 {selectedSource.source_url || "Manual entry"}
               </SheetDescription>
               <div className="pt-2 flex gap-2">
                 {getStatusBadge(selectedSource.status as SourceStatus)}
-                <span className="text-xs text-zinc-500 py-1 flex items-center">
+                <span className="text-xs text-muted-foreground py-1 flex items-center">
                   Updated{" "}
                   {selectedSource.last_updated &&
                     new Date(selectedSource.last_updated).toLocaleDateString()}
@@ -99,16 +99,16 @@ export default function SourceDetailsPage({
             </SheetHeader>
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-zinc-300 uppercase tracking-wide">
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                   Content Preview
                 </h4>
-                <div className="p-4 rounded-lg border border-white/5 bg-black/40 font-mono text-sm text-zinc-300 whitespace-pre-wrap">
+                <div className="p-4 rounded-lg border border-border bg-muted/50 font-mono text-sm text-foreground whitespace-pre-wrap">
                   {selectedSource.content ||
                     `# ${selectedSource.name}\n\n(No content preview available)`}
                 </div>
               </div>
             </div>
-            <SheetFooter className="p-6 border-t border-white/5 bg-[#050505]">
+            <SheetFooter className="p-6 border-t border-border bg-muted/30">
               <Button
                 onClick={handleDeleteSource}
                 variant="destructive"
@@ -133,17 +133,17 @@ export default function SourceDetailsPage({
 
 
       <AlertDialog open={isDeleteSourceDialogOpen} onOpenChange={setIsDeleteSourceDialogOpen}>
-        <AlertDialogContent className="bg-[#0A0A0E] border-white/10">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-foreground">
               Delete Source
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to delete "{selectedSource?.name}"? This action cannot be undone and will remove all associated routing rules.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10">
+            <AlertDialogCancel className="bg-muted border-border text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

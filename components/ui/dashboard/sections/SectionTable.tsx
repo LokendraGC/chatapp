@@ -26,23 +26,23 @@ export default function SectionTable({
   return (
     <Table>
       <TableHeader>
-        <TableRow className="border-white/5 hover:bg-transparent">
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 pl-6 py-3">
+        <TableRow className="border-border hover:bg-transparent">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground pl-6 py-3">
             Name
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 text-center py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground text-center py-3">
             Sources
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground py-3">
             Tone
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground py-3">
             Scope
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground py-3">
             Status
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-zinc-500 text-right pr-10 py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground text-right pr-10 py-3">
             Actions
           </TableHead>
         </TableRow>
@@ -50,7 +50,7 @@ export default function SectionTable({
       <TableBody>
         {isLoading ? (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
+            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
               <div className="flex items-center justify-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Loading Sections...</span>
@@ -61,21 +61,21 @@ export default function SectionTable({
           sections.map((section) => (
             <TableRow
               key={section.id}
-              className="border-white/5 group transition-colors hover:bg-white/5"
+              className="border-border group transition-colors hover:bg-muted/30"
             >
-              <TableCell className="font-medium text-zinc-200 pl-6 py-3">
+              <TableCell className="font-medium text-foreground pl-6 py-3">
                 {section.name}
               </TableCell>
-              <TableCell className="text-zinc-400 text-center py-3">
+              <TableCell className="text-muted-foreground text-center py-3">
                 {section.sourceCount}
               </TableCell>
-              <TableCell className="text-zinc-400 py-3">
+              <TableCell className="text-muted-foreground py-3">
                 {getToneBadge(section.tone)}
               </TableCell>
-              <TableCell className="text-zinc-400 py-3">
+              <TableCell className="text-muted-foreground py-3">
                 <span className="text-xs">{section.scopeLabel || "General"}</span>
               </TableCell>
-              <TableCell className="text-zinc-400 py-3">
+              <TableCell className="text-muted-foreground py-3">
                 {getStatusBadge(section.status)}
               </TableCell>
               <TableCell className="text-right pr-6 py-3">
@@ -83,7 +83,7 @@ export default function SectionTable({
                   variant="ghost"
                   size="sm"
                   onClick={() => onPreview(section)}
-                  className="text-zinc-400 hover:text-white hover:bg-white/5"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
                 >
                   Preview
                 </Button>
@@ -92,7 +92,7 @@ export default function SectionTable({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
+            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
               No sections found. Create your first section to get started.
             </TableCell>
           </TableRow>

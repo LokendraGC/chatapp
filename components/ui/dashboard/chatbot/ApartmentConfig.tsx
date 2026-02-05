@@ -35,11 +35,11 @@ export default function ApartmentConfig({
   hasChanges,
 }: ApartmentConfigProps) {
   return (
-    <Card className="border-white/5 bg-[#0A0A0E] overflow-hidden relative shadow-2xl">
+    <Card className="border-border bg-card overflow-hidden relative shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Palette className="w-4 h-4 text-zinc-400" />
-          <CardTitle className="text-sm font-medium text-white uppercase">
+          <Palette className="w-4 h-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-foreground uppercase">
             Appearance
           </CardTitle>
         </div>
@@ -47,7 +47,7 @@ export default function ApartmentConfig({
 
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-zinc-300">Primary Color</Label>
+          <Label className="text-foreground">Primary Color</Label>
           <div className="flex items-center gap-2">
             {PRESET_COLORS.map((color) => (
               <button
@@ -56,7 +56,7 @@ export default function ApartmentConfig({
                 className={cn(
                   "w-6 h-6 cursor-pointer rounded-full border-2 transition-all",
                   primaryColor === color.value
-                    ? "ring-2 ring-white ring-offset-2 ring-offset-zinc-900"
+                    ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
                     : "opacity-60 hover:opacity-100"
                 )}
                 style={{
@@ -83,12 +83,12 @@ export default function ApartmentConfig({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-zinc-300">Welcome Message</Label>
+          <Label className="text-foreground">Welcome Message</Label>
           <div className="flex items-center gap-2">
             <Textarea
               value={welcomeMessage}
               onChange={(e) => setWelcomeMessage(e.target.value)}
-              className="min-h-12.5 max-h-37.5 pr-12 outline-none text-white bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-12.5 max-h-37.5 pr-12 outline-none text-foreground bg-muted/30 border-border resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function ApartmentConfig({
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full bg-white text-black hover:bg-zinc-200 animate-in"
+            className="w-full animate-in"
           >
             {isSaving ? (
               "Saving ..."

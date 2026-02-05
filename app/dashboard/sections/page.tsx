@@ -214,17 +214,17 @@ const SectionsPage = () => {
     <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-medium text-white tracking-tight">
+          <h1 className="text-2xl font-medium text-foreground tracking-tight">
             Sections
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">
-            Define bihavior and tone for different topics.
+          <p className="text-sm text-muted-foreground mt-1">
+            Define behavior and tone for different topics.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={handleCreateSection}
-            className="bg-white text-black hover:bg-zinc-200"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Section
@@ -232,7 +232,7 @@ const SectionsPage = () => {
         </div>
       </div>
 
-      <Card className="border-white/5 bg-[#0A0A0E]">
+      <Card className="border-border bg-card">
         <CardContent className="p-0">
           <SectionTable
           sections={sections}
@@ -244,16 +244,16 @@ const SectionsPage = () => {
       </Card>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full sm:max-w-md border-l border-white/10 bg-[#0A0A0E] p-0 shadow-2xl">
+        <SheetContent className="w-full sm:max-w-md border-l border-border bg-card p-0 shadow-2xl">
           {selectedSection && (
             <>
-              <SheetHeader className="p-6 border-b border-white/5">
-                <SheetTitle className="text-xl text-white tracking-tight">
+              <SheetHeader className="p-6 border-b border-border">
+                <SheetTitle className="text-xl text-foreground tracking-tight">
                   {selectedSection.id === "new"
                     ? "Create Section"
                     : "View Section"}
                 </SheetTitle>
-                <SheetDescription className="text-zinc-500">
+                <SheetDescription className="text-muted-foreground">
                   {selectedSection.id === "new"
                     ? "Configure how the AI behaves for this specific topic."
                     : "Review section configuration and data sources."}
@@ -275,11 +275,11 @@ const SectionsPage = () => {
           )}
 
           {selectedSection?.id === "new" && (
-            <div className="px-6 py-4 border-t border-white/5">
+            <div className="px-6 py-4 border-t border-border">
               <Button
                 onClick={handleSaveSection}
                 disabled={isSaving}
-                className="w-full bg-white text-black hover:bg-zinc-200 disabled:opacity-50"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 {isSaving ? "Creating..." : "Create Section"}
               </Button>
@@ -309,17 +309,17 @@ const SectionsPage = () => {
       </Sheet>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[#0A0A0E] border-white/10">
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-foreground">
               Delete Section
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to delete "{selectedSection?.name}"? This action cannot be undone and will remove all associated routing rules.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10">
+            <AlertDialogCancel className="bg-muted border-border text-foreground hover:bg-muted/80">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

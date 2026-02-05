@@ -119,10 +119,10 @@ export default function AddKnowledgeModal({
         if (!open) setError(null);
       }}
     >
-      <DialogContent className="sm:max-w-[600px] bg-[#0E0E12] border-white/10 text-zinc-100 p-0 overflow-hidden gap-0">
+      <DialogContent className="sm:max-w-[600px] bg-card border-border text-foreground p-0 overflow-hidden gap-0">
         <DialogHeader className="p-6 pb-2">
-          <DialogTitle>Add New Source</DialogTitle>
-          <DialogDescription className="text-zinc-500">
+          <DialogTitle className="text-foreground">Add New Source</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Add a new source to your knowledge base.
           </DialogDescription>
         </DialogHeader>
@@ -135,25 +135,25 @@ export default function AddKnowledgeModal({
             setError(null);
           }}
         >
-          <div className="px-6 border-b border-white/5">
+          <div className="px-6 border-b border-border">
             <TabsList className="bg-transparent h-auto p-0 gap-6">
               <TabsTrigger
                 value="website"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-indigo-500 cursor-pointer font-medium text-zinc-400 rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-white hover:text-zinc-300 transition-all focus-visible:outline-none focus-visible:ring-0"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 border-b-2 border-transparent data-[state=active]:border-b-primary dark:data-[state=active]:border-0 dark:data-[state=active]:border-b-2 dark:data-[state=active]:border-b-primary dark:data-[state=active]:bg-transparent cursor-pointer font-medium text-muted-foreground rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-foreground hover:text-foreground/80 transition-all focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0"
               >
                 Website
               </TabsTrigger>
 
               <TabsTrigger
                 value="text"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-indigo-500 cursor-pointer font-medium text-zinc-400 rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-white hover:text-zinc-300 transition-all focus-visible:outline-none focus-visible:ring-0"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 border-b-2 border-transparent data-[state=active]:border-b-primary dark:data-[state=active]:border-0 dark:data-[state=active]:border-b-2 dark:data-[state=active]:border-b-primary dark:data-[state=active]:bg-transparent cursor-pointer font-medium text-muted-foreground rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-foreground hover:text-foreground/80 transition-all focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0"
               >
                 Q&A and Text
               </TabsTrigger>
 
               <TabsTrigger
                 value="upload"
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-b-indigo-500 cursor-pointer font-medium text-zinc-400 rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-white hover:text-zinc-300 transition-all focus-visible:outline-none focus-visible:ring-0"
+                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 border-b-2 border-transparent data-[state=active]:border-b-primary dark:data-[state=active]:border-0 dark:data-[state=active]:border-b-2 dark:data-[state=active]:border-b-primary dark:data-[state=active]:bg-transparent cursor-pointer font-medium text-muted-foreground rounded-none px-0 py-3 text-xs uppercase tracking-wide data-[state=active]:text-foreground hover:text-foreground/80 transition-all focus-visible:outline-none focus-visible:ring-0 focus-visible:border-0"
               >
                 File Upload
               </TabsTrigger>
@@ -176,11 +176,11 @@ export default function AddKnowledgeModal({
               value="website"
               className="space-y-4 animate-in fade-in-0 duration-300"
             >
-              <div className="p-4 rounded-lg bg-indigo-500/10 borderflex border-indigo-500/20 text-indigo-300/80 text-sm flex gap-3">
+              <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300/80 text-sm flex gap-3">
                 <Globe className="w-5 h-5 shrink-0" />
                 <div>
                   <p className="font-medium">Crawl Website</p>
-                  <p className="text-xs text-indigo-300/80 mt-1 leading-relaxed">
+                  <p className="text-xs text-indigo-600 dark:text-indigo-300/80 mt-1 leading-relaxed">
                     Enter a website URL to crawl significantly or add a specific
                     page link to provide focused context.
                   </p>
@@ -192,7 +192,7 @@ export default function AddKnowledgeModal({
                 <Input
                   type="url"
                   placeholder="https://example.com"
-                  className="bg-white/5 border-white/10 mt-1"
+                  className="bg-muted/50 border-border mt-1"
                   value={websiteUrl}
                   onChange={(e) => {
                     setWebsiteUrl(e.target.value);
@@ -206,11 +206,11 @@ export default function AddKnowledgeModal({
               value="text"
               className="space-y-4 animate-in fade-in-0 duration-300"
             >
-              <div className="p-4 rounded-lg bg-purple-500/10 borderflex border-purple-500/20 text-purple-300/80 text-sm flex gap-3">
+              <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300/80 text-sm flex gap-3">
                 <FileText className="w-5 h-5 shrink-0" />
                 <div>
                   <p className="font-medium">Raw Text</p>
-                  <p className="text-xs text-purple-300/80 mt-1 leading-relaxed">
+                  <p className="text-xs text-purple-600 dark:text-purple-300/80 mt-1 leading-relaxed">
                     Paste existing FAQs, policies, or internal notes directly
                   </p>
                 </div>
@@ -221,7 +221,7 @@ export default function AddKnowledgeModal({
                 <Input
                   type="text"
                   placeholder="Enter your title here..."
-                  className="bg-white/5 border-white/10 mt-1"
+                  className="bg-muted/50 border-border mt-1"
                   value={docsTitle}
                   onChange={(e) => setDocsTitle(e.target.value)}
                 />
@@ -231,7 +231,7 @@ export default function AddKnowledgeModal({
                 <Label>Content *</Label>
                 <Textarea
                   placeholder="Enter your content here..."
-                  className="bg-white/5 border-white/10 mt-1 min-h-32 max-h-64 overflow-y-auto"
+                  className="bg-muted/50 border-border mt-1 min-h-32 max-h-64 overflow-y-auto"
                   value={docsContent}
                   onChange={(e) => setDocsContent(e.target.value)}
                 />
@@ -272,7 +272,7 @@ export default function AddKnowledgeModal({
               />
 
               <div
-                className="border-2 border-dashed border-white/20 rounded-lg p-8 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-indigo-500/50 transition-colors bg-white/5"
+                className="border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary/50 transition-colors bg-muted/30"
                 onClick={() =>
                   document.getElementById("csv-file-input")?.click()
                 }
@@ -305,15 +305,15 @@ export default function AddKnowledgeModal({
                 }}
               >
                 <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-indigo-400" />
+                  <Upload className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-foreground">
                     {uploadedFile
                       ? uploadedFile.name
                       : "Click to upload or drag and drop"}
                   </p>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     CSV, TXT, or PDF (max 10MB)
                   </p>
                 </div>
@@ -321,18 +321,18 @@ export default function AddKnowledgeModal({
             </TabsContent>
           </div>
 
-          <div className="p-6 border-t border-white/5 bg-black/20 flex justify-end gap-2">
+          <div className="p-6 border-t border-border bg-muted/30 flex justify-end gap-2">
             <Button
               variant="ghost"
               onClick={() => setIsOpen(false)}
-              className="text-zinc-400 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
-              className={`bg-white min-w-[110px] text-black ${
+              className={`bg-primary text-primary-foreground min-w-[110px] ${
                 isLoading ? "opacity-50 cursor-not-allowed" : ""
-              } hover:bg-zinc-200`}
+              } hover:bg-primary/90`}
               onClick={handleImportWrapper}
               disabled={isLoading}
             >

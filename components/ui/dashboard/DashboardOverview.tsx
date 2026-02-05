@@ -35,8 +35,7 @@ export default function DashboardOverview() {
 
 
     if (isLoading) return (
-
-        <div className="flex-1 flex w-full items-center justify-center p-4">
+        <div className="flex-1 flex w-full items-center justify-center p-4 text-muted-foreground">
             <Loader2 className="w-8 h-8 animate-spin" />
         </div>
     );
@@ -82,7 +81,7 @@ export default function DashboardOverview() {
     return (
         <div className="p-6 md:p-8 space-y-6 w-full animate-in fade-in duration-500">
             <section className="space-y-4">
-                <h3 className="text-lg font-medium text-white tracking-tight">
+                <h3 className="text-lg font-medium text-foreground tracking-tight">
                     Setup Progress
                 </h3>
 
@@ -121,10 +120,10 @@ export default function DashboardOverview() {
                                 >
                                     <Card
                                         className={cn(
-                                            "relative overflow-hidden rounded-xl border bg-[#0A0A0E]/80 transition-all duration-200",
+                                            "relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-200",
                                             step.complete
-                                                ? "opacity-75 border-white/5 bg-white/5 hover:bg-white/10"
-                                                : cn("bg-white/5", accentStyles.card)
+                                                ? "opacity-90 bg-muted/50 hover:bg-muted border-border"
+                                                : cn("bg-card hover:bg-muted/50", accentStyles.card)
                                         )}
                                     >
                                         <CardContent className="p-4 flex items-center justify-between gap-3">
@@ -132,7 +131,7 @@ export default function DashboardOverview() {
                                                 <span
                                                     className={cn(
                                                         "text-sm font-medium block",
-                                                        step.complete ? "text-zinc-500" : "text-white"
+                                                        step.complete ? "text-muted-foreground" : "text-foreground"
                                                     )}
                                                 >
                                                     {step.label}
@@ -174,76 +173,72 @@ export default function DashboardOverview() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <Card className="□ border-white/5 □ bg-[#0A0A0E]">
+                    <Card className="border-border bg-card">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-base font-medium text-white">Knowledge Base</CardTitle>
+                            <CardTitle className="text-base font-medium text-foreground">Knowledge Base</CardTitle>
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 text-xs border-white/10 bg-transparent text-zinc-400 hover:text-white hover:bg-white/10"
+                                className="h-8 text-xs border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
                                 asChild
                             >
                                 <Link href="/dashboard/knowledge">Manage sources</Link>
                             </Button>
                         </CardHeader>
 
-
                         <CardContent className="p-4 grid grid-cols-3 gap-4">
-
-                            <div className="p-3 rounded-lg bg-white/2 border border-white/10">
+                            <div className="p-3 rounded-lg bg-muted/50 border border-border">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <Globe className="w-4 h-4 text-blue-400" />
-                                    <span className="text-xs text-zinc-500 font-medium">
+                                    <Globe className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                                    <span className="text-xs text-muted-foreground font-medium">
                                         Pages
                                     </span>
                                 </div>
-                                <span className="text-2xl font-medium text-white">
+                                <span className="text-2xl font-medium text-foreground">
                                     {knowledge.website || 0}
                                 </span>
                             </div>
 
-
-                            <div className="p-3 rounded-lg bg-white/2 border border-white/10">
+                            <div className="p-3 rounded-lg bg-muted/50 border border-border">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <FileText className="w-4 h-4 text-purple-400" />
-                                    <span className="text-xs text-zinc-500 font-medium">
+                                    <FileText className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                                    <span className="text-xs text-muted-foreground font-medium">
                                         Manual Text
                                     </span>
                                 </div>
-                                <span className="text-2xl font-medium text-white">
+                                <span className="text-2xl font-medium text-foreground">
                                     {knowledge.text || 0}
                                 </span>
                             </div>
 
-                            <div className="p-3 rounded-lg bg-white/2 border border-white/10">
+                            <div className="p-3 rounded-lg bg-muted/50 border border-border">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <Upload className="w-4 h-4 text-emerald-400" />
-                                    <span className="text-xs text-zinc-500 font-medium">
+                                    <Upload className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                                    <span className="text-xs text-muted-foreground font-medium">
                                         Upload Document
                                     </span>
                                 </div>
-                                <span className="text-2xl font-medium text-white">
+                                <span className="text-2xl font-medium text-foreground">
                                     {knowledge.upload || 0}
                                 </span>
                             </div>
-
                         </CardContent>
                     </Card>
 
 
-                    <Card className="□ border-white/5 □ bg-[#0A0A0E] min-h-90">
+                    <Card className="border-border bg-card min-h-90">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <div className="space-y-1">
-                                <CardTitle className="text-base font-medium text-white">
+                                <CardTitle className="text-base font-medium text-foreground">
                                     Sections
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-muted-foreground">
                                     configure behavior for different topics
                                 </CardDescription>
                             </div>
                             <Button
                                 size="sm"
-                                className="h-8 gap-1 bg-white text-black hover:bg-zinc-200"
+                                className="h-8 gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
                                 asChild
                             >
                                 <Link href="/dashboard/sections">
@@ -251,19 +246,18 @@ export default function DashboardOverview() {
                                     Create Section
                                 </Link>
                             </Button>
-
                         </CardHeader>
 
                         <CardContent className="p-0">
-                            <div className="divide-y divide-white/10">
+                            <div className="divide-y divide-border">
                                 {
                                     sections.list.length === 0 ? (
-                                        <div className="p-6 text-center text-sm text-zinc-500">
+                                        <div className="p-6 text-center text-sm text-muted-foreground">
                                             No sections found. Create your first section to get started.
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="grid grid-cols-12 gap-4 py-2 px-4 bg-white/2 text-[10px] text-zinc-500 tracking-wider font-medium">
+                                            <div className="grid grid-cols-12 gap-4 py-2 px-4 bg-muted/30 text-[10px] text-muted-foreground tracking-wider font-medium">
                                                 <div className="col-span-5">Name</div>
                                                 <div className="col-span-3">Sources</div>
                                                 <div className="col-span-3">Tone</div>
@@ -273,19 +267,19 @@ export default function DashboardOverview() {
                                             {sections?.list.map((section: any, i: number) => (
                                                 <div
                                                     key={i}
-                                                    className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 items-center hover:bg-white/2 transition-colors last:border-0 group"
+                                                    className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border items-center hover:bg-muted/30 transition-colors last:border-0 group"
                                                 >
-                                                    <div className="col-span-5 text-sm font-medium text-zinc-200">
+                                                    <div className="col-span-5 text-sm font-medium text-foreground">
                                                         {section.name}
                                                     </div>
-                                                    <div className="col-span-3 text-sm text-zinc-500">
+                                                    <div className="col-span-3 text-sm text-muted-foreground">
                                                         {section.sourceCount} Sources
                                                     </div>
 
                                                     <div className="col-span-3">
                                                         <Badge
                                                             variant="secondary"
-                                                            className="bg-white/10 text-sm text-zinc-500 rounded-lg hover:bg-white/20 transition-colors"
+                                                            className="bg-muted text-muted-foreground text-sm rounded-lg hover:bg-muted/80 transition-colors"
                                                         >
                                                             {section.tone}
                                                         </Badge>
@@ -296,11 +290,11 @@ export default function DashboardOverview() {
                                                             variant="ghost"
                                                             onClick={() => router.push('/dashboard/sections')}
                                                             size="icon"
-                                                            className="h-6 w-6 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            className="h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                        >
                                                             <MoreHorizontal className="w-4 h-4" />
                                                         </Button>
                                                     </div>
-
                                                 </div>
                                             ))}
                                         </>
@@ -308,24 +302,22 @@ export default function DashboardOverview() {
                                 }
                             </div>
                         </CardContent>
-
                     </Card>
                 </div>
 
                 <div className="space-y-8">
-                    <Card className="border-white/5 bg-[#0A0A0E] min-h-80 flex flex-col overflow-hidden">
+                    <Card className="border-border bg-card min-h-80 flex flex-col overflow-hidden">
                         <CardHeader className="pb-4 shrink-0">
-                            <div className="flex items-center justify-between ">
-                                <CardTitle className="text-base font-medium text-white">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-base font-medium text-foreground">
                                     Recent Chats
                                 </CardTitle>
                                 <Link
                                     href="/dashboard/conversations"
-                                    className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors"
+                                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                     View all <ArrowRight className="w-3 h-3" />
                                 </Link>
-
                             </div>
                         </CardHeader>
 
@@ -334,30 +326,28 @@ export default function DashboardOverview() {
                                 <ScrollArea className="h-full">
                                     <div className="space-y-1 pr-2">
                                         {chats.length === 0 ? (
-                                            <div className="p-4 text-center text-xs text-zinc-500">
+                                            <div className="p-4 text-center text-xs text-muted-foreground">
                                                 No chats yet.
                                             </div>
                                         ) : (
                                             chats.map((chat: any, i: number) => (
-
                                                 <Link
                                                     key={i}
                                                     href={`/dashboard/conversations/`}
-                                                    className="block p-2 rounded-lg hover:bg-white/2 transition-colors"
+                                                    className="block p-2 rounded-lg hover:bg-muted/50 transition-colors"
                                                 >
                                                     <div className="flex items-start justify-between mb-1">
-                                                        <span className="text-sm font-medium text-zinc-200 truncate max-w-45">
+                                                        <span className="text-sm font-medium text-foreground truncate max-w-45">
                                                             {chat.title}
                                                         </span>
-                                                        <span className="text-xs text-zinc-500">
+                                                        <span className="text-xs text-muted-foreground">
                                                             {chat.time}
                                                         </span>
                                                     </div>
-                                                    <span className="text-xs text-zinc-500">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {chat.snippet}
                                                     </span>
                                                 </Link>
-
                                             ))
                                         )}
                                     </div>
@@ -366,24 +356,24 @@ export default function DashboardOverview() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-white/5 bg-[#0A0A0E] overflow-hidden" id="widget">
+                    <Card className="border-border bg-card overflow-hidden" id="widget">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2">
-                                    <Code className="w-4 h-4 text-amber-400/80" />
+                                    <Code className="w-4 h-4 text-amber-500 dark:text-amber-400/80" />
                                     <div>
-                                        <CardTitle className="text-base font-medium text-white">
+                                        <CardTitle className="text-base font-medium text-foreground">
                                             Install Widget
                                         </CardTitle>
-                                        <CardDescription className="text-zinc-500 text-xs mt-0.5">
-                                            Paste this snippet before <code className="text-zinc-400 bg-white/5 px-1 rounded">&lt;/body&gt;</code> on your site.
+                                        <CardDescription className="text-muted-foreground text-xs mt-0.5">
+                                            Paste this snippet before <code className="text-foreground/80 bg-muted px-1 rounded">&lt;/body&gt;</code> on your site.
                                         </CardDescription>
                                     </div>
                                 </div>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 text-zinc-400 hover:text-white hover:bg-white/5 shrink-0"
+                                    className="h-8 text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
                                     onClick={handleCopy}
                                 >
                                     {copied ? (
@@ -397,8 +387,8 @@ export default function DashboardOverview() {
                         </CardHeader>
 
                         <CardContent className="pt-0">
-                            <div className="bg-[#050509] border border-white/10 rounded-lg p-4 overflow-hidden">
-                                <pre className="text-zinc-400 font-mono text-[12px] leading-relaxed whitespace-pre-wrap break-all overflow-x-auto pr-2 min-h-16">
+                            <div className="bg-muted border border-border rounded-lg p-4 overflow-hidden">
+                                <pre className="text-muted-foreground font-mono text-[12px] leading-relaxed whitespace-pre-wrap break-all overflow-x-auto pr-2 min-h-16">
                                     <code>{`<script src="${origin || process.env.NEXT_PUBLIC_SITE_URL || ""}/widget.js" data-id="${data?.botId || "..."}" defer></script>`}</code>
                                 </pre>
                             </div>
