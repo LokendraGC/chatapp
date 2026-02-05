@@ -144,27 +144,27 @@ export default function InitialForm() {
 
   return (
     <div className="w-full max-w-xl mx-auto min-h-100 flex flex-col justify-center items-center">
-      <div className="fixed top-0 left-0 w-full h-1 bg-white/5">
+      <div className="fixed top-0 left-0 w-full h-1 bg-muted">
         <div
-          className="h-full bg-indigo-500 transition-all duration-500 ease-in-out"
+          className="h-full bg-primary transition-all duration-500 ease-in-out"
           style={{ width: `${progress}%` }}
         />
       </div>
-      <div className="  fixed top-0 right-6 md:top-8 md:right-8 text-xs font-medium text-zinc-600 uppercase tracking-widest pointer-events-none fade-in">
+      <div className="fixed top-0 right-6 md:top-8 md:right-8 text-xs font-medium text-muted-foreground uppercase tracking-widest pointer-events-none fade-in">
         Set Up Your Account
       </div>
       {isSubmitting ? (
         <div className="flex flex-col items-center justify-center text-center">
           <div className="relative mb-8">
-            <div className="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full animate-pulse"></div>
-            <div className="relative w-16 h-16 bg-linear-to-tr from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-white animate-bounce" />
+            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
+            <div className="relative w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-primary-foreground animate-bounce" />
             </div>
           </div>
-          <h2 className="text-2xl font-medium text-white tracking-tight mb-2">
+          <h2 className="text-2xl font-medium text-foreground tracking-tight mb-2">
             Scanning Your Website...
           </h2>
-          <p className="text-sm text-zinc-400 font-light mb-8 leading-relaxed">
+          <p className="text-sm text-muted-foreground font-light mb-8 leading-relaxed">
             {`Scanning ${formData.websiteUrl}...`}
           </p>
         </div>
@@ -183,22 +183,22 @@ export default function InitialForm() {
                 variant="ghost"
                 size="icon"
                 onClick={handleBack}
-                className="text-zinc-500 hover:text-zinc-300 hover:bg-white/10 rounded-full -ml-2 w-8 h-8"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full -ml-2 w-8 h-8"
               >
                 <ChevronLeft className="w-5 h-5" />
               </Button>
             )}
-            <span className="text-sm font-medium text-zinc-600 uppercase">
+            <span className="text-sm font-medium text-muted-foreground uppercase">
               Step {currentStep + 1} of {STEPS.length}
             </span>
           </div>
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <h1 className="text-2xl font-medium text-white tracking-tight mb-2">
+              <h1 className="text-2xl font-medium text-foreground tracking-tight mb-2">
                 {stepData.question}
               </h1>
-              <p className="text-sm text-zinc-400 font-light mb-8 leading-relaxed">
+              <p className="text-sm text-muted-foreground font-light mb-8 leading-relaxed">
                 {stepData.description}
               </p>
             </div>
@@ -215,7 +215,7 @@ export default function InitialForm() {
                   }
                   onKeyDown={handleKeyDown}
                   placeholder={stepData.placeholder}
-                  className="w-full bg-transparent border-0 border-b border-white/10 placeholder:text-zinc-700 outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-b focus-visible:border-indigo-500 rounded-none h-auto transition-colors"
+                  className="w-full bg-transparent border-0 border-b border-border text-foreground placeholder:text-muted-foreground outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-b focus-visible:border-primary rounded-none h-auto transition-colors"
                   autoFocus
                 />
               ) : (
@@ -230,17 +230,17 @@ export default function InitialForm() {
                   }
                   onKeyDown={handleKeyDown}
                   placeholder={stepData.placeholder}
-                  className="w-full bg-transparent border-0 border-b border-white/10 placeholder:text-zinc-700 outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-b focus-visible:border-indigo-500 rounded-none h-auto transition-colors"
+                  className="w-full bg-transparent border-0 border-b border-border text-foreground placeholder:text-muted-foreground outline-none focus:ring-0 focus-visible:ring-0 focus-visible:border-b focus-visible:border-primary rounded-none h-auto transition-colors"
                   autoFocus
                 />
               )}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-600  pointer-events-none">
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                 <Icon className="w-6 h-6" />
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-8">
-              <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-600">
+              <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
                 {stepData.type === "textarea" ? (
                   <>
                     <Command className="w-3 h-3" />
@@ -257,9 +257,7 @@ export default function InitialForm() {
               <Button
                 onClick={handleNext}
                 disabled={!isStepValid}
-                className={cn(
-                  "rounded-full px-4 py-2 text-base cursor-pointer transition-all duration-300 font-medium hover:shadow-white/20 "
-                )}
+                className="rounded-full px-4 py-2 text-base cursor-pointer transition-all duration-300 font-medium"
               >
                 {currentStep === STEPS.length - 1 ? "Submit" : "Continue"}
                 {currentStep === STEPS.length - 1 ? (

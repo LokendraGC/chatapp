@@ -149,7 +149,11 @@ export default function TeamSection() {
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenDialog(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setOpenDialog(false)}
+                  className="border-2 border-border bg-background text-foreground hover:bg-muted hover:text-foreground"
+                >
                   Cancel
                 </Button>
                 <Button disabled={isAdding} onClick={handleAddMember}>

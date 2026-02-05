@@ -287,17 +287,17 @@ const SectionsPage = () => {
           )}
 
           {selectedSection?.id !== "new" && (
-            <div className="p-6 bg-red-500/5 border-t border-red-500/10">
-              <h5 className="text-sm font-medium text-red-400 mb-1">
+            <div className="p-6 bg-red-50 dark:bg-red-500/5 border-t-2 border-red-200 dark:border-red-500/10 rounded-b-lg">
+              <h5 className="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">
                 Danger Zone
               </h5>
-              <p className="text-xs text-red-500/70 mb-3">
+              <p className="text-xs text-red-600/90 dark:text-red-500/70 mb-3">
                 Deleting this section will remove all associated routing rules.
               </p>
               <Button
                 variant="destructive"
                 size="sm"
-                className="w-full bg-red-500/10 text-red-500 border border-red-500/20"
+                className="w-full bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-500 border-2 border-red-300 dark:border-red-500/20 hover:bg-red-200 dark:hover:bg-red-500/20"
                 onClick={handleDeleteSection}
                 disabled={isSaving}
               >
