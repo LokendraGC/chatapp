@@ -1,12 +1,25 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bot, ChevronDown, MessageCircle, User } from "lucide-react";
+import { ArrowRight, Bot, ChevronDown, ContactIcon, HelpCircleIcon, HomeIcon, Mail, MessageCircle, Phone, User } from "lucide-react";
+import {
+  FaFacebookF,
+  FaFacebookMessenger,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTiktok,
+  FaTwitter,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ChatbHome from "@/components/ui/embed/home";
+import Help from "@/components/ui/embed/help";
 
 
 interface ChatBotMetaData {
@@ -20,6 +33,13 @@ interface Section {
   name: string;
   source_ids: string[];
 }
+
+type SocialItem = { platform: string; url: string };
+type ContactInfo = {
+  email?: string;
+  phone?: string;
+  social_media?: SocialItem[];
+};
 
 const EmbedPage = () => {
   const searchParams = useSearchParams();
@@ -42,6 +62,9 @@ const EmbedPage = () => {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"home" | "contact" | "help">("home");
+  const [showChat, setShowChat] = useState(false);
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lastTouchTimeRef = useRef<number>(0);
 
@@ -142,6 +165,16 @@ const EmbedPage = () => {
 
     fetchConfig();
   }, [token]);
+
+  useEffect(() => {
+    fetch("/api/contact/fetch")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data?.contact) return;
+        setContactInfo(data.contact as ContactInfo);
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -301,11 +334,82 @@ const EmbedPage = () => {
     }, 900);
   };
 
+  const handleTabChange = (value: "home" | "contact" | "help") => {
+    setActiveTab(value);
+    setShowChat(false);
+    setActiveSection(null);
+  };
+
+  const openChatFromContact = () => {
+    setShowChat(true);
+  };
+
+  const getSocialMeta = (platform: string) => {
+    const key = platform.toLowerCase();
+    if (key.includes("whatsapp")) {
+      return {
+        label: "WhatsApp",
+        icon: <FaWhatsapp className="h-4 w-4" />,
+        className: "bg-emerald-100 text-emerald-600",
+      };
+    }
+    if (key.includes("messenger")) {
+      return {
+        label: "Messenger",
+        icon: <FaFacebookMessenger className="h-4 w-4" />,
+        className: "bg-sky-100 text-sky-600",
+      };
+    }
+    if (key.includes("facebook")) {
+      return {
+        label: "Facebook",
+        icon: <FaFacebookF className="h-4 w-4" />,
+        className: "bg-blue-100 text-blue-600",
+      };
+    }
+    if (key.includes("instagram")) {
+      return {
+        label: "Instagram",
+        icon: <FaInstagram className="h-4 w-4" />,
+        className: "bg-pink-100 text-pink-600",
+      };
+    }
+    if (key.includes("linkedin")) {
+      return {
+        label: "LinkedIn",
+        icon: <FaLinkedinIn className="h-4 w-4" />,
+        className: "bg-sky-100 text-sky-700",
+      };
+    }
+    if (key === "x" || key.includes("twitter")) {
+      return {
+        label: "X",
+        icon: <FaTwitter className="h-4 w-4" />,
+        className: "bg-zinc-100 text-zinc-700",
+      };
+    }
+    if (key.includes("youtube")) {
+      return {
+        label: "YouTube",
+        icon: <FaYoutube className="h-4 w-4" />,
+        className: "bg-red-100 text-red-600",
+      };
+    }
+    if (key.includes("tiktok")) {
+      return {
+        label: "TikTok",
+        icon: <FaTiktok className="h-4 w-4" />,
+        className: "bg-zinc-100 text-zinc-800",
+      };
+    }
+    return null;
+  };
+
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="w-full h-full bg-[#0A0A0E] rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col">
+    <div className="w-full min-h-screen flex items-center justify-center p-4 bg-zinc-100">
+      <div className="w-full max-w-[380px] h-[600px] bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-[#0E0E12] shrink-0">
+        <div className="h-14 border-b border-zinc-200 flex items-center justify-between px-4 bg-white shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div
@@ -314,11 +418,11 @@ const EmbedPage = () => {
               >
                 <Bot className="w-4 h-4 text-white" />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
 
             <div>
-              <h2 className="text-sm font-medium text-zinc-300">Support</h2>
+              <h2 className="text-sm font-medium text-zinc-900">Support</h2>
               <span className="text-[11px] text-emerald-500 font-medium">
                 Online
               </span>
@@ -329,7 +433,7 @@ const EmbedPage = () => {
             type="button"
             onClick={handleToggle}
             onTouchEnd={handleToggleTouch}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-white/10 active:scale-95 text-zinc-400 hover:text-white cursor-pointer touch-manipulation select-none"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 rounded-lg transition-colors hover:bg-zinc-100 active:scale-95 text-zinc-500 hover:text-zinc-900 cursor-pointer touch-manipulation select-none"
             style={{ WebkitTapHighlightColor: "transparent" }}
             aria-label="Minimize chat"
           >
@@ -340,114 +444,254 @@ const EmbedPage = () => {
         {/* Messages Container */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto bg-linear-to-b from-[#0A0A0E] to-[#0E0E12] p-4"
+          className="flex-1 overflow-y-auto bg-white p-4"
         >
-          <ScrollArea className="h-full p-6 relative bg-zinc-950/30">
+          <ScrollArea className="h-full p-6 relative bg-white">
 
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div key={index} className="space-y-2">
-                  <div
-                    className={cn(
-                      "flex w-full gap-2",
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    {message.role !== "user" && (
-                      <div className="relative shrink-0">
+            {!showChat ? (
+              <div className="space-y-4">
+                {activeTab === "home" && (
+                  <ChatbHome
+                    onShowAllQuestions={() => handleTabChange("help")}
+                    onContact={() => handleTabChange("contact")}
+                  />
+                )}
+                {activeTab === "help" && <Help />}
+                {activeTab === "contact" && (
+                  <div className="space-y-4">
+                    <div className="text-sm font-medium text-zinc-900">
+                      Contact us
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openChatFromContact}
+                      className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-left shadow-sm hover:bg-zinc-50 transition"
+                    >
+                      <div className="flex items-center gap-3 cursor-pointer">
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
                           style={{ backgroundColor: primaryColor }}
                         >
-                          <Bot className="w-4 h-4 text-white" />
+                          <Bot className="w-5 h-5 text-white" />
                         </div>
-                        <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-zinc-900">
+                            Support Bot
+                          </div>
+                          <div className="text-xs text-zinc-500">
+                            Hello! How can I help you today?
+                          </div>
+                        </div>
+                        <MessageCircle className="w-4 h-4 text-zinc-400" />
+                      </div>
+                    </button>
+                    {(contactInfo?.phone ||
+                      contactInfo?.email ||
+                      (contactInfo?.social_media ?? []).length > 0) && (
+                      <div className="space-y-2">
+                        {contactInfo?.phone && (
+                          <a
+                            href={`tel:${contactInfo.phone}`}
+                            className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                <Phone className="h-4 w-4" />
+                              </span>
+                              <span>{contactInfo.phone}</span>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-zinc-400" />
+                          </a>
+                        )}
+                        {contactInfo?.email && (
+                          <a
+                            href={`mailto:${contactInfo.email}`}
+                            className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-sky-600">
+                                <Mail className="h-4 w-4" />
+                              </span>
+                              <span>{contactInfo.email}</span>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-zinc-400" />
+                          </a>
+                        )}
+                        {(contactInfo?.social_media ?? []).map((item, index) => {
+                          const meta = getSocialMeta(item.platform || "");
+                          return (
+                            <a
+                              key={`${item.platform}-${index}`}
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50"
+                            >
+                              <div className="flex items-center gap-3">
+                                {meta ? (
+                                  <span
+                                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${meta.className}`}
+                                  >
+                                    {meta.icon}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 font-medium">
+                                    {item.platform?.slice(0, 2).toUpperCase()}
+                                  </span>
+                                )}
+                                <span className="capitalize">
+                                  {meta?.label ?? item.platform}
+                                </span>
+                              </div>
+                              <ArrowRight className="h-4 w-4 text-zinc-400" />
+                            </a>
+                          );
+                        })}
                       </div>
                     )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div key={index} className="space-y-2">
                     <div
                       className={cn(
-                        "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
-                        message.role === "user"
-                          ? "bg-zinc-800 text-zinc-100 rounded-tr-sm"
-                          : "bg-white text-zinc-900 rounded-tl-sm"
+                        "flex w-full gap-2",
+                        message.role === "user" ? "justify-end" : "justify-start"
                       )}
                     >
-                      {message.content}
+                      {message.role !== "user" && (
+                        <div className="relative shrink-0">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: primaryColor }}
+                          >
+                            <Bot className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        </div>
+                      )}
+                      <div
+                        className={cn(
+                          "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
+                          message.role === "user"
+                            ? "bg-zinc-900 text-white rounded-tr-sm"
+                            : "bg-zinc-100 text-zinc-900 rounded-tl-sm"
+                        )}
+                      >
+                        {message.content}
+                      </div>
+                      {message.role === "user" && (
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 bg-zinc-100">
+                          <User className="w-4 h-4 text-zinc-500" />
+                        </div>
+                      )}
                     </div>
-                    {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white/5 bg-zinc-800">
-                        <User className="w-4 h-4 text-zinc-400" />
+                    {message.isWelcome && sections.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pl-10 animate-in fade-in slide-in-from-top-1 duration-300">
+                        {sections.map((section) => (
+                          <button
+                            key={section.id}
+                            onClick={() => handleClickSection(section.name)}
+                            className="px-3 py-1 rounded-full border border-zinc-200 text-sm text-zinc-700 cursor-pointer hover:bg-zinc-50 transition-colors"
+                          >
+                            {section.name}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>
-                  {message.isWelcome && sections.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pl-10 animate-in fade-in slide-in-from-top-1 duration-300">
-                      {sections.map((section) => (
-                        <button
-                          key={section.id}
-                          onClick={() => handleClickSection(section.name)}
-                          className="px-3 py-1 rounded-full border border-white/20 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
-                        >
-                          {section.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
 
-              {isTyping && (
-                <div className="flex w-full gap-2 justify-start">
-                  <div className="relative shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: primaryColor }}
-                    >
-                      <Bot className="w-4 h-4 text-white" />
+                {isTyping && (
+                  <div className="flex w-full gap-2 justify-start">
+                    <div className="relative shrink-0">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: primaryColor }}
+                      >
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
-                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0E0E12]"></div>
+                    <div className="max-w-[80%] p-4 rounded-2xl bg-zinc-100 text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
+                    </div>
                   </div>
-                  <div className="max-w-[80%] p-4 rounded-2xl bg-white text-zinc-900 rounded-tl-sm flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </ScrollArea >
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-white/5 bg-[#0E0E12] shrink-0">
-          <div className="flex gap-2">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={!activeSection}
-              placeholder={
-                activeSection
-                  ? "Type a message ... "
-                  : "Please select a section to start"
-              }
-              className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-white placeholder:text-white/70 bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${input.trim()
-                ? "hover:brightness-110"
-                : "opacity-50 cursor-not-allowed"
-                }`}
-              style={{
-                backgroundColor: input.trim() ? primaryColor : "#374151",
-                color: "white",
-              }}
-            >
-              Send
-            </button>
-          </div>
+        <div className="p-4 border-t border-zinc-200 bg-white shrink-0">
+
+          {
+            showChat && (
+              <div className="flex gap-2">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={!showChat || !activeSection}
+                  placeholder={
+                    activeSection
+                      ? "Type a message ... "
+                      : "Please select a section to start"
+                  }
+                  className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${input.trim()
+                    ? "hover:brightness-110"
+                    : "opacity-50 cursor-not- allowed"
+                    }`}
+                  style={{
+                    backgroundColor: input.trim() ? primaryColor : "#E5E7EB",
+                    color: input.trim() ? "white" : "#9CA3AF",
+                  }}
+                >
+                  Send
+                </button>
+              </div>
+            )
+          }
+
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              handleTabChange(value as "home" | "contact" | "help")
+            }
+            className="w-full mt-4 "
+          >
+            <TabsList className="w-full rounded-full border border-zinc-200 bg-white/95 px-2 py-6 shadow-sm">
+              <TabsTrigger
+                value="home"
+                className="cursor-pointer flex-1 gap-2 rounded-full py-5 text-xs text-zinc-500 data-[state=active]:bg-zinc-900 data-[state=active]:text-white data-[state=active]:shadow-md"
+              >
+                <HomeIcon className="w-4 h-4" /> Home
+              </TabsTrigger>
+              <TabsTrigger
+                value="contact"
+                className="cursor-pointer flex-1 gap-2 rounded-full py-5 text-xs text-zinc-500 data-[state=active]:bg-zinc-900 data-[state=active]:text-white data-[state=active]:shadow-md"
+              >
+                <ContactIcon className="w-4 h-4" /> Contact
+              </TabsTrigger>
+              <TabsTrigger
+                value="help"
+                className="cursor-pointer flex-1 gap-2 rounded-full py-5 text-xs text-zinc-500 data-[state=active]:bg-zinc-900 data-[state=active]:text-white data-[state=active]:shadow-md"
+              >
+                <HelpCircleIcon className="w-4 h-4" /> Help
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           <div className="mt-2 text-center">
             <Link
