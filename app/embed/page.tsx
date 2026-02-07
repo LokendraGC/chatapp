@@ -431,7 +431,7 @@ const EmbedPage = () => {
                   ? "Type a message ... "
                   : "Please select a section to start"
               }
-              className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-white bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-white placeholder:text-white/70 bg-zinc-900/50 border-white/10 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               onClick={handleSend}
