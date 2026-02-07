@@ -65,6 +65,7 @@ const EmbedPage = () => {
   const [activeTab, setActiveTab] = useState<"home" | "contact" | "help">("home");
   const [showChat, setShowChat] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [isEmbedded, setIsEmbedded] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lastTouchTimeRef = useRef<number>(0);
 
@@ -86,6 +87,7 @@ const EmbedPage = () => {
     }
 
     if (typeof window !== "undefined") {
+      setIsEmbedded(window.self !== window.top);
       window.parent.postMessage(
         {
           type: "resize",
@@ -406,8 +408,20 @@ const EmbedPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center p-4 bg-zinc-100">
-      <div className="w-full max-w-[380px] h-[600px] bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex flex-col">
+    <div
+      className={
+        isEmbedded
+          ? "w-full h-full bg-transparent"
+          : "w-full min-h-screen flex items-center justify-center p-4 bg-zinc-100"
+      }
+    >
+      <div
+        className={
+          isEmbedded
+            ? "w-full h-full bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex flex-col"
+            : "w-full max-w-[380px] h-[600px] bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex flex-col"
+        }
+      >
         {/* Header */}
         <div className="h-14 border-b border-zinc-200 flex items-center justify-between px-4 bg-white shrink-0">
           <div className="flex items-center gap-3">
@@ -644,7 +658,7 @@ const EmbedPage = () => {
                       ? "Type a message ... "
                       : "Please select a section to start"
                   }
-                  className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="pt-3 min-h-12.5 max-h-37.5 pr-12 text-xs outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button
                   onClick={handleSend}
