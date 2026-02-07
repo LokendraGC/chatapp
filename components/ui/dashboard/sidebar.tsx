@@ -8,6 +8,7 @@ import {
   Bot,
   MessageSquare,
   Settings,
+  HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,6 +28,11 @@ const SIDEBAR_ITEMS = [
     label: "Sections",
     href: "/dashboard/sections",
     icon: Layers,
+  },
+  {
+    label: "FAQ",
+    href: "/dashboard/faq",
+    icon: HelpCircle,
   },
   {
     label: "Chatbot",
