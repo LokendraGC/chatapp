@@ -269,6 +269,57 @@ const EmbedPage = () => {
     }
   };
 
+  const renderWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={`${part}-${index}`}
+            href={part}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sky-600 underline underline-offset-2"
+          >
+            {part}
+          </a>
+        );
+      }
+      return <span key={`${part}-${index}`}>{part}</span>;
+    });
+  };
+
+  const renderAssistantContent = (content: string) => {
+    const lines = content.split(/\r?\n/);
+    const listLines = lines.filter((line) => /^(\s*[-*]|\s*\d+\.)\s+/.test(line));
+    const nonListLines = lines
+      .filter((line) => !/^(\s*[-*]|\s*\d+\.)\s+/.test(line))
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const listItems = listLines.map((line) =>
+      line.replace(/^(\s*[-*]|\s*\d+\.)\s+/, "").trim()
+    );
+
+    return (
+      <div className="space-y-2">
+        {nonListLines.length > 0 && (
+          <p className="whitespace-pre-wrap">{renderWithLinks(nonListLines.join("\n"))}</p>
+        )}
+        {listItems.length > 0 && (
+          <ul className="list-disc pl-5 space-y-1">
+            {listItems.map((item, idx) => (
+              <li key={`${item}-${idx}`} className="text-sm text-zinc-900">
+                {renderWithLinks(item)}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -595,7 +646,9 @@ const EmbedPage = () => {
                             : "bg-zinc-100 text-zinc-900 rounded-tl-sm"
                         )}
                       >
-                        {message.content}
+                        {message.role === "assistant"
+                          ? renderAssistantContent(message.content)
+                          : message.content}
                       </div>
                       {message.role === "user" && (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 bg-zinc-100">
