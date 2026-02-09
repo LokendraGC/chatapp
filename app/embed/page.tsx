@@ -169,17 +169,14 @@ const EmbedPage = () => {
   }, [token]);
 
   useEffect(() => {
-    const url = token
-      ? `/api/contact/public?token=${encodeURIComponent(token)}`
-      : "/api/contact/fetch";
-    fetch(url)
+    fetch("/api/contact/fetch")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data?.contact) return;
         setContactInfo(data.contact as ContactInfo);
       })
       .catch(() => undefined);
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -522,10 +519,9 @@ const EmbedPage = () => {
                   <ChatbHome
                     onShowAllQuestions={() => handleTabChange("help")}
                     onContact={() => handleTabChange("contact")}
-                    token={token}
                   />
                 )}
-                {activeTab === "help" && <Help token={token} />}
+                {activeTab === "help" && <Help />}
                 {activeTab === "contact" && (
                   <div className="space-y-4">
                     <div className="text-sm font-medium text-zinc-900">

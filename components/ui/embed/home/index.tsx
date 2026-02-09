@@ -8,11 +8,6 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-interface ChatbHomeProps {
-    onShowAllQuestions?: () => void;
-    onContact?: () => void;
-}
-
 type FaqItem = { question: string; answer: string };
 
 const fallbackQuestions: FaqItem[] = [
@@ -35,17 +30,13 @@ const fallbackQuestions: FaqItem[] = [
 interface ChatbHomeProps {
     onShowAllQuestions?: () => void;
     onContact?: () => void;
-    token?: string | null;
 }
 
-const ChatbHome = ({ onShowAllQuestions, onContact, token }: ChatbHomeProps) => {
+const ChatbHome = ({ onShowAllQuestions, onContact }: ChatbHomeProps) => {
     const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
     const [openIndex, setOpenIndex] = useState<number | null>(0);
     useEffect(() => {
-        const url = token
-            ? `/api/faq/public?token=${encodeURIComponent(token)}`
-            : "/api/faq/fetch";
-        fetch(url)
+        fetch("/api/faq/fetch")
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
                 if (!data?.faqs) return;
@@ -61,7 +52,7 @@ const ChatbHome = ({ onShowAllQuestions, onContact, token }: ChatbHomeProps) => 
                 }
             })
             .catch(() => undefined);
-    }, [token]);
+    }, []);
 
 
     return (
