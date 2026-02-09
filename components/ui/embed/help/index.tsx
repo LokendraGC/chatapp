@@ -10,6 +10,7 @@ import {
 
 interface HelpProps {
     onWriteMessage?: () => void;
+    token?: string | null;
 }
 
 type FaqItem = { question: string; answer: string };
@@ -31,7 +32,7 @@ const fallbackQuestions: FaqItem[] = [
     },
 ];
 
-const Help = ({ onWriteMessage }: HelpProps) => {
+const Help = ({ onWriteMessage, token }: HelpProps) => {
     const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
     const [openIndex, setOpenIndex] = useState<number | null>(0);
     const [showForm, setShowForm] = useState(false);
@@ -39,7 +40,10 @@ const Help = ({ onWriteMessage }: HelpProps) => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     useEffect(() => {
-        fetch("/api/faq/fetch")
+        const url = token
+            ? `/api/faq/public?token=${encodeURIComponent(token)}`
+            : "/api/faq/fetch";
+        fetch(url)
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
                 if (!data?.faqs) return;
@@ -55,7 +59,7 @@ const Help = ({ onWriteMessage }: HelpProps) => {
                 }
             })
             .catch(() => undefined);
-    }, []);
+    }, [token]);
 
     return (
         <div className="space-y-3">

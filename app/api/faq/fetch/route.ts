@@ -1,18 +1,9 @@
 import prisma from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const clerkUser = await currentUser();
-    if (!clerkUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const faqs = await prisma.faq.findMany({
-      where: {
-        user_email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
-      },
       orderBy: [{ sort_order: "asc" }, { created_at: "desc" }],
     });
 
