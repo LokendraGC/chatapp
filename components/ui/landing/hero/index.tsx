@@ -1,163 +1,160 @@
-import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs'
-import { Send, User } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { Send, User } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 
 const Hero = () => {
-    return (
-        <section className='relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden'>
-            <div className="max-w-4xl mx-auto text-center relative z-20">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 backdrop-blur-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
-                    <span className="text-xs text-zinc-300 tracking-wide font-light">
-                        Version 1.0.0 available now
-                    </span>
-                </div>
-                <h1 className='text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tighter mb-6 text-white'>
-                    Your AI-Powered Support Chatbot
-                    <br />
-                    <span className='text-zinc-500'>Powered by AI</span>
-                </h1>
-                <p className='text-lg md:text-xl text-zinc-400 font-light mb-10 max-w-2xl mx-auto leading-relaxed'>
-                    Instantly resolve customer questions with an assistant that reads your
-                    speaks with empathy. No robotic replies, just answers.
-                </p>
-                <div className='flex flex-col sm:flex-row items-center justify-center gap-4 mb-20'>
-                    <SignedOut>
-                        <SignInButton mode="modal">
-                            <button className='h-11 cursor-pointer px-8 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all flex items-center gap-2'>
-                                Start for Free
-                            </button>
-                        </SignInButton>
-                    </SignedOut>
+  return (
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
+      <div className="max-w-4xl mx-auto text-center relative z-20">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-6 backdrop-blur-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
+          <span className="text-xs text-zinc-300 tracking-wide font-light">
+            Version 1.0.0 available now
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tighter mb-6 text-white">
+          Your AI-Powered Support Chatbot
+          <br />
+          <span className="text-zinc-500">Powered by AI</span>
+        </h1>
+        <p className="text-lg md:text-xl text-zinc-400 font-light mb-10 max-w-2xl mx-auto leading-relaxed">
+          Instantly resolve customer questions with an assistant that reads your
+          speaks with empathy. No robotic replies, just answers.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="h-11 cursor-pointer px-8 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all flex items-center gap-2">
+                Start for Free
+              </button>
+            </SignInButton>
+          </SignedOut>
 
-                    <SignedIn>
-                        <Link
-                            href="/dashboard"
-                            className='h-11 cursor-pointer px-8 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all flex items-center gap-2'
-                        >
-                            Go to Dashboard
-                        </Link>
-                    </SignedIn>
-                    <Link href="/features" className='h-11 cursor-pointer px-8 rounded-full border border-zinc-800  text-zinc-300 text-sm font-medium hover:text-white transition-all flex items-center gap-2 bg-black/30'>
-                        Watch Demo
-                    </Link>
-                </div>
+          <SignedIn>
+            <Link
+              href="/dashboard"
+              className="h-11 cursor-pointer px-8 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-200 transition-all flex items-center gap-2"
+            >
+              Go to Dashboard
+            </Link>
+          </SignedIn>
+          <Link
+            href="/test"
+            className="h-11 cursor-pointer px-8 rounded-full border border-zinc-800  text-zinc-300 text-sm font-medium hover:text-white transition-all flex items-center gap-2 bg-black/30"
+          >
+            Watch Demo
+          </Link>
+        </div>
+      </div>
+
+      {/* floating chat interface */}
+      <div className="max-w-3xl mx-auto relative z-10 px-0 sm:px-4">
+        <div className="absolute inset-0 bg-indigo-500/10 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="p-1 md:p-2 relative overflow-hidden ring-1 ring-white/10 bg-[#0a0a0e] shadow-2xl rounded-2xl">
+          {/* Main Chat Container */}
+          <div className="flex flex-col h-[360px] xs:h-[400px] md:h-150 w-full bg-[#0a0a0e]">
+            {/* Header Section */}
+            <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-[#0E0E13] shrink-0">
+              <div className="flex items-center gap-2">
+                {/* The Pulsing Dot: Self-closing div to prevent text breaking */}
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+
+                {/* The Text: Placed outside the dot div */}
+                <span className="text-sm font-medium text-zinc-300">
+                  Sahayak Chatbot.
+                </span>
+              </div>
             </div>
 
-            {/* floating chat interface */}
-            <div className='max-w-3xl mx-auto relative z-10 px-0 sm:px-4'>
-                <div className='absolute inset-0 bg-indigo-500/10 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none'>
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 md:space-y-6 bg-zinc-950/30">
+              <div className="flex flex-col w-full items-start">
+                <div className="flex max-w-[90%] md:max-w-[85%] gap-3 items-start">
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    <Image
+                      src="/images/avatar.jpg"
+                      width={30}
+                      height={30}
+                      className="w-8 h-8 rounded-full object-cover"
+                      alt="User Avatar"
+                    />
+                  </div>
 
-                </div>
-                <div className='p-1 md:p-2 relative overflow-hidden ring-1 ring-white/10 bg-[#0a0a0e] shadow-2xl rounded-2xl'>
-                    {/* Main Chat Container */}
-                    <div className='flex flex-col h-[360px] xs:h-[400px] md:h-150 w-full bg-[#0a0a0e]'>
-
-                        {/* Header Section */}
-                        <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-[#0E0E13] shrink-0">
-                            <div className="flex items-center gap-2">
-                                {/* The Pulsing Dot: Self-closing div to prevent text breaking */}
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-
-                                {/* The Text: Placed outside the dot div */}
-                                <span className="text-sm font-medium text-zinc-300">
-                                    Sahayak Chatbot.
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 md:space-y-6 bg-zinc-950/30">
-                            <div className="flex flex-col w-full items-start">
-
-                                <div className="flex max-w-[90%] md:max-w-[85%] gap-3 items-start">
-
-                                    {/* Avatar */}
-                                    <div className="shrink-0">
-                                        <Image
-                                            src="/images/avatar.jpg"
-                                            width={30}
-                                            height={30}
-                                            className="w-8 h-8 rounded-full object-cover"
-                                            alt="User Avatar"
-                                        />
-                                    </div>
-
-                                    {/* Message */}
-                                    <div className="relative mt-4">
-                                        <div className="p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
-                                            Hi there, How can I help you today?
-                                        </div>
-
-                                        <div className='flex flex-wrap gap-2 pt-1 mt-1 ml-1'>
-                                            <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">FAQ</span>
-                                            <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">Pricing</span>
-                                            <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">Support</span>
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-
-                                <div className="mt-4 sm:flex flex-col w-full items-end">
-                                    <div className="flex max-w-[85%] gap-3 flex-row-reverse">
-                                        <div className='w-8 h-8 rounded-full flex items-center justify-center border border-white/5 bg-zinc-800'>
-                                            <User className='w-4 h-4 text-zinc-400' />
-                                        </div>
-
-                                        <div className='p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-zinc-800 text-zinc-300 rounded-tr-sm'>
-                                            Hello! I have a question about your pricing plans.
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div className="hidden sm:flex max-w-[85%] gap-3 items-start">
-                                    {/* Avatar */}
-                                    <div className="shrink-0">
-                                        <Image
-                                            src="/images/avatar.jpg"
-                                            width={30}
-                                            height={30}
-                                            className="w-8 h-8 rounded-full object-cover"
-                                            alt="User Avatar"
-                                        />
-                                    </div>
-
-                                    {/* Message */}
-                                    <div className="relative ml-1 mt-4">
-                                        <div className="p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
-                                            Chatbot support pricing varies widely depending on the features, complexity, and provider. Basic rule-based chatbots often come at low monthly costs or even free tiers with limited interactions, making them affordable for small businesses
-                                        </div>
-
-                                    </div>
-
-
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div className='p-4 bg-[#0A0A0E] border-t border-white/5 shrink-0'>
-                            <div className="relative">
-                                <div className='min-h-12.5 w-full px-4 py-3 text-sm bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-500 flex items-center justify-between'>
-                                    <span>Type a message...</span>
-                                    <button className='h-4 w-4 rounded-lg flex items-center justify-center text-zinc-500 cursor-default'>
-                                        <Send className='h-4 w-4' />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-
+                  {/* Message */}
+                  <div className="relative mt-4">
+                    <div className="p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
+                      Hi there, How can I help you today?
                     </div>
-                </div>
-            </div >
-        </section >
-    )
-}
 
-export default Hero
+                    <div className="flex flex-wrap gap-2 pt-1 mt-1 ml-1">
+                      <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">
+                        FAQ
+                      </span>
+                      <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">
+                        Pricing
+                      </span>
+                      <span className="px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 text-zinc-300 text-[10px] md:text-xs font-medium cursor-default">
+                        Support
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 sm:flex flex-col w-full items-end">
+                  <div className="flex max-w-[85%] gap-3 flex-row-reverse">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center border border-white/5 bg-zinc-800">
+                      <User className="w-4 h-4 text-zinc-400" />
+                    </div>
+
+                    <div className="p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-zinc-800 text-zinc-300 rounded-tr-sm">
+                      Hello! I have a question about your pricing plans.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hidden sm:flex max-w-[85%] gap-3 items-start">
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    <Image
+                      src="/images/avatar.jpg"
+                      width={30}
+                      height={30}
+                      className="w-8 h-8 rounded-full object-cover"
+                      alt="User Avatar"
+                    />
+                  </div>
+
+                  {/* Message */}
+                  <div className="relative ml-1 mt-4">
+                    <div className="p-3 md:p-4 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm bg-white text-zinc-900 rounded-tl-sm">
+                      Chatbot support pricing varies widely depending on the
+                      features, complexity, and provider. Basic rule-based
+                      chatbots often come at low monthly costs or even free
+                      tiers with limited interactions, making them affordable
+                      for small businesses
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-[#0A0A0E] border-t border-white/5 shrink-0">
+              <div className="relative">
+                <div className="min-h-12.5 w-full px-4 py-3 text-sm bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-500 flex items-center justify-between">
+                  <span>Type a message...</span>
+                  <button className="h-4 w-4 rounded-lg flex items-center justify-center text-zinc-500 cursor-default">
+                    <Send className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;

@@ -3,7 +3,7 @@ import React from "react";
 const Integration = () => {
   return (
     <section
-      id="how-it-works"
+      id="integrations"
       className="py-24 border-t border-white/5 bg-black/20"
     >
       <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-y-10 md:gap-y-0 md:gap-x-12">
@@ -57,7 +57,9 @@ const Integration = () => {
             {/* Code Content */}
             <div className="p-6 bg-[#0a0a0e]">
               <div className="font-mono text-sm text-zinc-400 leading-relaxed space-y-1">
-                <div className="text-zinc-500">&lt;!-- Sahayak Chatbot --&gt;</div>
+                <div className="text-zinc-500">
+                  &lt;!-- Sahayak Chatbot --&gt;
+                </div>
                 <div>
                   &lt;<span className="text-pink-400">script</span>&gt;
                 </div>

@@ -13,7 +13,7 @@ export const Footer = () => {
 
       <div className="max-w-6xl mx-auto px-6 pb-12 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Left: Logo */}
-          <div className="flex items-center">
+        <div className="flex items-center">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-5 h-5 bg-white rounded-sm flex items-center justify-center">
               <div className="w-2.5 h-2.5 bg-black rounded-[1px]"></div>
@@ -26,10 +26,10 @@ export const Footer = () => {
 
         {/* Center: Privacy and Terms */}
         <div className="flex items-center gap-6 text-sm text-zinc-400">
-          <Link href="/features" className="hover:text-white transition-colors">
-            Terms
+          <Link href="/terms" className="hover:text-white transition-colors">
+            Terms of Service
           </Link>
-          <Link href="/features" className="hover:text-white transition-colors">
+          <Link href="/policy" className="hover:text-white transition-colors">
             Privacy Policy
           </Link>
         </div>
