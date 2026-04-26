@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "../../input";
 import { Card, CardContent, CardHeader, CardTitle } from "../../card";
 import { Code as CodeIcon, Copy, Check, AlertCircle } from "lucide-react";
 import { Button } from "../../button";

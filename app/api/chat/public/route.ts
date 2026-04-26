@@ -1,5 +1,5 @@
 import { countConversationTokens } from "@/lib/countConversationTokens";
-import { summarizeMarkdown } from "@/lib/openAI";
+import { summarizeMarkdown } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import trimContextByChars from "@/lib/trimContextByChars";
 import { GoogleGenAI } from "@google/genai";
@@ -168,7 +168,8 @@ export async function POST(req: Request) {
                 const recentMessages = messages.slice(-10);
                 const oldestMessage = messages.slice(0, -10);
                 if (oldestMessage.length > 0) {
-                    const summary = await summarizeMarkdown(oldestMessage);
+                    const oldestMessageString = oldestMessage.map((m: any) => `${m.role}: ${m.content}`).join("\n\n");
+                    const summary = await summarizeMarkdown(oldestMessageString);
                     context = `PREVIOUS CONVERSATION SUMMARY: ${summary}\n\n${context}`;
                     messages = recentMessages;
                 }
@@ -193,6 +194,7 @@ export async function POST(req: Request) {
             - The CONTEXT section below contains important information about the company, products, services, and policies.
             - ALWAYS use information from the CONTEXT to answer user questions accurately.
             - If the user asks about something mentioned in the CONTEXT, provide the relevant information from the CONTEXT.
+            - If asked about team members, staff, or the company team, look for a list of names and roles in the CONTEXT and provide them clearly.
             - Only say you don't know if the information is truly not in the CONTEXT.
             - When answering, reference specific details from the CONTEXT when relevant.
             

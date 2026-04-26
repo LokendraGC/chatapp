@@ -1,7 +1,18 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ArrowRight, Bot, ChevronDown, ContactIcon, HelpCircleIcon, HomeIcon, Mail, MessageCircle, Phone, User } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  ChevronDown,
+  ContactIcon,
+  HelpCircleIcon,
+  HomeIcon,
+  Mail,
+  MessageCircle,
+  Phone,
+  User,
+} from "lucide-react";
 import {
   FaFacebookF,
   FaFacebookMessenger,
@@ -17,10 +28,9 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChatbHome from "@/components/ui/embed/home";
 import Help from "@/components/ui/embed/help";
-
 
 interface ChatBotMetaData {
   id: string;
@@ -62,7 +72,9 @@ const EmbedPage = () => {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"home" | "contact" | "help">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "contact" | "help">(
+    "home",
+  );
   const [showChat, setShowChat] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [isEmbedded, setIsEmbedded] = useState(false);
@@ -95,7 +107,7 @@ const EmbedPage = () => {
           height: "60px",
           borderRadius: "30px",
         },
-        "*"
+        "*",
       );
     }
   }, []);
@@ -112,7 +124,7 @@ const EmbedPage = () => {
           height: "600px", // Increased height for better view
           borderRadius: "12px",
         },
-        "*"
+        "*",
       );
     } else {
       window.parent.postMessage(
@@ -122,7 +134,7 @@ const EmbedPage = () => {
           height: "60px",
           borderRadius: "30px",
         },
-        "*"
+        "*",
       );
     }
   };
@@ -182,8 +194,12 @@ const EmbedPage = () => {
     const scrollToBottom = () => {
       if (scrollContainerRef.current) {
         // Find the ScrollArea viewport
-        const scrollArea = scrollContainerRef.current.querySelector('[data-slot="scroll-area"]');
-        const viewport = scrollArea?.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
+        const scrollArea = scrollContainerRef.current.querySelector(
+          '[data-slot="scroll-area"]',
+        );
+        const viewport = scrollArea?.querySelector(
+          '[data-slot="scroll-area-viewport"]',
+        ) as HTMLElement;
 
         if (viewport) {
           // Use multiple attempts to ensure scrolling works
@@ -211,10 +227,9 @@ const EmbedPage = () => {
     }
 
     const currentSection = sections.find(
-      (section) => section.name === activeSection
+      (section) => section.name === activeSection,
     );
     const sourceIds = currentSection?.source_ids || [];
-
 
     const userMessage = {
       role: "user",
@@ -226,9 +241,7 @@ const EmbedPage = () => {
     setInput("");
     setIsTyping(true);
 
-
     try {
-
       const res = await fetch("/api/chat/public", {
         method: "POST",
         headers: {
@@ -256,12 +269,12 @@ const EmbedPage = () => {
           ...prevMessages,
           {
             role: "assistant",
-            content: "I'm sorry, I couldn't generate a response. Please try again.",
+            content:
+              "I'm sorry, I couldn't generate a response. Please try again.",
             section: null,
           },
         ]);
       }
-
     } catch (error) {
       console.error("Error in sending message:", error);
     } finally {
@@ -292,20 +305,24 @@ const EmbedPage = () => {
 
   const renderAssistantContent = (content: string) => {
     const lines = content.split(/\r?\n/);
-    const listLines = lines.filter((line) => /^(\s*[-*]|\s*\d+\.)\s+/.test(line));
+    const listLines = lines.filter((line) =>
+      /^(\s*[-*]|\s*\d+\.)\s+/.test(line),
+    );
     const nonListLines = lines
       .filter((line) => !/^(\s*[-*]|\s*\d+\.)\s+/.test(line))
       .map((line) => line.trim())
       .filter(Boolean);
 
     const listItems = listLines.map((line) =>
-      line.replace(/^(\s*[-*]|\s*\d+\.)\s+/, "").trim()
+      line.replace(/^(\s*[-*]|\s*\d+\.)\s+/, "").trim(),
     );
 
     return (
       <div className="space-y-2">
         {nonListLines.length > 0 && (
-          <p className="whitespace-pre-wrap">{renderWithLinks(nonListLines.join("\n"))}</p>
+          <p className="whitespace-pre-wrap">
+            {renderWithLinks(nonListLines.join("\n"))}
+          </p>
         )}
         {listItems.length > 0 && (
           <ul className="list-disc pl-5 space-y-1">
@@ -357,7 +374,10 @@ const EmbedPage = () => {
           onClick={handleToggle}
           onTouchEnd={handleToggleTouch}
           className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-full flex items-center justify-center shadow-lg hover:brightness-110 active:scale-95 transition-all text-white hover:scale-105 cursor-pointer touch-manipulation select-none"
-          style={{ backgroundColor: primaryColor, WebkitTapHighlightColor: "transparent" }}
+          style={{
+            backgroundColor: primaryColor,
+            WebkitTapHighlightColor: "transparent",
+          }}
           aria-label="Open chat"
         >
           <MessageCircle className="w-8 h-8" />
@@ -512,7 +532,6 @@ const EmbedPage = () => {
           className="flex-1 overflow-y-auto bg-white p-4"
         >
           <ScrollArea className="h-full p-6 relative bg-white">
-
             {!showChat ? (
               <div className="space-y-4">
                 {activeTab === "home" && (
@@ -582,36 +601,38 @@ const EmbedPage = () => {
                             <ArrowRight className="h-4 w-4 text-zinc-400" />
                           </a>
                         )}
-                        {(contactInfo?.social_media ?? []).map((item, index) => {
-                          const meta = getSocialMeta(item.platform || "");
-                          return (
-                            <a
-                              key={`${item.platform}-${index}`}
-                              href={item.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50"
-                            >
-                              <div className="flex items-center gap-3">
-                                {meta ? (
-                                  <span
-                                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${meta.className}`}
-                                  >
-                                    {meta.icon}
+                        {(contactInfo?.social_media ?? []).map(
+                          (item, index) => {
+                            const meta = getSocialMeta(item.platform || "");
+                            return (
+                              <a
+                                key={`${item.platform}-${index}`}
+                                href={item.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50"
+                              >
+                                <div className="flex items-center gap-3">
+                                  {meta ? (
+                                    <span
+                                      className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${meta.className}`}
+                                    >
+                                      {meta.icon}
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 font-medium">
+                                      {item.platform?.slice(0, 2).toUpperCase()}
+                                    </span>
+                                  )}
+                                  <span className="capitalize">
+                                    {meta?.label ?? item.platform}
                                   </span>
-                                ) : (
-                                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 font-medium">
-                                    {item.platform?.slice(0, 2).toUpperCase()}
-                                  </span>
-                                )}
-                                <span className="capitalize">
-                                  {meta?.label ?? item.platform}
-                                </span>
-                              </div>
-                              <ArrowRight className="h-4 w-4 text-zinc-400" />
-                            </a>
-                          );
-                        })}
+                                </div>
+                                <ArrowRight className="h-4 w-4 text-zinc-400" />
+                              </a>
+                            );
+                          },
+                        )}
                       </div>
                     )}
                   </div>
@@ -624,7 +645,9 @@ const EmbedPage = () => {
                     <div
                       className={cn(
                         "flex w-full gap-2",
-                        message.role === "user" ? "justify-end" : "justify-start"
+                        message.role === "user"
+                          ? "justify-end"
+                          : "justify-start",
                       )}
                     >
                       {message.role !== "user" && (
@@ -643,7 +666,7 @@ const EmbedPage = () => {
                           "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
                           message.role === "user"
                             ? "bg-zinc-900 text-white rounded-tr-sm"
-                            : "bg-zinc-100 text-zinc-900 rounded-tl-sm"
+                            : "bg-zinc-100 text-zinc-900 rounded-tl-sm",
                         )}
                       >
                         {message.role === "assistant"
@@ -692,44 +715,42 @@ const EmbedPage = () => {
                 )}
               </div>
             )}
-          </ScrollArea >
+          </ScrollArea>
         </div>
 
         {/* Input Area */}
         <div className="p-4 border-t border-zinc-200 bg-white shrink-0">
-
-          {
-            showChat && (
-              <div className="flex gap-2">
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={!showChat || !activeSection}
-                  placeholder={
-                    activeSection
-                      ? "Type a message ... "
-                      : "Please select a section to start"
-                  }
-                  className="pt-3 min-h-12.5 max-h-37.5 pr-12 text-xs outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                  className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${input.trim()
+          {showChat && (
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={!showChat || !activeSection}
+                placeholder={
+                  activeSection
+                    ? "Type a message ... "
+                    : "Please select a section to start"
+                }
+                className="pt-3 min-h-12.5 max-h-37.5 pr-12 text-xs outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${
+                  input.trim()
                     ? "hover:brightness-110"
                     : "opacity-50 cursor-not- allowed"
-                    }`}
-                  style={{
-                    backgroundColor: input.trim() ? primaryColor : "#E5E7EB",
-                    color: input.trim() ? "white" : "#9CA3AF",
-                  }}
-                >
-                  Send
-                </button>
-              </div>
-            )
-          }
+                }`}
+                style={{
+                  backgroundColor: input.trim() ? primaryColor : "#E5E7EB",
+                  color: input.trim() ? "white" : "#9CA3AF",
+                }}
+              >
+                Send
+              </button>
+            </div>
+          )}
 
           <Tabs
             value={activeTab}
@@ -768,7 +789,6 @@ const EmbedPage = () => {
               Powered by K Xa Hajur
             </Link>
           </div>
-
         </div>
       </div>
     </div>

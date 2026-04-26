@@ -27,7 +27,7 @@ export async function summarizeMarkdown(markdown: string) {
 
       temperature: 0.1,
 
-      max_tokens: 900,
+      max_tokens: 4000,
 
       messages: [
         {
@@ -38,19 +38,17 @@ export async function summarizeMarkdown(markdown: string) {
 You are a data summarization engine for an AI chatbot.
 
 Your task:
-
-- Convert the input website markdown or text or csv files data into a CLEAN, DENSE SUMMARY for LLM context usage.
+- Convert the input website markdown or text or csv files data into a CLEAN, WELL-STRUCTURED SUMMARY for LLM context usage.
 
 STRICT RULES:
-
-- Output ONLY plain text (no markdown, no bullet points, no headings).
-- Write as ONE continuous paragraph.
+- Use bullet points and headings to organize the summary.
+- Include relevant links (such as "About Us" or specific website URLs) using <a> tags with target="_blank" so they open in a new tab.
+- Always provide FULL messages and complete sentences. Do NOT truncate or cut off thoughts (e.g., avoid "I am..." or "our server is..." without finishing).
 - Remove navigation, menus, buttons, CTAs, pricing tables, sponsors, ads, testimonials, community chats, UI labels, emojis, and decorative content.
 - Remove repetition and marketing language.
 - Keep ONLY factual, informational content that helps answer customer support questions.
-- Do NOT copy sentences verbatim unless absolutely necessary.
-- Compress aggressively while preserving meaning.
-- The final output MUST be under 2000 words.
+- The final output MUST be clear, detailed, and under 3000 words.
+- CRITICAL: Never end a message abruptly or mid-sentence. Every response must conclude with a complete thought and proper punctuation.
 
 The result will be stored as long-term context for a chatbot.
 
