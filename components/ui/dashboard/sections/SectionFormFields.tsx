@@ -69,7 +69,7 @@ export default function SectionFormFields({
         </h4>
 
         <div className="space-y-2">
-          <Label className="text-muted-foreground">Section Name</Label>
+          <Label className="text-muted-foreground">Section Name <span className="text-red-500">*</span></Label>
           <Input
             placeholder="e.g. Billing Policy"
             className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
@@ -80,7 +80,7 @@ export default function SectionFormFields({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-muted-foreground">Description</Label>
+          <Label className="text-muted-foreground">Description <span className="text-red-500">*</span></Label>
           <Input
             placeholder="When should the AI use this section?"
             className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
@@ -98,7 +98,7 @@ export default function SectionFormFields({
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
             <h4 className="text-xs font-semibold text-muted-foreground tracking-tight uppercase">
-              Data Source
+              Data Source <span className="text-red-500">*</span>
             </h4>
             <span className="text-xs text-muted-foreground">
               {selectedSources.length} attached
@@ -106,7 +106,7 @@ export default function SectionFormFields({
           </div>
 
           <Select
-            value={selectedSources[0] || ""}
+            value=""
             onValueChange={(value) => {
               if (!selectedSources.includes(value)) {
                 setSelectedSources([...selectedSources, value]);
@@ -114,10 +114,10 @@ export default function SectionFormFields({
             }}
             disabled={isDissabled}
           >
-            <SelectTrigger className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground">
+            <SelectTrigger className="w-full bg-muted/30 border-border text-foreground placeholder:text-muted-foreground cursor-pointer">
               <SelectValue
                 placeholder={
-                  isLoadingSources ? "Loading Sources..." : "Select a source"
+                  isLoadingSources ? "Loading Sources..." : "Select source"
                 }
               />
             </SelectTrigger>
@@ -168,10 +168,10 @@ export default function SectionFormFields({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0 text-foreground hover:text-red-500"
+                      className="cursor-pointer h-6 w-6 p-0 text-foreground hover:text-red-500"
                       onClick={() => {
                         setSelectedSources(
-                          selectedSources.filter((id) => id !== sourceId)
+                          selectedSources.filter((id) => id !== sourceId),
                         );
                       }}
                       disabled={isDissabled}
@@ -187,7 +187,7 @@ export default function SectionFormFields({
 
         <div className="space-y-4">
           <h4 className="text-xs font-semibold text-muted-foreground tracking-tight uppercase">
-            Tone
+            Tone <span className="text-red-500">*</span>
           </h4>
           <RadioGroup
             value={formData.tone}
@@ -224,7 +224,9 @@ export default function SectionFormFields({
                     <div className="flex items-center gap-2">
                       <span
                         className={`text-sm font-medium cursor-pointer ${
-                          isSelected ? "text-foreground" : "text-muted-foreground"
+                          isSelected
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }`}
                       >
                         {option.label}
@@ -254,7 +256,9 @@ export default function SectionFormFields({
           </h4>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-muted-foreground text-xs">Allowed Topics</Label>
+              <Label className="text-muted-foreground text-xs">
+                Allowed Topics
+              </Label>
               <Input
                 placeholder="e.g. pricing, returns, etc."
                 className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
@@ -267,7 +271,9 @@ export default function SectionFormFields({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-muted-foreground text-xs">Blocked Topics</Label>
+              <Label className="text-muted-foreground text-xs">
+                Blocked Topics
+              </Label>
               <Input
                 placeholder="e.g. competitors etc."
                 className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"

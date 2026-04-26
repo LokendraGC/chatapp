@@ -14,6 +14,7 @@ interface SectionTableProps {
   sections: Section[];
   isLoading: boolean;
   onPreview: (section: Section) => void;
+  onEdit: (id: string) => void;
   onCreateSection: () => void;
 }
 
@@ -21,6 +22,7 @@ export default function SectionTable({
   sections,
   isLoading,
   onPreview,
+  onEdit,
   onCreateSection,
 }: SectionTableProps) {
   return (
@@ -42,7 +44,7 @@ export default function SectionTable({
           <TableHead className="text-xs uppercase font-medium text-muted-foreground py-3">
             Status
           </TableHead>
-          <TableHead className="text-xs uppercase font-medium text-muted-foreground text-right pr-10 py-3">
+          <TableHead className="text-xs uppercase font-medium text-muted-foreground text-right pr-16 py-3">
             Actions
           </TableHead>
         </TableRow>
@@ -78,7 +80,17 @@ export default function SectionTable({
               <TableCell className="text-muted-foreground py-3">
                 {getStatusBadge(section.status)}
               </TableCell>
+
+
               <TableCell className="text-right pr-6 py-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(section.id)}
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted mr-2"
+                >
+                  Edit
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"

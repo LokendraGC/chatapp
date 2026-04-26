@@ -25,7 +25,6 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-
 const INITIAL_FORM_DATA: SectionFormData = {
   name: "",
   description: "",
@@ -39,7 +38,7 @@ const SectionsPage = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState<Section | null>(null);
   const [knowledgeSources, setKnowledgeSources] = useState<KnowledgeSource[]>(
-    []
+    [],
   );
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [isLoadingSources, setIsLoadingSources] = useState(false);
@@ -48,6 +47,7 @@ const SectionsPage = () => {
   const [isLoadingSections, setIsLoadingSections] = useState(true);
   const [formData, setFormData] = useState<SectionFormData>(INITIAL_FORM_DATA);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSaveSection = async () => {
     try {
@@ -141,6 +141,7 @@ const SectionsPage = () => {
     });
     setSelectedSources([]);
     setFormData(INITIAL_FORM_DATA);
+    setIsEditing(false);
     setIsSheetOpen(true);
   };
 
@@ -150,7 +151,6 @@ const SectionsPage = () => {
         const res = await fetch("/api/knowledge/fetch");
         const data = await res.json();
         setKnowledgeSources(data.sources);
-        
       } catch (error) {
         console.error("Error fetching knowledge sources:", error);
       }
@@ -158,8 +158,7 @@ const SectionsPage = () => {
     fetchKnowledgeSources();
   }, []);
 
-
-  const isPreviewMode = selectedSection?.id !== "new";
+  const isPreviewMode = selectedSection?.id !== "new" && !isEditing;
 
   const handleDeleteSection = () => {
     setIsDeleteDialogOpen(true);
@@ -169,7 +168,7 @@ const SectionsPage = () => {
     try {
       setIsSaving(true);
       setIsDeleteDialogOpen(false);
-      
+
       const response = await fetch(`/api/section/delete`, {
         method: "DELETE",
         headers: {
@@ -207,7 +206,79 @@ const SectionsPage = () => {
       fallbackBehavior: "escalate",
     });
     setSelectedSources(section.sourceIds || []);
+    setIsEditing(false);
     setIsSheetOpen(true);
+  };
+
+  const handleEditSection = (id: string) => {
+    const section = sections.find((s) => s.id === id);
+    if (!section) return;
+
+    setSelectedSection(section);
+    setFormData({
+      name: section.name,
+      description: section.description,
+      tone: section.tone as Tone,
+      allowedTopics: section.allowedTopics || "",
+      blockedTopics: section.blockedTopics || "",
+      fallbackBehavior: "escalate",
+    });
+    setSelectedSources(section.sourceIds || []);
+    setIsEditing(true);
+    setIsSheetOpen(true);
+  };
+
+  const handleUpdateSection = async () => {
+    try {
+      if (!formData.description.trim()) {
+        toast.error("Description is required");
+        return;
+      }
+      if (!formData.name.trim()) {
+        toast.error("Name is required");
+        return;
+      }
+      if (!formData.tone) {
+        toast.error("Tone is required");
+        return;
+      }
+      if (!selectedSources.length) {
+        toast.error("Sources are required");
+        return;
+      }
+      setIsSaving(true);
+      const response = await fetch(`/api/section/edit`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: selectedSection?.id,
+          name: formData.name,
+          description: formData.description,
+          tone: formData.tone,
+          allowedTopics: formData.allowedTopics,
+          blockedTopics: formData.blockedTopics,
+          sourceIds: selectedSources,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to update section");
+        return;
+      }
+      await fetchSections();
+      setIsSheetOpen(false);
+      setIsEditing(false);
+      toast.success("Section updated successfully");
+      setFormData(INITIAL_FORM_DATA);
+      setSelectedSources([]);
+    } catch (error) {
+      console.error("Error updating section:", error);
+      toast.error("An error occurred while updating the section");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -235,10 +306,11 @@ const SectionsPage = () => {
       <Card className="border-border bg-card">
         <CardContent className="p-0">
           <SectionTable
-          sections={sections}
-          isLoading={isLoadingSections}
-          onPreview={handlePreviewSection}
-          onCreateSection={handleCreateSection}
+            sections={sections}
+            isLoading={isLoadingSections}
+            onPreview={handlePreviewSection}
+            onEdit={handleEditSection}
+            onCreateSection={handleCreateSection}
           />
         </CardContent>
       </Card>
@@ -251,12 +323,16 @@ const SectionsPage = () => {
                 <SheetTitle className="text-xl text-foreground tracking-tight">
                   {selectedSection.id === "new"
                     ? "Create Section"
-                    : "View Section"}
+                    : isEditing
+                      ? "Edit Section"
+                      : "View Section"}
                 </SheetTitle>
                 <SheetDescription className="text-muted-foreground">
                   {selectedSection.id === "new"
                     ? "Configure how the AI behaves for this specific topic."
-                    : "Review section configuration and data sources."}
+                    : isEditing
+                      ? "Update your section configuration and data sources."
+                      : "Review section configuration and data sources."}
                 </SheetDescription>
               </SheetHeader>
 
@@ -286,6 +362,18 @@ const SectionsPage = () => {
             </div>
           )}
 
+          {selectedSection?.id !== "new" && isEditing && (
+            <div className="px-6 py-4 border-t border-border">
+              <Button
+                onClick={handleUpdateSection}
+                disabled={isSaving}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                {isSaving ? "Updating..." : "Update Section"}
+              </Button>
+            </div>
+          )}
+
           {selectedSection?.id !== "new" && (
             <div className="p-6 bg-red-50 dark:bg-red-500/5 border-t-2 border-red-200 dark:border-red-500/10 rounded-b-lg">
               <h5 className="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">
@@ -301,21 +389,26 @@ const SectionsPage = () => {
                 onClick={handleDeleteSection}
                 disabled={isSaving}
               >
-                {isSaving ? "Deleting ..." : "Delete Section"}
+                Delete Section
               </Button>
             </div>
           )}
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">
               Delete Section
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              Are you sure you want to delete "{selectedSection?.name}"? This action cannot be undone and will remove all associated routing rules.
+              Are you sure you want to delete "{selectedSection?.name}"? This
+              action cannot be undone and will remove all associated routing
+              rules.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
