@@ -14,7 +14,7 @@ export default function FeaturesPage() {
                     <p className="mt-2 text-base text-amber-100/90">
                         This site is still under active development. For now, you can read
                         about the key features and properties of the{" "}
-                        <span className="font-semibold text-white">K Xa Hajur Chatbot</span>{" "}
+                        <span className="font-semibold text-white">Sahayak Chatbot</span>{" "}
                         below.
                     </p>
                 </div>
@@ -22,7 +22,7 @@ export default function FeaturesPage() {
                 {/* Heading */}
                 <section className="mb-10 space-y-3">
                     <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                        K Xa Hajur Chatbot
+                        Sahayak Chatbot
                     </h1>
                     <p className="max-w-2xl text-base text-zinc-400 md:text-lg">
                         An AI-powered customer support chatbot built on Next.js and Google

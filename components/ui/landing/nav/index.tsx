@@ -10,7 +10,7 @@ const Navbar = async () => {
             <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-black rounded-[1px]"></div>
           </div>
           <span className="text-sm sm:text-base font-semibold tracking-tight text-white/90 truncate">
-            K Xa Hajur
+          Sahayak Chatbot
           </span>
         </Link>
 

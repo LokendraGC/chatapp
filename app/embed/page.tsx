@@ -191,6 +191,7 @@ const EmbedPage = () => {
   }, []);
 
   useEffect(() => {
+    // i have facing issue when i click on bot it is opening chat window but not scrolling to middle of the chat window please fix this issue
     const scrollToBottom = () => {
       if (scrollContainerRef.current) {
         // Find the ScrollArea viewport
@@ -786,7 +787,7 @@ const EmbedPage = () => {
               href={"/"}
               className="text-[12px] text-zinc-600 font-medium hover:text-zinc-500 transition-colors"
             >
-              Powered by K Xa Hajur
+              Powered by Sahayak
             </Link>
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function Sidebar({ metadata, email }: SidebarProps) {
             <div className="w-2.5 h-2.5 bg-sidebar rounded-[1px]" />
           </div>
           <Link href={'/'} className="text-sm font-medium tracking-tight text-sidebar-foreground">
-            K Xa Hajur
+            Sahayak
           </Link>
         </div>
       </div>

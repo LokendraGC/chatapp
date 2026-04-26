@@ -63,7 +63,7 @@ const Hero = () => {
 
                                 {/* The Text: Placed outside the dot div */}
                                 <span className="text-sm font-medium text-zinc-300">
-                                    K Xa Hajur Chatbot.
+                                    Sahayak Chatbot.
                                 </span>
                             </div>
                         </div>

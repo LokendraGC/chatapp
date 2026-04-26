@@ -8,7 +8,7 @@
 
     var widgetID = script.getAttribute("data-id");
     if (!widgetID || widgetID.trim() === "") {
-      console.error("[K Xa Hajur] Widget ID is required");
+      console.error("[Sahayak] Widget ID is required");
       return;
     }
 
@@ -17,7 +17,7 @@
     try {
       baseUrl = new URL(script.src).origin;
     } catch (e) {
-      console.error("[K Xa Hajur] Could not get script origin", e);
+      console.error("[Sahayak] Could not get script origin", e);
       return;
     }
 
@@ -91,9 +91,9 @@
           }
         });
       }).catch(function(error){
-        console.error("[K Xa Hajur] Error creating session:", error);
+        console.error("[Sahayak] Error creating session:", error);
       });
   } catch (error) {
-    console.error("[K Xa Hajur] Error initializing widget:", error);
+    console.error("[Sahayak] Error initializing widget:", error);
   }
 })();

@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       headers: corsHeaders,
     });
   } catch (error) {
-    console.error("[K Xa Hajur] Error creating session:", error);
+    console.error("[Sahayak] Error creating session:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: corsHeaders,
