@@ -1,6 +1,6 @@
-import React from "react";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export const Pricing = () => {
   return (
@@ -16,7 +16,7 @@ export const Pricing = () => {
         <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/20 flex flex-col items-start text-left hover:bg-zinc-900/30 transition-colors h-full">
           <div className="text-sm font-medium text-zinc-400 mb-2">Starter</div>
           <div className="text-4xl font-medium text-white tracking-tight">
-            $0 <span className="text-lg text-zinc-600 font-light">/mo</span>
+            Rs.0 <span className="text-lg text-zinc-600 font-light">/mo</span>
           </div>
 
           <ul className="space-y-3 mb-8 mt-4 text-sm text-zinc-300 font-light w-full flex-1">
@@ -32,16 +32,30 @@ export const Pricing = () => {
               Community Support
             </li>
           </ul>
-          <Link href="/features" className="text-center cursor-pointer w-full bg-transparent border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 mx-auto transition-all mt-auto">
-            Start for Free
-          </Link>
+
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="text-center cursor-pointer w-full bg-transparent border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 mx-auto transition-all mt-auto">
+                Start for Free
+              </button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <Link
+              href="/dashboard"
+              className="text-center cursor-pointer w-full bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-200 mx-auto transition-all mt-auto"
+            >
+              Go to Dashboard
+            </Link>
+          </SignedIn>
         </div>
 
         <div className="p-8 rounded-3xl border border-white/5 bg-zinc-900/20 flex flex-col items-start text-left hover:bg-zinc-900/30 transition-colors h-full">
           <div className="text-sm font-medium text-zinc-400 mb-2">Popular</div>
           <div className="text-xl font-medium text-indigo-400 mb-2">Pro</div>
           <div className="text-4xl font-medium text-white tracking-tight">
-            $29 <span className="text-lg text-zinc-600 font-light">/mo</span>
+            Rs.100 <span className="text-lg text-zinc-600 font-light">/mo</span>
           </div>
 
           <ul className="space-y-3 mb-8 mt-4 text-sm text-zinc-300 font-light w-full flex-1">
@@ -58,9 +72,22 @@ export const Pricing = () => {
               Priority Support
             </li>
           </ul>
-          <Link href="/features" className="text-center cursor-pointer w-full bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-200 mx-auto transition-all mt-auto">
-            Upgrade to Pro
-          </Link>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="bg-white text-black cursor-pointer w-full px-4 py-2 rounded-full text-sm font-semibold mx-auto transition-all mt-auto">
+                Upgrade to Pro
+              </button>
+            </SignInButton>
+          </SignedOut>
+
+          <SignedIn>
+            <Link
+              href="/dashboard"
+              className="text-center cursor-pointer w-full bg-white text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-200 mx-auto transition-all mt-auto"
+            >
+              Upgrade to Pro
+            </Link>
+          </SignedIn>
         </div>
       </div>
     </section>
