@@ -7,7 +7,7 @@ import { ThemeProvider } from "next-themes";
 import DashboardHeader from "@/components/ui/dashboard/header";
 
 export const metadata = {
-  title: "K xa Hajur chat app",
+  title: "Sahayak chat app",
   description: "A chatbot to help you with your support needs.",
 };
 
