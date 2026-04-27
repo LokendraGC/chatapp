@@ -69,7 +69,9 @@ export default function SectionFormFields({
         </h4>
 
         <div className="space-y-2">
-          <Label className="text-muted-foreground">Section Name <span className="text-red-500">*</span></Label>
+          <Label className="text-muted-foreground">
+            Section Name <span className="text-red-500">*</span>
+          </Label>
           <Input
             placeholder="e.g. Billing Policy"
             className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
@@ -80,7 +82,9 @@ export default function SectionFormFields({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-muted-foreground">Description <span className="text-red-500">*</span></Label>
+          <Label className="text-muted-foreground">
+            Description <span className="text-red-500">*</span>
+          </Label>
           <Input
             placeholder="When should the AI use this section?"
             className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"

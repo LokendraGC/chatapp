@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { GripVertical, Plus, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "@clerk/nextjs";
 
 interface OrganizationData {
   id: string;
@@ -63,6 +64,7 @@ const SOCIAL_MEDIA_OPTIONS = [
 ];
 
 export default function SettingsPage() {
+  const { signOut } = useAuth();
   const [organizationData, setOrganizationData] =
     useState<OrganizationData | null>(null);
   const [contactForm, setContactForm] = useState<ContactData>({
@@ -76,15 +78,20 @@ export default function SettingsPage() {
     social_media: [],
   });
   const [newSocialPlatform, setNewSocialPlatform] = useState(
-    SOCIAL_MEDIA_OPTIONS[0]?.value ?? ""
+    SOCIAL_MEDIA_OPTIONS[0]?.value ?? "",
   );
   const [newSocialUrl, setNewSocialUrl] = useState("");
   const [draggedSocialId, setDraggedSocialId] = useState<string | null>(null);
   const [dragOverSocialId, setDragOverSocialId] = useState<string | null>(null);
   const [isSavingContact, setIsSavingContact] = useState(false);
+  const [isSavingWorkspace, setIsSavingWorkspace] = useState(false);
   const [isContactLoading, setIsContactLoading] = useState(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const updateOrganizationData = (updates: Partial<OrganizationData>) => {
+    setOrganizationData((prev) => (prev ? { ...prev, ...updates } : updates as OrganizationData));
+  };
 
   useEffect(() => {
     const fetchOrganizationData = async () => {
@@ -103,7 +110,8 @@ export default function SettingsPage() {
         const data = await response.json();
         if (data?.contact) {
           const social =
-            Array.isArray(data.contact.social_media) && data.contact.social_media
+            Array.isArray(data.contact.social_media) &&
+            data.contact.social_media
               ? data.contact.social_media
               : [];
           const normalized = {
@@ -155,10 +163,10 @@ export default function SettingsPage() {
   const reorderSocialMedia = (sourceId: string, targetId: string) => {
     setContactForm((prev) => {
       const sourceIndex = prev.social_media.findIndex(
-        (item) => item.id === sourceId
+        (item) => item.id === sourceId,
       );
       const targetIndex = prev.social_media.findIndex(
-        (item) => item.id === targetId
+        (item) => item.id === targetId,
       );
       if (sourceIndex === -1 || targetIndex === -1) return prev;
 
@@ -209,20 +217,53 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSaveWorkspace = async () => {
+    if (!organizationData?.business_name || !organizationData?.website_url) {
+      toast.error("Workspace Name and Primary Website are required");
+      return;
+    }
+    setIsSavingWorkspace(true);
+    try {
+      const response = await fetch("/api/organization/upsert", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_name: organizationData.business_name,
+          website_url: organizationData.website_url,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to save workspace info");
+      const data = await response.json();
+      if (data?.organization) {
+        setOrganizationData(data.organization);
+      }
+      toast.success("Workspace information saved successfully");
+    } catch (error) {
+      console.error("Error saving workspace info:", error);
+      toast.error("Failed to save workspace information");
+    } finally {
+      setIsSavingWorkspace(false);
+    }
+  };
+
   const handleDeleteWorkspace = async () => {
     setIsDeleting(true);
     try {
-      // TODO: Implement delete workspace API call
-      // const response = await fetch("/api/workspace/delete", {
-      //   method: "DELETE",
-      // });
-      // if (!response.ok) {
-      //   throw new Error("Failed to delete workspace");
-      // }
-      console.log("Workspace deletion not yet implemented");
+      const response = await fetch("/api/workspace/delete", {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete workspace");
+      }
+      toast.success("Workspace deleted permanently.");
       setIsDeleteDialogOpen(false);
+      
+      // Sign the user out and redirect them to the home page since their data is gone
+      await signOut();
+      window.location.href = "/";
     } catch (error) {
       console.error("Error deleting workspace:", error);
+      toast.error("Failed to delete workspace. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -252,22 +293,33 @@ export default function SettingsPage() {
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-muted-foreground text-xs">Workspace Name</Label>
-              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
-                {organizationData?.business_name}
-              </div>
+              <Label className="text-muted-foreground text-xs">
+                Workspace Name
+              </Label>
+              <Input
+                value={organizationData?.business_name || ""}
+                onChange={(e) => updateOrganizationData({ business_name: e.target.value })}
+                placeholder="Enter workspace name"
+                className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-muted-foreground">Primary Website</Label>
-              <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
-                {organizationData?.website_url}
-              </div>
+              <Input
+                type="url"
+                value={organizationData?.website_url || ""}
+                onChange={(e) => updateOrganizationData({ website_url: e.target.value })}
+                placeholder="https://..."
+                className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
+              />
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-muted-foreground text-xs">Default Language</Label>
+              <Label className="text-muted-foreground text-xs">
+                Default Language
+              </Label>
               <div className="p-3 rounded-md bg-muted/30 text-foreground border border-border">
                 English
               </div>
@@ -280,10 +332,14 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
+
+          <div className="flex justify-end pt-4">
+            <Button onClick={handleSaveWorkspace} disabled={isSavingWorkspace}>
+              {isSavingWorkspace ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
-
-
 
       <Card className="border-border bg-card">
         <CardHeader>
@@ -346,7 +402,9 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs">Social Media</Label>
+            <Label className="text-muted-foreground text-xs">
+              Social Media
+            </Label>
             <div className="grid gap-3 md:grid-cols-[220px,1fr,auto]">
               <select
                 value={newSocialPlatform}
@@ -460,7 +518,7 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
               <p className="text-sm font-medium text-foreground">
                 Delete Workspace
@@ -469,7 +527,10 @@ export default function SettingsPage() {
                 Permanently delete all knowledge, conversations, and settings.
               </p>
             </div>
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+            >
               <AlertDialogTrigger asChild>
                 <Button
                   size="sm"
@@ -485,7 +546,9 @@ export default function SettingsPage() {
                     Delete Workspace
                   </AlertDialogTitle>
                   <AlertDialogDescription className="text-muted-foreground">
-                    Are you sure you want to delete your workspace? This action cannot be undone and will permanently delete all knowledge, conversations, team members, and settings.
+                    Are you sure you want to delete your workspace? This action
+                    cannot be undone and will permanently delete all knowledge,
+                    conversations, team members, and settings.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

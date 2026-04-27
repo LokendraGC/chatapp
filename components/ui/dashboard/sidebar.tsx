@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const SIDEBAR_ITEMS = [
+export const SIDEBAR_ITEMS = [
   {
     label: "Dashboard",
     href: "/dashboard",

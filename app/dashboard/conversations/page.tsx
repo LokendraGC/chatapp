@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Bot, Loader2, MoreHorizontal, Search, Send, User } from "lucide-react";
+import { Bot, Loader2, MoreHorizontal, Search, Send, User, ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState, useMemo } from "react";
 
 
@@ -170,8 +170,11 @@ export default function ConversationsPage() {
 
   return (
     <div className="flex h-[calc(100vh-65px)] overflow-hidden bg-background animate-in fade-in-0 duration-500">
-      <div className="flex flex-col border-r border-border w-[350px] md:w-[400px] bg-card">
-        <div className="p-4 border-b border-border space-y-4">
+      <div className={cn(
+        "flex flex-col border-r border-border bg-card",
+        selectedId ? "hidden md:flex w-[350px] md:w-[400px]" : "w-full md:w-[400px]"
+      )}>
+        <div className="p-4 border-b border-border space-y-4 shrink-0">
           <div className="flex items-center justify-between">
             <h1 className="font-semibold text-foreground">Inbox</h1>
             <div className="text-xs text-muted-foreground">{filteredConversations.length} conversations</div>
@@ -187,8 +190,9 @@ export default function ConversationsPage() {
               className="pl-10 bg-muted/30 border-border w-full text-foreground placeholder:text-muted-foreground"
             />
           </div>
+        </div>
 
-          <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0">
             <div className="flex flex-col">
               {isLoadingList ? (
                 <div className="flex items-center justify-center py-10">
@@ -256,16 +260,25 @@ export default function ConversationsPage() {
               )}
             </div>
           </ScrollArea>
-
-        </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-background">
+      <div className={cn(
+        "flex-1 flex flex-col min-w-0 bg-background",
+        !selectedId ? "hidden md:flex" : "flex"
+      )}>
         {
           selectedConversation ? (
             <>
-              <div className="h-16 border-b border-border flex items-center justify-between px-4 bg-card">
+              <div className="h-16 border-b border-border flex items-center justify-between px-4 bg-card shrink-0">
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="md:hidden mr-1" 
+                    onClick={() => setSelectedId(null)}
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                       <User className="w-4 h-4 text-muted-foreground" />

@@ -101,7 +101,7 @@ export default function TeamSection() {
 
   return (
     <Card className="border-border bg-card">
-      <CardHeader className="flex flex-row justify-between items-center">
+      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <CardTitle className="text-base font-medium text-foreground">
             Team Members
@@ -181,11 +181,11 @@ export default function TeamSection() {
                 <div className="grid gap-4">
                   {team.map((member) => (
                     <div
-                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border"
+                      className="flex flex-col sm:flex-row sm:items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border"
                       key={member.id}
                     >
                       {/* Avatar at the start */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
                         <Avatar>
                           {member.image && (
                             <AvatarImage src={member.image} alt={member.name || "User"} />
@@ -202,14 +202,14 @@ export default function TeamSection() {
                       </div>
 
                       {/* Email in the center */}
-                      <div className="flex-1 flex items-center justify-center">
+                      <div className="flex-1 flex items-center sm:justify-center w-full sm:w-auto text-left">
                         <p className="text-muted-foreground text-sm">
                           {member.user_email || "Unknown"}
                         </p>
                       </div>
 
                       {/* Role on the right */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
                         <Badge
                           variant="secondary"
                           className={cn(

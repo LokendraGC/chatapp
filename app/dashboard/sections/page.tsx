@@ -316,7 +316,10 @@ const SectionsPage = () => {
       </Card>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full sm:max-w-md border-l border-border bg-card p-0 shadow-2xl">
+        <SheetContent 
+          className="w-full sm:max-w-md border-l border-border bg-card p-0 shadow-2xl"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           {selectedSection && (
             <>
               <SheetHeader className="p-6 border-b border-border">

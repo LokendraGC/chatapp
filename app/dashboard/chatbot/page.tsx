@@ -212,7 +212,7 @@ export default function ChatbotPage() {
   }
 
   return (
-    <div className="p-6 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300 h-[calc(100vh-10px)] overflow-auto flex flex-col">
+    <div className="p-4 md:p-10 space-y-6 w-full animate-in fade-in-0 duration-300 lg:h-[calc(100vh-10px)] flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div>
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">
@@ -224,8 +224,8 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0">
-        <div className="lg:col-span-7 flex flex-col h-full min-h-0 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 lg:min-h-0">
+        <div className="lg:col-span-7 flex flex-col h-[600px] lg:h-full lg:min-h-0 space-y-4">
           <ChatSimulator
             messages={messages}
             primaryColor={primaryColor}
@@ -242,7 +242,7 @@ export default function ChatbotPage() {
           />
         </div>
 
-        <div className="lg:col-span-5 h-full min-h-0 overflow-hidden flex flex-col">
+        <div className="lg:col-span-5 lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden flex flex-col">
           <ScrollArea className="h-full pr-4">
             <div className="space-y-6 pb-8">
               <ApartmentConfig
