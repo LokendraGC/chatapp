@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
 
         const chatbotMetadata = await prisma.chatBotMetadata.findMany({
             where: {
-                user_email: clerkUser.emailAddresses[0]?.emailAddress,
+                user_email: (await getWorkspaceEmail(clerkUser) || ""),
             },
         });
         if (chatbotMetadata.length === 0) {

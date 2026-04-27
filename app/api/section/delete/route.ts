@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -32,7 +33,7 @@ export async function DELETE(req: Request) {
     }
 
     // Verify the section belongs to the user
-    if (section.user_email !== clerkUser.emailAddresses[0]?.emailAddress) {
+    if (section.user_email !== (await getWorkspaceEmail(clerkUser) || "")) {
       return NextResponse.json(
         { error: "You can not delete this section" },
         { status: 403 }

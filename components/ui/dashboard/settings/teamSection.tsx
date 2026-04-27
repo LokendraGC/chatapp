@@ -48,7 +48,7 @@ export default function TeamSection() {
     try {
       const response = await fetch("/api/team/fetch");
       const data = await response.json();
-      setTeam(data.teamMembers);
+      setTeam(data?.teamMembers || []);
     } catch (error) {
       console.error("Error fetching team:", error);
     } finally {

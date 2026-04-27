@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -9,7 +10,7 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const userEmail = clerkUser.emailAddresses[0]?.emailAddress ?? "";
+    const userEmail = (await getWorkspaceEmail(clerkUser) || "") ?? "";
     const organizationId = clerkUser.id;
 
     // First find all conversations so we can delete their messages

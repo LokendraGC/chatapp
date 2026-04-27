@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -11,7 +12,7 @@ export async function GET(req: Request) {
 
     const [metaDataRecord] = await prisma.metaData.findMany({
       where: {
-        user_email: clerkUser.emailAddresses[0]?.emailAddress,
+        user_email: (await getWorkspaceEmail(clerkUser) || ""),
       },
     });
 

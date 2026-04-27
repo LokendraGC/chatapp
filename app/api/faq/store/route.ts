@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -21,14 +22,14 @@ export async function POST(req: Request) {
     const existingMax = await prisma.faq.aggregate({
       _max: { sort_order: true },
       where: {
-        user_email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
       },
     });
     const nextOrder = (existingMax._max.sort_order ?? -1) + 1;
 
     const faq = await prisma.faq.create({
       data: {
-        user_email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
         question: question.trim(),
         answer: answer.trim(),
         sort_order: nextOrder,

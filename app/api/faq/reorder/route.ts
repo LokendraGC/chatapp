@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -18,7 +19,7 @@ export async function PUT(req: Request) {
       );
     }
 
-    const userEmail = clerkUser.emailAddresses[0]?.emailAddress ?? "";
+    const userEmail = (await getWorkspaceEmail(clerkUser) || "") ?? "";
 
     await prisma.$transaction(
       orderedIds.map((id: string, index: number) =>

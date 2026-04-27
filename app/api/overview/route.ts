@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
 
         const bots = await prisma.chatBotMetadata.findMany({
             where: {
-                user_email: clerkUser.emailAddresses[0]?.emailAddress,
+                user_email: (await getWorkspaceEmail(clerkUser) || ""),
             },
         });
 
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
         const knowledgeByType = await prisma.knowledgeSource.groupBy({
             by: ["type"],
             where: {
-                user_email: clerkUser.emailAddresses[0]?.emailAddress,
+                user_email: (await getWorkspaceEmail(clerkUser) || ""),
             },
             _count: {
                 _all: true,
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
 
         const recentSections = await prisma.section.findMany({
             where: {
-                user_email: clerkUser.emailAddresses[0]?.emailAddress,
+                user_email: (await getWorkspaceEmail(clerkUser) || ""),
             },
             orderBy: {
                 created_at: "desc",

@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
     // Get user from Prisma database
     const user = await prisma.user.findUnique({
       where: {
-        email: clerkUser.emailAddresses[0]?.emailAddress,
+        email: (await getWorkspaceEmail(clerkUser) || ""),
       },
     });
 

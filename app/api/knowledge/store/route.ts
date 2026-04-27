@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { summarizeMarkdown } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
@@ -195,7 +196,7 @@ export async function POST(req: Request) {
         // Save to database
         const knowledgeSource = await prisma.knowledgeSource.create({
           data: {
-            user_email: clerkUser.emailAddresses[0]?.emailAddress || "unknown@example.com",
+            user_email: (await getWorkspaceEmail(clerkUser) || "") || "unknown@example.com",
             type: "upload",
             name: fileName,
             status: "active",
@@ -245,7 +246,7 @@ export async function POST(req: Request) {
           );
         }
 
-        const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+        const userEmail = (await getWorkspaceEmail(clerkUser) || "");
         const MAX_CONTENT_CHARS = 500_000;
 
         const cleanMarkdown = (raw: string) => {
@@ -439,7 +440,7 @@ export async function POST(req: Request) {
 
         await prisma.knowledgeSource.create({
           data: {
-            user_email: clerkUser.emailAddresses[0]?.emailAddress,
+            user_email: (await getWorkspaceEmail(clerkUser) || ""),
             type: "text",
             name: title,
             status: "active",

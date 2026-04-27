@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -21,7 +22,7 @@ export async function PUT(req: Request) {
     const faq = await prisma.faq.updateMany({
       where: {
         id,
-        user_email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
       },
       data: {
         question: question.trim(),

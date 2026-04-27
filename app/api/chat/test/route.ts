@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { countConversationTokens } from "@/lib/countConversationTokens";
 import { summarizeMarkdown } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
   let { messages, knowledge_source_ids } = await req.json();
 
   let context = "";
-  const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+  const userEmail = (await getWorkspaceEmail(clerkUser) || "");
 
   // Fetch knowledge sources - use specific IDs if provided, otherwise fetch all for the user
   if (knowledge_source_ids && knowledge_source_ids.length > 0) {

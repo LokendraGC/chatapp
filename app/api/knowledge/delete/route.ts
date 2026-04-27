@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -24,7 +25,7 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: "Source not found" }, { status: 404 });
         }
 
-        if (source.user_email !== clerkUser.emailAddresses[0]?.emailAddress) {
+        if (source.user_email !== (await getWorkspaceEmail(clerkUser) || "")) {
             return NextResponse.json({ error: "You can not delete this source" }, { status: 403 });
         }
 

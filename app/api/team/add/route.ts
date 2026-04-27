@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import { clerkClient } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
     const clerkUser = await currentUser();
     const user = await prisma.user.findUnique({
       where: {
-        email: clerkUser?.emailAddresses[0]?.emailAddress,
+        email: (await getWorkspaceEmail(clerkUser) || ""),
       },
     });
     if (!clerkUser || !user)
@@ -26,41 +27,26 @@ export async function POST(req: Request) {
 
     const client = await clerkClient();
     let clerkOrganizationId: string | null = null;
+    let dbOrgId = clerkUser.id;
 
     try {
-
-      console.log("clerkUser.id:", clerkUser.id);
-
       const memberships = await client.users.getOrganizationMembershipList({
         userId: clerkUser.id,
       });
-
-      const membership = memberships.data[0];
-
-      console.log("Membership role:", membership?.role);
-
-
-      if (!membership) {
-        return NextResponse.json(
-          { error: "User is not part of any organization" },
-          { status: 400 }
-        );
+      const membership = memberships?.data?.[0];
+      if (membership?.organization?.id) {
+        clerkOrganizationId = membership.organization.id;
+        dbOrgId = clerkOrganizationId;
       }
-
-      clerkOrganizationId = membership.organization.id;
     } catch (orgError: any) {
-
-      return NextResponse.json(
-        { error: "User is not part of any organization" },
-        { status: 400 }
-      );
+      console.error("No clerk organization found, falling back to local DB.");
     }
 
     // Check if member exists locally
     const existingMember = await prisma.teamMember.findFirst({
       where: {
         user_email: email,
-        organization_id: clerkOrganizationId,
+        organization_id: dbOrgId,
       },
     });
 
@@ -107,9 +93,9 @@ export async function POST(req: Request) {
       data: {
         name,
         user_email: email,
-        organization_id: clerkOrganizationId,
+        organization_id: dbOrgId,
         clerk_invitation_id: invitation?.id || null,
-        status: "pending",
+        status: clerkOrganizationId ? "pending" : "active",
       },
     });
 

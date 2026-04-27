@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -9,17 +9,31 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    let orgId = clerkUser.id;
+    try {
+      const client = await clerkClient();
+      const memberships = await client.users.getOrganizationMembershipList({
+        userId: clerkUser.id,
+      });
+      if (memberships?.data?.[0]?.organization?.id) {
+        orgId = memberships.data[0].organization.id;
+      }
+    } catch (err) {
+      console.error("Error fetching Clerk organization memberships:", err);
+    }
+
     const teamMembers = await prisma.teamMember.findMany({
       where: {
-        organization_id: clerkUser.id,
+        organization_id: orgId,
       },
     });
 
-    return NextResponse.json({ teamMembers }, { status: 200 });
+    return NextResponse.json({ teamMembers: teamMembers || [] }, { status: 200 });
 
   } catch (error) {
+    console.error("API error in team fetch:", error);
     return NextResponse.json(
-      { error: "Failed to fetch team members" },
+      { teamMembers: [], error: "Failed to fetch team members" },
       { status: 500 }
     );
   }

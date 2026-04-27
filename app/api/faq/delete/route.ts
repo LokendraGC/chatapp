@@ -1,3 +1,4 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -18,7 +19,7 @@ export async function DELETE(req: Request) {
     const result = await prisma.faq.deleteMany({
       where: {
         id,
-        user_email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
       },
     });
     if (result.count === 0) {
