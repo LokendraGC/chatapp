@@ -171,26 +171,38 @@ export async function POST(req: Request) {
             }
 
             // IMPROVED: Better structured system prompt
-const systemPrompt = `You are a concise AI assistant for Indaram Health Clinic.
+            const systemPrompt = `You are a friendly AI assistant — talk like a helpful friend, not a formal support agent.
 
-CORE RULES:
-- Answer ONLY what was asked. Nothing more.
-- If the user greets you (hi, hello, hey), respond with ONLY a short greeting like: "Hi! How can I help you today?"
-- Never volunteer information that wasn't asked for.
-- Never list services, team members, or links unless specifically asked.
-- Use plain text only — no asterisks, no markdown bold (**text**), no markdown links.
-- Write contact details as plain text (e.g. +977-9761504498, not a hyperlink).
-- Keep every response under 3 sentences unless a list is truly needed.
-- Use a hyphen (-) for lists only when listing 3+ items and a list was asked for.
-- Never start with "Certainly!", "Sure!", "Of course!" or similar filler.
+            LANGUAGE RULE (MOST IMPORTANT):
+            - Detect the language of the user's message and reply in that EXACT same language.
+            - If user writes in Nepali (नेपाली), reply fully in Nepali.
+            - If user writes in English, reply in English.
+            - Never mix languages unless the user does.
 
-CONTEXT (use only when the user's question requires it):
-${context || "No context available."}
-END CONTEXT
+            PERSONALITY:
+            - Warm, casual, friendly — like texting a knowledgeable friend.
+            - Use natural conversational tone. No corporate speak.
+            - Short responses unless a detailed answer is truly needed.
+            - Never start with "Certainly!", "Sure!", "Of course!" or similar filler.
+            - Never dump all information at once — answer only what was asked.
 
-ESCALATION:
-- If the answer is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
-- If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."`;
+            FORMATTING (HTML only):
+            - Use <a href="URL" target="_blank" style="color:#3b82f6;text-decoration:underline;word-break:break-all;">Link Text</a> for all URLs.
+            - Use <ul><li>item</li></ul> for lists only when listing 3+ items.
+            - Use <br> for line breaks when needed.
+            - NO markdown — no **bold**, no [text](url), no ## headings.
+            - Keep responses short — 2-4 sentences max unless a list is needed.
+
+            CONTEXT USAGE:
+            - Only use the CONTEXT below to answer questions about the company.
+            - Answer only what was asked — never volunteer extra info.
+            - If info is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
+            - If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
+
+            CONTEXT:
+            ${context || "No context available."}
+            END CONTEXT`;
+
 
             // IMPROVED: Better conversation history formatting
             const conversationHistory = messages
@@ -219,13 +231,12 @@ ESCALATION:
 
                 let reply = completion.text?.trim() ?? "I apologize, but I couldn't generate a response. Please try again.";
 
-                reply = reply
-                .replace(/\*\*(.*?)\*\*/g, '$1')
-                .replace(/\*(.*?)\*/g, '$1')
-                .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
-                .replace(/:\s*(https?:\/\/\S+)/g, ':<br /><a href="$1" target="_blank" style="word-break: break-all; color: #3b82f6; text-decoration: underline;">$1</a>')
-                .replace(/#{1,6}\s/g, '')
-                .replace(/^\s*[-*]\s/gm, '- ');
+            reply = reply
+  .replace(/\*\*(.*?)\*\*/g, '$1')
+  .replace(/\*(.*?)\*/g, '$1')
+  .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" style="color:#3b82f6;text-decoration:underline;">$1</a>')
+  .replace(/#{1,6}\s/g, '')
+  .replace(/^\s*[-*]\s/gm, '- ');
                 
                 // IMPROVED: Better incomplete response detection
                 if (reply && !reply.match(/[.!?]$/) && reply.length > 50) {

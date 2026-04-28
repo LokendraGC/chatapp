@@ -41,18 +41,22 @@ export default function ChatSimulator({
     const scrollToBottom = () => {
       if (scrollContainerRef.current) {
         // Try multiple methods to find the viewport
-        const scrollArea = scrollContainerRef.current.querySelector('[data-slot="scroll-area"]');
-        const viewport = scrollArea?.querySelector('[data-slot="scroll-area-viewport"]') as HTMLElement;
-        
+        const scrollArea = scrollContainerRef.current.querySelector(
+          '[data-slot="scroll-area"]',
+        );
+        const viewport = scrollArea?.querySelector(
+          '[data-slot="scroll-area-viewport"]',
+        ) as HTMLElement;
+
         if (viewport) {
           // Use multiple attempts to ensure scrolling works
           const attemptScroll = () => {
             viewport.scrollTop = viewport.scrollHeight;
           };
-          
+
           // Immediate attempt
           attemptScroll();
-          
+
           // Delayed attempts to handle async rendering
           requestAnimationFrame(attemptScroll);
           setTimeout(attemptScroll, 50);
@@ -60,7 +64,7 @@ export default function ChatSimulator({
         }
       }
     };
-    
+
     scrollToBottom();
   }, [messages, isTyping]);
 
@@ -86,91 +90,98 @@ export default function ChatSimulator({
 
       <div ref={scrollContainerRef} className="flex-1 min-h-0">
         <ScrollArea className="h-full p-6 relative bg-muted/20">
-        <div className="space-y-6 pb-4">
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={cn(
-                "flex w-full flex-col",
-                msg.role === "user" ? "items-end" : "items-start"
-              )}
-            >
+          <div className="space-y-6 pb-4">
+            {messages.map((msg, i) => (
               <div
+                key={i}
                 className={cn(
-                  "flex max-w-[80%] gap-3",
-                  msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                  "flex w-full flex-col",
+                  msg.role === "user" ? "items-end" : "items-start",
                 )}
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-border",
-                    msg.role === "user" ? "bg-muted" : "text-primary-foreground"
+                    "flex max-w-[80%] gap-3",
+                    msg.role === "user" ? "flex-row-reverse" : "flex-row",
                   )}
-                  style={
-                    msg.role !== "user" ? { backgroundColor: primaryColor } : {}
-                  }
                 >
-                  {msg.role === "user" ? (
-                    <User className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <BotIcon className="w-4 h-4 text-white" />
-                  )}
-                </div>                <div className="space-y-2">
                   <div
                     className={cn(
-                      "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap",
+                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-border",
                       msg.role === "user"
-                        ? "bg-muted text-foreground rounded-tr-sm"
-                        : "text-white rounded-tl-sm"
+                        ? "bg-muted"
+                        : "text-primary-foreground",
                     )}
                     style={
-                      msg.role !== "user" ? { backgroundColor: primaryColor } : {}
+                      msg.role !== "user"
+                        ? { backgroundColor: primaryColor }
+                        : {}
                     }
                   >
-                    {msg.content}
+                    {msg.role === "user" ? (
+                      <User className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <BotIcon className="w-4 h-4 text-white" />
+                    )}
+                  </div>{" "}
+                  <div className="space-y-2">
+                    <div
+                      className={cn(
+                        "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap",
+                        msg.role === "user"
+                          ? "bg-muted text-foreground rounded-tr-sm"
+                          : "text-white rounded-tl-sm",
+                      )}
+                      style={
+                        msg.role !== "user"
+                          ? { backgroundColor: primaryColor }
+                          : {}
+                      }
+                    >
+                      {msg.content}
+                    </div>
+
+                    {msg.isWelcome && sections.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-1 ml-1 animate-in fade-in-0 duration-300 slide-in-from-top-1">
+                        {sections.map((section) => (
+                          <button
+                            key={section.id}
+                            onClick={() => handleSectionClick(section.name)}
+                            className="px-3 py-1 rounded-full border border-border text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
+                          >
+                            {section.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="flex w-full justify-start">
+                <div className="flex max-w-[80%] gap-3 row">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    <Bot className="w-4 h-4 text-white" />
                   </div>
 
-                  {msg.isWelcome && sections.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-1 ml-1 animate-in fade-in-0 duration-300 slide-in-from-top-1">
-                      {sections.map((section) => (
-                        <button
-                          key={section.id}
-                          onClick={() => handleSectionClick(section.name)}
-                          className="px-3 py-1 rounded-full border border-border text-sm text-foreground cursor-pointer hover:bg-muted transition-colors"
-                        >
-                          {section.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div
+                    className="p-4 rounded-2xl text-white rounded-tl-sm flex items-center gap-1.5"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-
-          {isTyping && (
-            <div className="flex w-full justify-start">
-              <div className="flex max-w-[80%] gap-3 row">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  <Bot className="w-4 h-4 text-white" />
-                </div>
-
-                <div
-                  className="p-4 rounded-2xl text-white rounded-tl-sm flex items-center gap-1.5"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-bounce" />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+            )}
+          </div>
+        </ScrollArea>
       </div>
 
       <div className="p-4 bg-card border-t border-border">
@@ -193,7 +204,9 @@ export default function ChatSimulator({
             disabled={!activeSection || !input.trim()}
             className={cn(
               "absolute right-2 bottom-2 h-8 w-8 transition-colors",
-              !activeSection || !input.trim() ? "bg-muted text-muted-foreground" : ""
+              !activeSection || !input.trim()
+                ? "bg-muted text-muted-foreground"
+                : "",
             )}
             style={
               activeSection && input.trim()
@@ -203,7 +216,6 @@ export default function ChatSimulator({
           >
             <Send className="w-4 h-4" />
           </Button>
-          
         </div>
       </div>
     </Card>

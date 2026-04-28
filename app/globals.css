@@ -143,3 +143,10 @@
   background: #3b82f6;
   color: #ffffff;
 }
+
+.chat-message a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  color: #3b82f6;
+  text-decoration: underline;
+}

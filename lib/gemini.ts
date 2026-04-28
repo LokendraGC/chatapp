@@ -33,7 +33,8 @@ REMOVE:
 FORMAT:
 - Use clear headings (##) for main topics
 - Use bullet points (-) for lists
-- Preserve URLs using markdown format: [Link Text](URL)
+- Preserve URLs as plain HTML: <a href="URL">Link Text</a>
+- Write all contact details (phone, email, address) as plain text, no markdown
 - Keep sentences complete and factual
 - Organize by topic (Contact Info, Services, Team, etc.)
 
