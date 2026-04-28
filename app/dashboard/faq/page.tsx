@@ -37,11 +37,30 @@ export default function FaqPage() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [domain, setDomain] = useState("");
 
-  const fetchFaqs = useCallback(async () => {
+  const fetchMetadata = useCallback(async () => {
+    try {
+      const res = await fetch("/api/metadata/fetch");
+      const json = await res.json();
+      if (json.exists && json.data?.website_url) {
+        setDomain(json.data.website_url);
+        return json.data.website_url;
+      }
+    } catch (e) {
+      console.error("Error fetching metadata:", e);
+    }
+    return "";
+  }, []);
+
+  const fetchFaqs = useCallback(async (currentDomain?: string) => {
     try {
       setIsLoadingFaqs(true);
-      const res = await fetch("/api/faq/fetch");
+      const activeDomain = currentDomain || domain;
+      const url = activeDomain 
+        ? `/api/faq/fetch?domain=${encodeURIComponent(activeDomain)}`
+        : "/api/faq/fetch";
+      const res = await fetch(url);
       const data = await res.json();
       setFaqs(data.faqs ?? []);
     } catch (e) {
@@ -49,11 +68,15 @@ export default function FaqPage() {
     } finally {
       setIsLoadingFaqs(false);
     }
-  }, []);
+  }, [domain]);
 
   useEffect(() => {
-    fetchFaqs();
-  }, [fetchFaqs]);
+    const init = async () => {
+      const d = await fetchMetadata();
+      fetchFaqs(d);
+    };
+    init();
+  }, [fetchMetadata, fetchFaqs]);
 
   const openAddDialog = () => {
     setSelectedFaq(null);
@@ -92,6 +115,7 @@ export default function FaqPage() {
           body: JSON.stringify({
             question: question.trim(),
             answer: answer.trim(),
+            domain: domain,
           }),
         });
         if (!res.ok) throw new Error("Failed to create");

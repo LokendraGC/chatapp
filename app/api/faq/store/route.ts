@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { question, answer } = body;
+    const { question, answer, domain } = body;
     if (!question?.trim() || !answer?.trim()) {
       return NextResponse.json(
         { error: "Question and answer are required" },
@@ -19,24 +19,27 @@ export async function POST(req: Request) {
       );
     }
 
+    const userEmail = (await getWorkspaceEmail(clerkUser)) || "";
+
     const existingMax = await prisma.faq.aggregate({
       _max: { sort_order: true },
       where: {
-        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
+        user_email: userEmail,
       },
     });
     const nextOrder = (existingMax._max.sort_order ?? -1) + 1;
 
     const faq = await prisma.faq.create({
       data: {
-        user_email: (await getWorkspaceEmail(clerkUser) || "") ?? "",
+        user_email: userEmail,
         question: question.trim(),
         answer: answer.trim(),
         sort_order: nextOrder,
+        domain: domain || "",
       },
     });
     return NextResponse.json({ faq }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating FAQ:", error);
     return NextResponse.json(
       { error: "Failed to create FAQ" },

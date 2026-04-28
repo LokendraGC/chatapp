@@ -1,9 +1,40 @@
+import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const clerkUser = await currentUser();
+    const { searchParams } = new URL(req.url);
+    const domain = searchParams.get("domain");
+    const token = searchParams.get("token");
+
+    let user_email = "";
+    
+    // If authenticated (dashboard), use the workspace email
+    if (clerkUser) {
+      user_email = (await getWorkspaceEmail(clerkUser)) || "";
+    } 
+    // If token provided (widget), decode it to get the owner's email
+    else if (token) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
+        if (payload && payload.ownerEmail) {
+          user_email = payload.ownerEmail as string;
+        }
+      } catch (e) {
+        console.error("Token verification failed in FAQ fetch:", e);
+      }
+    }
+
     const faqs = await prisma.faq.findMany({
+      where: {
+        user_email: user_email || undefined,
+        ...(domain ? { domain: { contains: domain } } : {}),
+      },
       orderBy: [{ sort_order: "asc" }, { created_at: "desc" }],
     });
 

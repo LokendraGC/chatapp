@@ -30,13 +30,16 @@ const fallbackQuestions: FaqItem[] = [
 interface ChatbHomeProps {
     onShowAllQuestions?: () => void;
     onContact?: () => void;
+    token?: string | null;
 }
 
-const ChatbHome = ({ onShowAllQuestions, onContact }: ChatbHomeProps) => {
+const ChatbHome = ({ onShowAllQuestions, onContact, token }: ChatbHomeProps) => {
     const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     useEffect(() => {
-        fetch("/api/faq/fetch")
+        const domain = window.location.hostname;
+        const url = `/api/faq/fetch?domain=${encodeURIComponent(domain)}${token ? `&token=${encodeURIComponent(token)}` : ""}`;
+        fetch(url)
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
                 if (!data?.faqs) return;

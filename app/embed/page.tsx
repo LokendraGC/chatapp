@@ -541,6 +541,7 @@ const EmbedPage = () => {
                   <ChatbHome
                     onShowAllQuestions={() => handleTabChange("help")}
                     onContact={() => handleTabChange("contact")}
+                    token={token}
                   />
                 )}
                 {activeTab === "help" && <Help />}
