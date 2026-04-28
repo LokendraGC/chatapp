@@ -223,6 +223,7 @@ ESCALATION:
                 .replace(/\*\*(.*?)\*\*/g, '$1')
                 .replace(/\*(.*?)\*/g, '$1')
                 .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                .replace(/:\s*(https?:\/\/\S+)/g, ':<br /><a href="$1" target="_blank" style="word-break: break-all; color: #3b82f6; text-decoration: underline;">$1</a>')
                 .replace(/#{1,6}\s/g, '')
                 .replace(/^\s*[-*]\s/gm, '- ');
                 
