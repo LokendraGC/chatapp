@@ -171,7 +171,7 @@ export async function POST(req: Request) {
             }
 
             // IMPROVED: Better structured system prompt
-            const systemPrompt = `You are a friendly, helpful AI customer support assistant for Indaram Health Clinic.
+const systemPrompt = `You are a friendly, helpful AI customer support assistant for Indaram Health Clinic.
 
 RESPONSE GUIDELINES:
 - Provide complete, thorough answers - NEVER cut off mid-sentence

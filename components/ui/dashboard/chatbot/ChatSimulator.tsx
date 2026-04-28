@@ -115,12 +115,10 @@ export default function ChatSimulator({
                   ) : (
                     <BotIcon className="w-4 h-4 text-white" />
                   )}
-                </div>
-
-                <div className="space-y-2">
+                </div>                <div className="space-y-2">
                   <div
                     className={cn(
-                      "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm",
+                      "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap",
                       msg.role === "user"
                         ? "bg-muted text-foreground rounded-tr-sm"
                         : "text-white rounded-tl-sm"
