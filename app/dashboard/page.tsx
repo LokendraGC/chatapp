@@ -12,10 +12,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchMetadata = async () => {
-      const response = await fetch("/api/metadata/fetch");
-      const data = await response.json();
-      setMetadata(data.exists);
-      setLoading(false);
+      try {
+        const response = await fetch("/api/metadata/fetch");
+        const data = await response.json();
+        setMetadata(data.exists);
+      } catch (error) {
+        console.error("Error fetching metadata:", error);
+        setMetadata(false);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchMetadata();
   }, []);

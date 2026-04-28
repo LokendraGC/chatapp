@@ -92,21 +92,32 @@ export default function InitialForm() {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    const response = await fetch("/api/metadata/store", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        business_name: formData.businessName,
-        website_url: formData.websiteUrl,
-        external_links: formData.externalLinks,
-      }),
-    }); 
+      const response = await fetch("/api/metadata/store", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_name: formData.businessName,
+          website_url: formData.websiteUrl,
+          external_links: formData.externalLinks,
+        }),
+      });
 
-    await response.json();
-    setIsSubmitting(false);
-    window.location.reload();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save metadata");
+      }
+
+      await response.json();
+      window.location.reload();
+    } catch (error) {
+      console.error("Submission error:", error);
+      setIsSubmitting(false);
+      // You might want to add a toast or alert here
+      alert(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+    }
   };
 
   const handleNext = async () => {

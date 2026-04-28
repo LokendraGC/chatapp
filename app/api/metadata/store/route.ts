@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
 
 export async function POST(req: Request) {
   const clerkUser = await currentUser();
@@ -12,15 +13,25 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Get user from Prisma database
-    const user = await prisma.user.findUnique({
+    const userEmail = await getWorkspaceEmail(clerkUser) || "";
+    
+    let user = await prisma.user.findUnique({
       where: {
-        email: (await getWorkspaceEmail(clerkUser) || ""),
+        email: userEmail,
       },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      // Create user if not found (fallback if webhook hasn't run)
+      user = await prisma.user.create({
+        data: {
+          id: clerkUser.id,
+          organization_id: randomUUID(),
+          email: clerkUser.emailAddresses[0]?.emailAddress || userEmail,
+          name: clerkUser.firstName,
+          image: clerkUser.imageUrl,
+        },
+      });
     }
 
     const { business_name, website_url, external_links } = await req.json();
@@ -34,7 +45,7 @@ export async function POST(req: Request) {
 
     const metadata = await prisma.metaData.create({
       data: {
-        user_email: (await getWorkspaceEmail(clerkUser) || ""),
+        user_email: userEmail,
         business_name,
         website_url,
         external_links: external_links ?? null,
@@ -52,7 +63,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: "Metadata stored successfully" + metadata },
+      { message: "Metadata stored successfully" },
       { status: 200 }
     );
   } catch (error) {

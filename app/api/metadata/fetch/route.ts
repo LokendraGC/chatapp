@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ exists: false, source: "none" }, { status: 200 });
     }
 
     const cookieStore = await cookies();
