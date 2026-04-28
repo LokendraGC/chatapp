@@ -90,7 +90,9 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const updateOrganizationData = (updates: Partial<OrganizationData>) => {
-    setOrganizationData((prev) => (prev ? { ...prev, ...updates } : updates as OrganizationData));
+    setOrganizationData((prev) =>
+      prev ? { ...prev, ...updates } : (updates as OrganizationData),
+    );
   };
 
   useEffect(() => {
@@ -257,7 +259,7 @@ export default function SettingsPage() {
       }
       toast.success("Workspace deleted permanently.");
       setIsDeleteDialogOpen(false);
-      
+
       // Sign the user out and redirect them to the home page since their data is gone
       await signOut();
       window.location.href = "/";
@@ -298,7 +300,9 @@ export default function SettingsPage() {
               </Label>
               <Input
                 value={organizationData?.business_name || ""}
-                onChange={(e) => updateOrganizationData({ business_name: e.target.value })}
+                onChange={(e) =>
+                  updateOrganizationData({ business_name: e.target.value })
+                }
                 placeholder="Enter workspace name"
                 className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
               />
@@ -308,7 +312,9 @@ export default function SettingsPage() {
               <Input
                 type="url"
                 value={organizationData?.website_url || ""}
-                onChange={(e) => updateOrganizationData({ website_url: e.target.value })}
+                onChange={(e) =>
+                  updateOrganizationData({ website_url: e.target.value })
+                }
                 placeholder="https://..."
                 className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground"
               />

@@ -10,7 +10,16 @@ import {
 } from "../../sheet";
 import { getTypeIcon, getStatusBadge } from "./KnowledgeSources";
 import { Button } from "../../button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../../alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../alert-dialog";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
@@ -31,7 +40,8 @@ export default function SourceDetailsPage({
   selectedSource,
   onDelete,
 }: SourceDetailsPageProps) {
-  const [isDeleteSourceDialogOpen, setIsDeleteSourceDialogOpen] = useState(false);
+  const [isDeleteSourceDialogOpen, setIsDeleteSourceDialogOpen] =
+    useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (!selectedSource) return null;
@@ -61,13 +71,14 @@ export default function SourceDetailsPage({
       setIsOpen(false);
       setIsDeleteSourceDialogOpen(false);
       toast.success(`"${selectedSource.name}" deleted successfully`);
-      
+
       // Refresh the sources list in parent component
       if (onDelete) {
         onDelete();
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to delete source";
+      const message =
+        error instanceof Error ? error.message : "Failed to delete source";
       console.error("Error deleting source:", error);
       toast.error(message);
     } finally {
@@ -113,7 +124,7 @@ export default function SourceDetailsPage({
                 onClick={handleDeleteSource}
                 variant="destructive"
                 disabled={isDeleting}
-                className="w-full bg-red-500/10 text-red-500 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-red-500/10 text-red-500 dark:text-white dark:border-red-500/20  hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDeleting ? (
                   <>
@@ -127,19 +138,21 @@ export default function SourceDetailsPage({
             </SheetFooter>
           </div>
         </SheetContent>
-
-
       </Sheet>
 
-
-      <AlertDialog open={isDeleteSourceDialogOpen} onOpenChange={setIsDeleteSourceDialogOpen}>
+      <AlertDialog
+        open={isDeleteSourceDialogOpen}
+        onOpenChange={setIsDeleteSourceDialogOpen}
+      >
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">
               Delete Source
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              Are you sure you want to delete "{selectedSource?.name}"? This action cannot be undone and will remove all associated routing rules.
+              Are you sure you want to delete "{selectedSource?.name}"? This
+              action cannot be undone and will remove all associated routing
+              rules.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -164,6 +177,5 @@ export default function SourceDetailsPage({
         </AlertDialogContent>
       </AlertDialog>
     </>
-
   );
 }
