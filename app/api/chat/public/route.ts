@@ -173,35 +173,35 @@ export async function POST(req: Request) {
             // IMPROVED: Better structured system prompt
             const systemPrompt = `You are a friendly AI assistant — talk like a helpful friend, not a formal support agent.
 
-            LANGUAGE RULE (MOST IMPORTANT):
-            - Detect the language of the user's message and reply in that EXACT same language.
-            - If user writes in Nepali (नेपाली), reply fully in Nepali.
-            - If user writes in English, reply in English.
-            - Never mix languages unless the user does.
+LANGUAGE RULE (MOST IMPORTANT):
+- Detect the language of the user's message and reply in that EXACT same language.
+- If user writes in Nepali (नेपाली), reply fully in Nepali.
+- If user writes in English, reply in English.
+- Never mix languages unless the user does.
 
-            PERSONALITY:
-            - Warm, casual, friendly — like texting a knowledgeable friend.
-            - Use natural conversational tone. No corporate speak.
-            - Short responses unless a detailed answer is truly needed.
-            - Never start with "Certainly!", "Sure!", "Of course!" or similar filler.
-            - Never dump all information at once — answer only what was asked.
+PERSONALITY:
+- Warm, casual, friendly — like texting a knowledgeable friend.
+- Use natural conversational tone. No corporate speak.
+- Short responses unless a detailed answer is truly needed.
+- Never start with "Certainly!", "Sure!", "Of course!" or similar filler.
+- Never dump all information at once — answer only what was asked.
 
-            FORMATTING (HTML only):
-            - Use <a href="URL" target="_blank" style="color:#3b82f6;text-decoration:underline;word-break:break-all;">Link Text</a> for all URLs.
-            - Use <ul><li>item</li></ul> for lists only when listing 3+ items.
-            - Use <br> for line breaks when needed.
-            - NO markdown — no **bold**, no [text](url), no ## headings.
-            - Keep responses short — 2-4 sentences max unless a list is needed.
+FORMATTING (HTML only):
+- Use <a href="URL" target="_blank" style="color:#ffffff;text-decoration:underline;word-break:break-all;">Link Text</a> for all URLs.
+- Use <ul><li>item</li></ul> for lists only when listing 3+ items.
+- Use <br> for line breaks when needed.
+- NO markdown — no **bold**, no [text](url), no ## headings.
+- Keep responses short — 2-4 sentences max unless a list is needed.
 
-            CONTEXT USAGE:
-            - Only use the CONTEXT below to answer questions about the company.
-            - Answer only what was asked — never volunteer extra info.
-            - If info is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
-            - If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
+CONTEXT USAGE:
+- Only use the CONTEXT below to answer questions about the company.
+- Answer only what was asked — never volunteer extra info.
+- If info is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
+- If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
 
-            CONTEXT:
-            ${context || "No context available."}
-            END CONTEXT`;
+CONTEXT:
+${context || "No context available."}
+END CONTEXT`;
 
 
             // IMPROVED: Better conversation history formatting
@@ -231,12 +231,21 @@ export async function POST(req: Request) {
 
                 let reply = completion.text?.trim() ?? "I apologize, but I couldn't generate a response. Please try again.";
 
-            reply = reply
-  .replace(/\*\*(.*?)\*\*/g, '$1')
-  .replace(/\*(.*?)\*/g, '$1')
-  .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" style="color:#3b82f6;text-decoration:underline;">$1</a>')
-  .replace(/#{1,6}\s/g, '')
-  .replace(/^\s*[-*]\s/gm, '- ');
+                // Safe Link Conversion & Hallucination Cleanup
+                reply = reply
+                    // Clean up potential AI hallucinations like ["](URL) inside href
+                    .replace(/href="([^"]+)\["\]\((https?:\/\/[^\s)]+)\)"/g, 'href="$1$2"')
+                    // Convert markdown links ONLY if they are not already part of an HTML link
+                    .replace(/<a[^>]*>.*?<\/a>|\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
+                        if (text && url) {
+                            return `<a href="${url}" target="_blank">${text}</a>`;
+                        }
+                        return match;
+                    })
+                    .replace(/\*\*(.*?)\*\*/g, '$1')
+                    .replace(/\*(.*?)\*/g, '$1')
+                    .replace(/#{1,6}\s/g, '')
+                    .replace(/^\s*[-*]\s/gm, '- ');
                 
                 // IMPROVED: Better incomplete response detection
                 if (reply && !reply.match(/[.!?]$/) && reply.length > 50) {

@@ -670,12 +670,18 @@ const EmbedPage = () => {
                           "max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm",
                           message.role === "user"
                             ? "bg-zinc-900 text-white rounded-tr-sm"
-                            : "bg-zinc-100 text-zinc-900 rounded-tl-sm",
+                            : "text-white rounded-tl-sm",
                         )}
+                        style={
+                          message.role !== "user"
+                            ? { backgroundColor: primaryColor }
+                            : {}
+                        }
                       >
-                        {message.role === "assistant"
-                          ? renderAssistantContent(message.content)
-                          : message.content}
+                        <div
+                          className="whitespace-pre-wrap chat-message"
+                          dangerouslySetInnerHTML={{ __html: message.content }}
+                        />
                       </div>
                       {message.role === "user" && (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 bg-zinc-100">

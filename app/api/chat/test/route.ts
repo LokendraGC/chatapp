@@ -75,44 +75,37 @@ export async function POST(req: Request) {
     }
   }
 
-  const systemPrompt = `You are an AI assistant and you are friendly and helpful, humanlike customer support specialist.
+  const systemPrompt = `You are a friendly AI assistant — talk like a helpful friend, not a formal support agent.
 
-CRITICAL RULES:
-If asked for your name, always respond with "I'm an AI assistant".
+LANGUAGE RULE (MOST IMPORTANT):
+- Detect the language of the user's message and reply in that EXACT same language.
+- If user writes in Nepali (नेपाली), reply fully in Nepali.
+- If user writes in English, reply in English.
+- Never mix languages unless the user does.
 
-If asked for your role, always respond with "I'm a customer support specialist."
+PERSONALITY:
+- Warm, casual, friendly — like texting a knowledgeable friend.
+- Use natural conversational tone. No corporate speak.
+- Short responses unless a detailed answer is truly needed.
+- Never start with "Certainly!", "Sure!", "Of course!" or similar filler.
+- Never dump all information at once — answer only what was asked.
 
-Keep answers CONCISE (2-4 sentences maximum) and conversational. Always provide complete, helpful answers. NEVER cut off your response mid-sentence - always complete your full thought.
+FORMATTING (HTML only):
+- Use <a href="URL" target="_blank" style="color:#ffffff;text-decoration:underline;word-break:break-all;">Link Text</a> for all URLs.
+- Use <ul><li>item</li></ul> for lists only when listing 3+ items.
+- Use <br> for line breaks when needed.
+- NO markdown — no **bold**, no [text](url), no ## headings.
+- Keep responses short — 2-4 sentences max unless a list is needed.
 
-KNOWLEDGE BASE USAGE:
-- The CONTEXT section below contains important information about the company, products, services, and policies.
-  - ALWAYS use information from the CONTEXT to answer user questions accurately.
-  - If the user asks about something mentioned in the CONTEXT, provide the relevant information from the CONTEXT.
-  - If asked about team members, staff, or the company team, look for a list of names and roles in the CONTEXT and provide them clearly.
-  - Only say you don't know if the information is truly not in the CONTEXT.
-  - When answering, reference specific details from the CONTEXT when relevant.
-  - ul li should used if necessary to represent the bullet points of any information.
-  - use link properly with href attribute if providing any urls in response.
-  - always give full answer not truncate the sentence or response.
-  - use html tags for formatting the response.
-  - use same language as user to respond. if user is in english then respond in english, if user is in nepali then respond in nepali.
+CONTEXT USAGE:
+- Only use the CONTEXT below to answer questions about the company.
+- Answer only what was asked — never volunteer extra info.
+- If info is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
+- If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
 
-If the user asks a broad question, DO NOT provide a summary. Instead, ask more specific questions to better understand their needs.
-
-Never dump information. Always conversationally guide the user to the specific topic.
-
-Mirror the user's communication style but ensure your responses are always complete and helpful.
-
-IMPORTANT: Always finish your sentences completely. Never cut off mid-sentence.
-
-ESCALATION PROTOCOL:
--If you simply DON'T KNOW THE ANSWER from the context (after carefully checking), or if the user indicates they're unhappy, ask: "Would you like me to create a support ticket for you?"
--If the user says yes, or gives permission to create a support ticket, your reply MUST be: "[ESCALATED] I have created a support ticket for you. Please wait for a response from our team.";
-
-CONTEXT (Use this information to answer questions):
+CONTEXT:
 ${context || "No context available."}
-
-`;
+END CONTEXT`;
 
   // Convert messages array to conversation history string
   const conversationHistory = messages
@@ -131,17 +124,30 @@ ${context || "No context available."}
       contents: fullPrompt,
       config: {
         temperature: 0.7,
-        maxOutputTokens: 1000,
+        maxOutputTokens: 2048,
       },
     });
     
     let reply = completion.text?.trim() ?? "I'm sorry, couldn't generate a response.";
     
+    // Safe Link Conversion & Hallucination Cleanup
+    reply = reply
+        // Clean up potential AI hallucinations like ["](URL) inside href
+        .replace(/href="([^"]+)\["\]\((https?:\/\/[^\s)]+)\)"/g, 'href="$1$2"')
+        // Convert markdown links ONLY if they are not already part of an HTML link
+        .replace(/<a[^>]*>.*?<\/a>|\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
+            if (text && url) {
+                return `<a href="${url}" target="_blank">${text}</a>`;
+            }
+            return match;
+        })
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/#{1,6}\s/g, '')
+        .replace(/^\s*[-*]\s/gm, '- ');
+
     // Ensure the response is complete - check if it ends with proper punctuation
-    // If it seems cut off, try to get more content
     if (reply && !reply.match(/[.!?]$/) && reply.length > 0) {
-      // Response might be incomplete, but we'll return what we have
-      // The increased token limit should prevent this
       console.warn("Response might be incomplete:", reply);
     }
     
