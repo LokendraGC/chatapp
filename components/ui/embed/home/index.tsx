@@ -37,6 +37,27 @@ const ChatbHome = ({ onShowAllQuestions, onContact, token }: ChatbHomeProps) => 
     const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     useEffect(() => {
+        // Try to load from cookie first for instant results
+        const getCookie = (name: string) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop()?.split(";").shift();
+            return null;
+        };
+
+        const cached = getCookie("domain_faqs");
+        if (cached) {
+            try {
+                const parsed = JSON.parse(decodeURIComponent(cached));
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setQuestions(parsed.slice(0, 3));
+                    // We still fetch in background to sync, but user sees cached immediately
+                }
+            } catch (e) {
+                console.error("Failed to parse FAQ cookie:", e);
+            }
+        }
+
         const domain = window.location.hostname;
         const url = `/api/faq/fetch?domain=${encodeURIComponent(domain)}${token ? `&token=${encodeURIComponent(token)}` : ""}`;
         fetch(url)

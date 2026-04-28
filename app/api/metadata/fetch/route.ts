@@ -46,7 +46,11 @@ export async function GET(req: Request) {
     if (metadata) {
       cookieStore.set(
         "metadata",
-        JSON.stringify({ business_name: metadata.business_name }),
+        JSON.stringify({ 
+          business_name: metadata.business_name,
+          website_url: metadata.website_url,
+          external_links: metadata.external_links
+        }),
         {
           httpOnly: true,
           sameSite: "lax",
