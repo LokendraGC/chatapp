@@ -7,7 +7,7 @@ import { ThemeProvider } from "next-themes";
 import DashboardHeader from "@/components/ui/dashboard/header";
 
 export const metadata = {
-  title: "Sahayak chat app",
+  title: "Karmi chat app",
   description: "A chatbot to help you with your support needs.",
 };
 
@@ -16,24 +16,41 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   const clerkUser = await currentUser();
   const cookieStore = await cookies();
   const metaDataCookie = cookieStore.get("metadata");
 
-  let metadata: { business_name?: string; website_url?: string; external_links?: string } | null = null;
-  let userEmail: string | null = clerkUser?.emailAddresses?.[0]?.emailAddress ?? null;
+  let metadata: {
+    business_name?: string;
+    website_url?: string;
+    external_links?: string;
+  } | null = null;
+  let userEmail: string | null =
+    clerkUser?.emailAddresses?.[0]?.emailAddress ?? null;
 
   if (clerkUser && userEmail) {
     if (metaDataCookie?.value) {
       try {
-        const cookieData = JSON.parse(metaDataCookie.value) as { business_name?: string; website_url?: string; external_links?: string | null };
-        metadata = { business_name: cookieData.business_name, website_url: cookieData.website_url, external_links: cookieData.external_links ?? undefined };
+        const cookieData = JSON.parse(metaDataCookie.value) as {
+          business_name?: string;
+          website_url?: string;
+          external_links?: string | null;
+        };
+        metadata = {
+          business_name: cookieData.business_name,
+          website_url: cookieData.website_url,
+          external_links: cookieData.external_links ?? undefined,
+        };
         if (cookieData.business_name && !cookieData.website_url) {
           const [fullMetadata] = await prisma.metaData.findMany({
             where: { user_email: userEmail },
           });
-          if (fullMetadata) metadata = { business_name: fullMetadata.business_name, website_url: fullMetadata.website_url, external_links: fullMetadata.external_links ?? undefined };
+          if (fullMetadata)
+            metadata = {
+              business_name: fullMetadata.business_name,
+              website_url: fullMetadata.website_url,
+              external_links: fullMetadata.external_links ?? undefined,
+            };
         }
       } catch (error) {
         console.error("Error parsing metadata:", error);
@@ -43,7 +60,12 @@ export default async function DashboardLayout({
       const [dbMetadata] = await prisma.metaData.findMany({
         where: { user_email: userEmail },
       });
-      if (dbMetadata) metadata = { business_name: dbMetadata.business_name, website_url: dbMetadata.website_url, external_links: dbMetadata.external_links ?? undefined };
+      if (dbMetadata)
+        metadata = {
+          business_name: dbMetadata.business_name,
+          website_url: dbMetadata.website_url,
+          external_links: dbMetadata.external_links ?? undefined,
+        };
     }
   }
 
@@ -56,7 +78,10 @@ export default async function DashboardLayout({
       enableSystem
       disableTransitionOnChange
     >
-      <div suppressHydrationWarning className="bg-background text-foreground min-h-screen flex flex-col p-0 antialiased selection:bg-zinc-800 font-sans">
+      <div
+        suppressHydrationWarning
+        className="bg-background text-foreground min-h-screen flex flex-col p-0 antialiased selection:bg-zinc-800 font-sans"
+      >
         {showSidebar ? (
           <>
             <Sidebar metadata={metadata} email={userEmail} />

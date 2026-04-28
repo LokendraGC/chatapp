@@ -58,7 +58,7 @@ const Integration = () => {
             <div className="p-6 bg-[#0a0a0e]">
               <div className="font-mono text-sm text-zinc-400 leading-relaxed space-y-1">
                 <div className="text-zinc-500">
-                  &lt;!-- Sahayak Chatbot --&gt;
+                  &lt;!-- Karmi Chatbot --&gt;
                 </div>
                 <div>
                   &lt;<span className="text-pink-400">script</span>&gt;

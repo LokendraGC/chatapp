@@ -78,7 +78,7 @@ export default function DashboardHeader({
                   <div className="w-2.5 h-2.5 bg-sidebar rounded-[1px]" />
                 </div>
                 <span className="text-sm font-medium tracking-tight text-sidebar-foreground">
-                  Sahayak
+                  Karmi AI Chatbot
                 </span>
               </Link>
             </div>

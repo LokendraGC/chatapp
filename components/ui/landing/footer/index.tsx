@@ -6,7 +6,7 @@ export const Footer = () => {
       <div className="w-full px-6 pt-16 pb-6">
         <div className="flex items-center justify-center">
           <span className="text-center text-[clamp(3rem,14vw,16rem)] font-extrabold tracking-tight text-white/10 select-none">
-            Sahayak
+            Karmi
           </span>
         </div>
       </div>
@@ -19,7 +19,7 @@ export const Footer = () => {
               <div className="w-2.5 h-2.5 bg-black rounded-[1px]"></div>
             </div>
             <span className="text-base font-semibold tracking-tight text-white/90">
-              Sahayak
+              Karmi
             </span>
           </Link>
         </div>
@@ -37,7 +37,7 @@ export const Footer = () => {
         {/* Right: Copyright */}
         <div className="flex items-center">
           <p className="text-sm text-zinc-500">
-            &copy; {new Date().getFullYear()} Sahayak. All rights reserved.
+            &copy; {new Date().getFullYear()} Karmi. All rights reserved.
           </p>
         </div>
       </div>

@@ -60,7 +60,7 @@ export async function GET(req: Request) {
       }
     );
   } catch (error) {
-    console.error("[Sahayak] Error getting widget config:", error);
+    console.error("[Karmi] Error getting widget config:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
     });

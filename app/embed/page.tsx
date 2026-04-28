@@ -787,7 +787,7 @@ const EmbedPage = () => {
               href={"/"}
               className="text-[12px] text-zinc-600 font-medium hover:text-zinc-500 transition-colors"
             >
-              Powered by Sahayak
+              Powered by Karmi AI
             </Link>
           </div>
         </div>

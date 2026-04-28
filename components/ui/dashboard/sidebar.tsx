@@ -71,8 +71,11 @@ export default function Sidebar({ metadata, email }: SidebarProps) {
           <div className="w-8 h-8 bg-sidebar-foreground rounded-sm flex items-center justify-center">
             <div className="w-2.5 h-2.5 bg-sidebar rounded-[1px]" />
           </div>
-          <Link href={'/'} className="text-sm font-medium tracking-tight text-sidebar-foreground">
-            Sahayak
+          <Link
+            href={"/"}
+            className="text-sm font-medium tracking-tight text-sidebar-foreground"
+          >
+            Karmi
           </Link>
         </div>
       </div>
@@ -88,7 +91,7 @@ export default function Sidebar({ metadata, email }: SidebarProps) {
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
               )}
             >
               <item.icon className="w-4 h-4 shrink-0" />
@@ -99,8 +102,6 @@ export default function Sidebar({ metadata, email }: SidebarProps) {
           );
         })}
       </nav>
-
-    
     </aside>
   );
 }
