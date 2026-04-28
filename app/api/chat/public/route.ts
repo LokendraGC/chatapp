@@ -26,13 +26,11 @@ export async function POST(req: Request) {
             }),
         });
 
-
         let sessionID: string | undefined;
         let widgetId: string | undefined;
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-        // Make sure JWT_SECRET is set
         if (!process.env.JWT_SECRET) {
             console.error("JWT_SECRET is not set in environment variables");
             return NextResponse.json(
@@ -44,10 +42,8 @@ export async function POST(req: Request) {
         try {
             const { payload } = await jwtVerify(token, secret);
             sessionID = payload.sessionID as string;
-            // Fix: Use widgedId (with typo) to match what's stored in JWT
             widgetId = payload.widgedId as string;
 
-            // Add debugging logs
             console.log("JWT payload:", payload);
             console.log("sessionID from token:", sessionID);
             console.log("widgetId from token:", widgetId);
@@ -67,10 +63,8 @@ export async function POST(req: Request) {
             );
         }
 
-        // Parse request body
         let { messages, knowledge_source_ids } = await req.json();
 
-        // Add debugging log
         console.log("Request body parsed:", { messages, knowledge_source_ids });
 
         const lastMessage = messages[messages.length - 1];
@@ -158,15 +152,16 @@ export async function POST(req: Request) {
                 }
             }
 
-            // Cap context size so Gemini input (and cost) stays bounded
-            context = trimContextByChars(context, 6000);
+            // IMPROVED: Increase context size limit to preserve more information
+            context = trimContextByChars(context, 12000); // Increased from 6000
 
             // Token counting and message summarization
             const tokenCount = await countConversationTokens(messages, context);
 
-            if (tokenCount > 6000) {
-                const recentMessages = messages.slice(-10);
-                const oldestMessage = messages.slice(0, -10);
+            // IMPROVED: Higher threshold before summarizing
+            if (tokenCount > 12000) {
+                const recentMessages = messages.slice(-15); // Keep more recent messages
+                const oldestMessage = messages.slice(0, -15);
                 if (oldestMessage.length > 0) {
                     const oldestMessageString = oldestMessage.map((m: any) => `${m.role}: ${m.content}`).join("\n\n");
                     const summary = await summarizeMarkdown(oldestMessageString);
@@ -175,56 +170,55 @@ export async function POST(req: Request) {
                 }
             }
 
+            // IMPROVED: Better structured system prompt
+            const systemPrompt = `You are a friendly, helpful AI customer support assistant for Indaram Health Clinic.
 
-            const systemPrompt = `You are an AI assistant and you are friendly and helpful, humanlike customer support specialist.
+RESPONSE GUIDELINES:
+- Provide complete, thorough answers - NEVER cut off mid-sentence
+- Be conversational and natural in your tone
+- Give specific, accurate information from the CONTEXT below
+- If multiple pieces of information are relevant, share them all
+- Use bullet points with "-" when listing multiple items
 
-            CRITICAL RULES:
-            If asked for your name, always respond with "I'm an AI assistant".
-            
-            If asked for your role, always respond with "I'm a customer support specialist."
-            
-            Keep answers CONCISE (2-4 sentences maximum) and conversational. Always provide complete, helpful answers. NEVER cut off your response mid-sentence - always complete your full thought.
+CONTEXT USAGE - CRITICAL:
+The CONTEXT section below contains the company's information. This is your PRIMARY source of truth.
+- When asked about location, address, phone, email, services, doctors, or any company details, extract the EXACT information from the CONTEXT
+- If the user asks "where are you located" or "what's your address", look for address, location, or contact information in the CONTEXT
+- ALWAYS check the CONTEXT thoroughly before saying you don't know
+- Reference specific details from CONTEXT in your answers
+- If team members or staff are listed in CONTEXT, provide their names and roles when asked
 
-            FORMATTING GUIDANCE:
-            - If the user asks for recommendations, resources, steps, or options, answer with a short BULLETED list.
-            - Only include URLs that appear in the CONTEXT. Do NOT invent links.
-            - Use "-" for bullet points when listing items.
-            
-            KNOWLEDGE BASE USAGE:
-            - The CONTEXT section below contains important information about the company, products, services, and policies.
-            - ALWAYS use information from the CONTEXT to answer user questions accurately.
-            - If the user asks about something mentioned in the CONTEXT, provide the relevant information from the CONTEXT.
-            - If asked about team members, staff, or the company team, look for a list of names and roles in the CONTEXT and provide them clearly.
-            - Only say you don't know if the information is truly not in the CONTEXT.
-            - When answering, reference specific details from the CONTEXT when relevant.
-            
-            If the user asks a broad question, DO NOT provide a summary. Instead, ask more specific questions to better understand their needs.
-            
-            Never dump information. Always conversationally guide the user to the specific topic.
-            
-            Mirror the user's communication style but ensure your responses are always complete and helpful.
-            
-            IMPORTANT: Always finish your sentences completely. Never cut off mid-sentence.
-            
-            ESCALATION PROTOCOL:
-            -If you simply DON'T KNOW THE ANSWER from the context (after carefully checking), or if the user indicates they're unhappy, ask: "Would you like me to create a support ticket for you?"
-            -If the user says yes, or gives permission to create a support ticket, your reply MUST be: "[ESCALATED] I have created a support ticket for you. Please wait for a response from our team.";
-            
-            CONTEXT (Use this information to answer questions):
-            ${context || "No context available."}
-            
-            `;
+FORMATTING:
+- Use bullet points when listing services, features, or multiple items
+- Include URLs that appear in the CONTEXT using proper markdown links
+- Keep responses clear and well-organized
 
-            // Convert messages array to conversation history string
+IMPORTANT: 
+- Complete every sentence fully with proper punctuation
+- Never end responses abruptly or mid-thought
+- If you're unsure, say so clearly, but always check CONTEXT first
+
+ESCALATION:
+- If information is truly not in CONTEXT and you cannot help, ask: "Would you like me to create a support ticket for you?"
+- If user agrees to escalation, respond with: "[ESCALATED] I have created a support ticket for you. Our team will respond soon."
+
+=== CONTEXT (Your primary information source) ===
+${context || "No context available."}
+=== END CONTEXT ===
+`;
+
+            // IMPROVED: Better conversation history formatting
             const conversationHistory = messages
                 .map((msg: { role: string; content: string }) => {
-                    const roleLabel = msg.role === "user" ? "User" : "Assistant";
-                    return `${roleLabel}: ${msg.content}`;
+                    return `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`;
                 })
                 .join("\n\n");
 
-            // Build the full prompt with conversation history
-            const fullPrompt = `${systemPrompt}${conversationHistory ? `\n\nCONVERSATION HISTORY:\n${conversationHistory}\n\nAssistant:` : ""}`;
+            // Build the prompt with clear structure
+            const fullPrompt = `${systemPrompt}\n\n=== CONVERSATION HISTORY ===\n${conversationHistory}\n\nAssistant: `;
+
+            console.log("Context length:", context.length);
+            console.log("Full prompt length:", fullPrompt.length);
 
             try {
                 const completion = await ai.models.generateContent({
@@ -232,19 +226,27 @@ export async function POST(req: Request) {
                     contents: fullPrompt,
                     config: {
                         temperature: 0.7,
-                        maxOutputTokens: 1000, // Increased from 200 to allow complete responses
+                        maxOutputTokens: 2048, // INCREASED from 1000 to allow complete responses
+                        topP: 0.95,
+                        topK: 40,
                     },
                 });
 
-                let reply = completion.text?.trim() ?? "I'm sorry, I couldn't generate a response. Please try again.";
+                let reply = completion.text?.trim() ?? "I apologize, but I couldn't generate a response. Please try again.";
 
-                if (reply && !reply.match(/[.!?]$/) && reply.length > 0) {
-                    console.warn("Response might be incomplete:", reply);
+                // IMPROVED: Better incomplete response detection
+                if (reply && !reply.match(/[.!?]$/) && reply.length > 50) {
+                    console.warn("Response appears incomplete (no ending punctuation):", reply);
+                    // Try to append an ellipsis to show truncation
+                    reply += "...";
                 }
 
+                // Check if response is suspiciously short for a complex query
+                if (lastMessage.content.length > 50 && reply.length < 30) {
+                    console.warn("Response might be too short for query length");
+                }
 
                 try {
-
                     await prisma.message.create({
                         data: {
                             conversation_id: sessionID,
