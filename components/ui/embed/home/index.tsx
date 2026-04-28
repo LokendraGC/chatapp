@@ -34,7 +34,7 @@ interface ChatbHomeProps {
 
 const ChatbHome = ({ onShowAllQuestions, onContact }: ChatbHomeProps) => {
     const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
     useEffect(() => {
         fetch("/api/faq/fetch")
             .then((res) => (res.ok ? res.json() : null))

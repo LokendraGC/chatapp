@@ -191,36 +191,38 @@ const EmbedPage = () => {
   }, []);
 
   useEffect(() => {
-    // i have facing issue when i click on bot it is opening chat window but not scrolling to middle of the chat window please fix this issue
-    const scrollToBottom = () => {
-      if (scrollContainerRef.current) {
-        // Find the ScrollArea viewport
-        const scrollArea = scrollContainerRef.current.querySelector(
-          '[data-slot="scroll-area"]',
-        );
-        const viewport = scrollArea?.querySelector(
-          '[data-slot="scroll-area-viewport"]',
-        ) as HTMLElement;
+    if (scrollContainerRef.current) {
+      const scrollArea = scrollContainerRef.current.querySelector(
+        '[data-slot="scroll-area"]',
+      );
+      const viewport = scrollArea?.querySelector(
+        '[data-slot="scroll-area-viewport"]',
+      ) as HTMLElement;
 
-        if (viewport) {
-          // Use multiple attempts to ensure scrolling works
+      if (viewport) {
+        if (showChat) {
+          // In chat mode, scroll to bottom to show latest messages
           const attemptScroll = () => {
             viewport.scrollTop = viewport.scrollHeight;
           };
-
-          // Immediate attempt
           attemptScroll();
-
-          // Delayed attempts to handle async rendering
           requestAnimationFrame(attemptScroll);
           setTimeout(attemptScroll, 50);
           setTimeout(attemptScroll, 150);
+        } else {
+          // In tab mode (home/contact/help), always show from the top
+          const scrollToTop = () => {
+            viewport.scrollTop = 0;
+          };
+          scrollToTop();
+          requestAnimationFrame(scrollToTop);
+          setTimeout(scrollToTop, 50);
+          setTimeout(scrollToTop, 150);
+          setTimeout(scrollToTop, 300);
         }
       }
-    };
-
-    scrollToBottom();
-  }, [messages, isTyping, isOpen]);
+    }
+  }, [messages, isTyping, isOpen, showChat, activeTab]);
 
   const handleSend = async () => {
     if (!input.trim()) {
