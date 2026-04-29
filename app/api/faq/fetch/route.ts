@@ -26,11 +26,22 @@ export async function GET(req: Request) {
       try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
         const { payload } = await jwtVerify(token, secret);
-        if (payload && payload.ownerEmail) {
+        if (payload?.ownerEmail) {
           user_email = payload.ownerEmail as string;
         }
       } catch (e) {
-        console.error("Token verification failed:", e);
+        // Token is a plain widget ID, not a JWT — look up owner from DB
+        try {
+          const bot = await prisma.chatBotMetadata.findUnique({
+            where: { id: token },
+            select: { user_email: true },
+          });
+          if (bot?.user_email) {
+            user_email = bot.user_email;
+          }
+        } catch (dbErr) {
+          console.error("Widget ID lookup failed:", dbErr);
+        }
       }
     }
     // IMPORTANT: If we can't identify the user/owner, don't query the DB
@@ -39,11 +50,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ faqs: FALLBACK_FAQS }, { status: 200 });
     }
     const faqs = await prisma.faq.findMany({
-      where: {
-        user_email: user_email, // Removed '|| undefined' for security
-        ...(domain ? { domain: { contains: domain } } : {}),
-      },
-      orderBy: [{ sort_order: "asc" }, { created_at: "desc" }],
+      where: { user_email },
+      orderBy: [{ sort_order: "asc" }],
     });
     return NextResponse.json({ 
       faqs: faqs.length > 0 ? faqs : FALLBACK_FAQS 

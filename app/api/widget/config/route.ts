@@ -47,10 +47,19 @@ export async function GET(req: Request) {
       },
     });
 
+    // Get website_url from MetaData table for domain filtering in frontend
+    const siteMetadata = await prisma.metaData.findUnique({
+      where: { user_email: ownerEmail },
+      select: { website_url: true },
+    });
+
     return new Response(
       JSON.stringify({
-        metadata,
-        sections, // Changed from userSections to sections
+        metadata: {
+          ...metadata,
+          website_url: siteMetadata?.website_url || "",
+        },
+        sections,
       }),
       {
         status: 200,

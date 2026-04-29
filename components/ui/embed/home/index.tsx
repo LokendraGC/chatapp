@@ -42,43 +42,26 @@ const ChatbHome = ({
 
   useEffect(() => {
     const fetchFaqs = async () => {
+      if (!token) return;
       try {
-        // Get domain from widget config using token
-        let domain = "";
-        if (token) {
-          const configRes = await fetch(`/api/widget/config?token=${token}`);
-          if (configRes.ok) {
-            const config = await configRes.json();
-            domain =
-              config.metadata?.domain || config.metadata?.website_url || "";
-            // Strip protocol if present: https://clinic.com → clinic.com
-            domain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
-          }
-        }
-
-        const url = `/api/faq/fetch${domain ? `?domain=${encodeURIComponent(domain)}` : ""}`;
-        const res = await fetch(url);
+        const res = await fetch(
+          `/api/faq/fetch?token=${encodeURIComponent(token)}`,
+        );
         if (!res.ok) return;
         const data = await res.json();
-
         const normalized = (data.faqs as any[])
           .map((item) => ({
             question: String(item?.question ?? ""),
             answer: String(item?.answer ?? ""),
           }))
           .filter((item) => item.question && item.answer);
-
-        if (normalized.length > 0) {
-          setQuestions(normalized.slice(0, 3));
-        }
+        if (normalized.length > 0) setQuestions(normalized.slice(0, 3));
       } catch (e) {
         console.error("Failed to fetch FAQs:", e);
       }
     };
-
     fetchFaqs();
   }, [token]);
-
   return (
     <div className="space-y-4">
       <div className="space-y-3 rounded-2xl bg-[radial-gradient(80%_100%_at_0%_0%,rgba(59,130,246,0.16),rgba(255,255,255,0.9))] p-4">
