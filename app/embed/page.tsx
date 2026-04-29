@@ -544,7 +544,7 @@ const EmbedPage = () => {
                     token={token}
                   />
                 )}
-                {activeTab === "help" && <Help />}
+                {activeTab === "help" && <Help token={token} />}
                 {activeTab === "contact" && (
                   <div className="space-y-4">
                     <div className="text-sm font-medium text-zinc-900">

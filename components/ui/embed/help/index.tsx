@@ -10,6 +10,7 @@ import {
 
 interface HelpProps {
   onWriteMessage?: () => void;
+  token?: string | null;
 }
 
 type FaqItem = { question: string; answer: string };
@@ -30,31 +31,48 @@ const fallbackQuestions: FaqItem[] = [
   },
 ];
 
-const Help = ({ onWriteMessage }: HelpProps) => {
+const Help = ({ onWriteMessage, token }: HelpProps) => {
   const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+
   useEffect(() => {
-    fetch("/api/faq/fetch")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!data?.faqs) return;
-        const normalized = (data.faqs as any[]).map((item) => ({
-          question: String(item?.question ?? ""),
-          answer: String(item?.answer ?? ""),
-        }));
-        const filtered = normalized.filter(
-          (item) => item.question && item.answer,
-        );
-        if (filtered.length > 0) {
-          setQuestions(filtered as FaqItem[]);
+    const fetchFaqs = async () => {
+      try {
+        let domain = "";
+        if (token) {
+          const configRes = await fetch(`/api/widget/config?token=${token}`);
+          if (configRes.ok) {
+            const config = await configRes.json();
+            domain =
+              config.metadata?.domain || config.metadata?.website_url || "";
+            domain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+          }
         }
-      })
-      .catch(() => undefined);
-  }, []);
+
+        const url = `/api/faq/fetch${domain ? `?domain=${encodeURIComponent(domain)}` : ""}`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const normalized = (data.faqs as any[])
+          .map((item) => ({
+            question: String(item?.question ?? ""),
+            answer: String(item?.answer ?? ""),
+          }))
+          .filter((item) => item.question && item.answer);
+
+        if (normalized.length > 0) setQuestions(normalized);
+      } catch (e) {
+        console.error("Failed to fetch FAQs:", e);
+      }
+    };
+
+    fetchFaqs();
+  }, [token]);
 
   return (
     <div className="space-y-3">

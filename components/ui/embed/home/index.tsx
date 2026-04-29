@@ -39,47 +39,45 @@ const ChatbHome = ({
 }: ChatbHomeProps) => {
   const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  useEffect(() => {
-    // Try to load from cookie first for instant results
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(";").shift();
-      return null;
-    };
 
-    const cached = getCookie("domain_faqs");
-    if (cached) {
+  useEffect(() => {
+    const fetchFaqs = async () => {
       try {
-        const parsed = JSON.parse(decodeURIComponent(cached));
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setQuestions(parsed.slice(0, 3));
-          // We still fetch in background to sync, but user sees cached immediately
+        // Get domain from widget config using token
+        let domain = "";
+        if (token) {
+          const configRes = await fetch(`/api/widget/config?token=${token}`);
+          if (configRes.ok) {
+            const config = await configRes.json();
+            domain =
+              config.metadata?.domain || config.metadata?.website_url || "";
+            // Strip protocol if present: https://clinic.com → clinic.com
+            domain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+          }
+        }
+
+        const url = `/api/faq/fetch${domain ? `?domain=${encodeURIComponent(domain)}` : ""}`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const normalized = (data.faqs as any[])
+          .map((item) => ({
+            question: String(item?.question ?? ""),
+            answer: String(item?.answer ?? ""),
+          }))
+          .filter((item) => item.question && item.answer);
+
+        if (normalized.length > 0) {
+          setQuestions(normalized.slice(0, 3));
         }
       } catch (e) {
-        console.error("Failed to parse FAQ cookie:", e);
+        console.error("Failed to fetch FAQs:", e);
       }
-    }
+    };
 
-    const domain = window.location.hostname;
-    const url = `/api/faq/fetch?domain=${encodeURIComponent(domain)}${token ? `&token=${encodeURIComponent(token)}` : ""}`;
-    fetch(url)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!data?.faqs) return;
-        const normalized = (data.faqs as any[]).map((item) => ({
-          question: String(item?.question ?? ""),
-          answer: String(item?.answer ?? ""),
-        }));
-        const filtered = normalized.filter(
-          (item) => item.question && item.answer,
-        );
-        if (filtered.length > 0) {
-          setQuestions(filtered.slice(0, 3));
-        }
-      })
-      .catch(() => undefined);
-  }, []);
+    fetchFaqs();
+  }, [token]);
 
   return (
     <div className="space-y-4">
