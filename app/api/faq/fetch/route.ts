@@ -1,9 +1,7 @@
-import { getWorkspaceEmail } from "@/lib/workspace";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
 
 const FALLBACK_FAQS = [
   { question: "How can I contact support?", answer: "You can reach us via the contact tab or send us a message here." },
@@ -15,14 +13,12 @@ export async function GET(req: Request) {
   try {
     const clerkUser = await currentUser();
     const { searchParams } = new URL(req.url);
-    const domain = searchParams.get("domain");
     const token = searchParams.get("token");
     let user_email = "";
-    
+
     if (clerkUser) {
       user_email = clerkUser.emailAddresses[0].emailAddress ?? "";
-    } 
-    else if (token) {
+    } else if (token) {
       try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
         const { payload } = await jwtVerify(token, secret);
@@ -30,32 +26,31 @@ export async function GET(req: Request) {
           user_email = payload.ownerEmail as string;
         }
       } catch (e) {
-        // Token is a plain widget ID, not a JWT — look up owner from DB
         try {
           const bot = await prisma.chatBotMetadata.findUnique({
             where: { id: token },
             select: { user_email: true },
           });
-          if (bot?.user_email) {
-            user_email = bot.user_email;
-          }
+          if (bot?.user_email) user_email = bot.user_email;
         } catch (dbErr) {
           console.error("Widget ID lookup failed:", dbErr);
         }
       }
     }
-    // IMPORTANT: If we can't identify the user/owner, don't query the DB
-    // This prevents one user from seeing another user's FAQs
+
     if (!user_email) {
       return NextResponse.json({ faqs: FALLBACK_FAQS }, { status: 200 });
     }
+
     const faqs = await prisma.faq.findMany({
       where: { user_email },
       orderBy: [{ sort_order: "asc" }],
     });
-    return NextResponse.json({ 
-      faqs: faqs.length > 0 ? faqs : FALLBACK_FAQS 
+
+    return NextResponse.json({
+      faqs: faqs.length > 0 ? faqs : FALLBACK_FAQS,
     }, { status: 200 });
+
   } catch (error) {
     console.error("Error fetching FAQs:", error);
     return NextResponse.json({ faqs: FALLBACK_FAQS });

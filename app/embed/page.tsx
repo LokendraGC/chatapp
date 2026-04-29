@@ -36,6 +36,7 @@ interface ChatBotMetaData {
   id: string;
   color: string;
   welcome_message: string;
+  website_url?: string;
 }
 
 interface Section {
@@ -181,14 +182,18 @@ const EmbedPage = () => {
   }, [token]);
 
   useEffect(() => {
-    fetch("/api/contact/fetch")
+    if (!token) return;
+    const domain = metaData?.website_url || "";
+    const url = `/api/contact/fetch?token=${encodeURIComponent(token)}&domain=${encodeURIComponent(domain)}`;
+
+    fetch(url)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data?.contact) return;
         setContactInfo(data.contact as ContactInfo);
       })
       .catch(() => undefined);
-  }, []);
+  }, [token, metaData?.website_url]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -542,9 +547,12 @@ const EmbedPage = () => {
                     onShowAllQuestions={() => handleTabChange("help")}
                     onContact={() => handleTabChange("contact")}
                     token={token}
+                    domain={metaData?.website_url || ""}
                   />
                 )}
-                {activeTab === "help" && <Help token={token} />}
+                {activeTab === "help" && (
+                  <Help token={token} domain={metaData?.website_url || ""} />
+                )}
                 {activeTab === "contact" && (
                   <div className="space-y-4">
                     <div className="text-sm font-medium text-zinc-900">

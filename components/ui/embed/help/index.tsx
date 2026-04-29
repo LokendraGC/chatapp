@@ -11,6 +11,7 @@ import {
 interface HelpProps {
   onWriteMessage?: () => void;
   token?: string | null;
+  domain?: string;
 }
 
 type FaqItem = { question: string; answer: string };
@@ -31,7 +32,7 @@ const fallbackQuestions: FaqItem[] = [
   },
 ];
 
-const Help = ({ onWriteMessage, token }: HelpProps) => {
+const Help = ({ onWriteMessage, token, domain }: HelpProps) => {
   const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [showForm, setShowForm] = useState(false);
@@ -43,9 +44,8 @@ const Help = ({ onWriteMessage, token }: HelpProps) => {
     const fetchFaqs = async () => {
       if (!token) return;
       try {
-        const res = await fetch(
-          `/api/faq/fetch?token=${encodeURIComponent(token)}`,
-        );
+        const url = `/api/faq/fetch?token=${encodeURIComponent(token)}${domain ? `&domain=${encodeURIComponent(domain)}` : ""}`;
+        const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
         const normalized = (data.faqs as any[])
@@ -60,7 +60,7 @@ const Help = ({ onWriteMessage, token }: HelpProps) => {
       }
     };
     fetchFaqs();
-  }, [token]);
+  }, [token, domain]);
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-sm font-medium text-zinc-900">

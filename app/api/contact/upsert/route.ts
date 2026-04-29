@@ -18,12 +18,14 @@ export async function PUT(req: Request) {
       email,
       phone,
       social_media,
+      domain,
     } = body ?? {};
 
     const userEmail = (await getWorkspaceEmail(clerkUser) || "") ?? "";
     const existing = await prisma.contact.findFirst({
       where: {
         user_email: userEmail,
+        domain: domain || "",
       },
     });
 
@@ -39,6 +41,7 @@ export async function PUT(req: Request) {
             url: typeof item?.url === "string" ? item.url : "",
           }))
         : [],
+      domain: domain || "",
     };
 
     const contact = existing

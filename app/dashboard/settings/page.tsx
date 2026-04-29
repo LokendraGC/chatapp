@@ -88,12 +88,28 @@ export default function SettingsPage() {
   const [isContactLoading, setIsContactLoading] = useState(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [domain, setDomain] = useState("");
 
   const updateOrganizationData = (updates: Partial<OrganizationData>) => {
     setOrganizationData((prev) =>
       prev ? { ...prev, ...updates } : (updates as OrganizationData),
     );
   };
+
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const res = await fetch("/api/metadata/fetch");
+        const json = await res.json();
+        if (json.exists && json.data?.website_url) {
+          setDomain(json.data.website_url);
+        }
+      } catch (e) {
+        console.error("Error fetching metadata:", e);
+      }
+    };
+    fetchMetadata();
+  }, []);
 
   useEffect(() => {
     const fetchOrganizationData = async () => {
@@ -108,7 +124,10 @@ export default function SettingsPage() {
     const fetchContactData = async () => {
       try {
         setIsContactLoading(true);
-        const response = await fetch("/api/contact/fetch");
+        const url = domain 
+          ? `/api/contact/fetch?domain=${encodeURIComponent(domain)}`
+          : "/api/contact/fetch";
+        const response = await fetch(url);
         const data = await response.json();
         if (data?.contact) {
           const social =
@@ -133,7 +152,7 @@ export default function SettingsPage() {
       }
     };
     fetchContactData();
-  }, []);
+  }, [domain]);
 
   const updateContactForm = (updates: Partial<ContactData>) => {
     setContactForm((prev) => ({ ...prev, ...updates }));
@@ -195,6 +214,7 @@ export default function SettingsPage() {
             platform,
             url,
           })),
+          domain: domain,
         }),
       });
       if (!response.ok) throw new Error("Failed to save contact info");

@@ -30,12 +30,14 @@ interface ChatbHomeProps {
   onShowAllQuestions?: () => void;
   onContact?: () => void;
   token?: string | null;
+  domain?: string;
 }
 
 const ChatbHome = ({
   onShowAllQuestions,
   onContact,
   token,
+  domain,
 }: ChatbHomeProps) => {
   const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -44,9 +46,8 @@ const ChatbHome = ({
     const fetchFaqs = async () => {
       if (!token) return;
       try {
-        const res = await fetch(
-          `/api/faq/fetch?token=${encodeURIComponent(token)}`,
-        );
+        const url = `/api/faq/fetch?token=${encodeURIComponent(token)}${domain ? `&domain=${encodeURIComponent(domain)}` : ""}`;
+        const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
         const normalized = (data.faqs as any[])
@@ -61,7 +62,7 @@ const ChatbHome = ({
       }
     };
     fetchFaqs();
-  }, [token]);
+  }, [token, domain]);
   return (
     <div className="space-y-4">
       <div className="space-y-3 rounded-2xl bg-[radial-gradient(80%_100%_at_0%_0%,rgba(59,130,246,0.16),rgba(255,255,255,0.9))] p-4">
