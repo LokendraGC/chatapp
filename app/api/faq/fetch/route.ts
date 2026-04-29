@@ -17,14 +17,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const domain = searchParams.get("domain");
     const token = searchParams.get("token");
-
     let user_email = "";
     
-    // If authenticated (dashboard), use the workspace email
     if (clerkUser) {
-      user_email = (await getWorkspaceEmail(clerkUser)) || "";
+      user_email = clerkUser.emailAddresses[0].emailAddress ?? "";
     } 
-    // If token provided (widget), decode it to get the owner's email
     else if (token) {
       try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -33,27 +30,26 @@ export async function GET(req: Request) {
           user_email = payload.ownerEmail as string;
         }
       } catch (e) {
-        console.error("Token verification failed in FAQ fetch:", e);
+        console.error("Token verification failed:", e);
       }
     }
-
-    
-
+    // IMPORTANT: If we can't identify the user/owner, don't query the DB
+    // This prevents one user from seeing another user's FAQs
+    if (!user_email) {
+      return NextResponse.json({ faqs: FALLBACK_FAQS }, { status: 200 });
+    }
     const faqs = await prisma.faq.findMany({
       where: {
-        user_email: user_email || undefined,
+        user_email: user_email, // Removed '|| undefined' for security
         ...(domain ? { domain: { contains: domain } } : {}),
       },
       orderBy: [{ sort_order: "asc" }, { created_at: "desc" }],
     });
-
-    // After your prisma.faq.findMany:
     return NextResponse.json({ 
       faqs: faqs.length > 0 ? faqs : FALLBACK_FAQS 
     }, { status: 200 });
-
   } catch (error) {
-   console.error("Error fetching FAQs:", error);
+    console.error("Error fetching FAQs:", error);
     return NextResponse.json({ faqs: FALLBACK_FAQS });
   }
 }

@@ -19,7 +19,7 @@ export async function PUT(req: Request) {
       );
     }
 
-    const userEmail = (await getWorkspaceEmail(clerkUser) || "") ?? "";
+    const userEmail = clerkUser.emailAddresses[0].emailAddress ?? "";
 
     await prisma.$transaction(
       orderedIds.map((id: string, index: number) =>
