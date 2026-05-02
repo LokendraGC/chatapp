@@ -3,6 +3,7 @@ import { countConversationTokens } from "@/lib/countConversationTokens";
 import { summarizeMarkdown } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import trimContextByChars from "@/lib/trimContextByChars";
+import { searchWeb } from "@/lib/tavily";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
@@ -58,7 +59,26 @@ export async function POST(req: Request) {
       .join("\n\n");
   }
 
-  context = trimContextByChars(context, 6000);
+  context = trimContextByChars(context, 12000);
+
+  let useWebSearch = false;
+  if (!context || context.length < 200) {
+    useWebSearch = true;
+  }
+
+  if (useWebSearch) {
+    console.log("Using Tavily web search...");
+    const lastMessage = messages[messages.length - 1];
+    const webContext = await searchWeb(lastMessage.content);
+
+    context = `
+WEB SEARCH RESULTS:
+${webContext}
+
+USER QUESTION:
+${lastMessage.content}
+`;
+  }
 
   const tokenCount = await countConversationTokens(messages, context);
 
@@ -100,7 +120,10 @@ FORMATTING (HTML only):
 CONTEXT USAGE:
 - Only use the CONTEXT below to answer questions about the company.
 - Answer only what was asked — never volunteer extra info.
-- If info is not in CONTEXT, ask: "Would you like me to create a support ticket for you?"
+- First use CONTEXT (company knowledge)
+- If CONTEXT is empty or insufficient, use WEB SEARCH RESULTS
+- If both are insufficient, say you don't know
+- Never hallucinate
 - If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
 
 CONTEXT:

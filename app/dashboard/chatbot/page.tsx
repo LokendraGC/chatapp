@@ -3,6 +3,8 @@
 import ChatSimulator from "@/components/ui/dashboard/chatbot/ChatSimulator";
 import EmbedCodeConfig from "@/components/ui/dashboard/chatbot/EmbedCodeConfig";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Save } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
@@ -221,6 +223,25 @@ export default function ChatbotPage() {
           <p className="text-sm text-muted-foreground mt-1">
             Test your assistance, customize appearance, and get started.
           </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {hasChanges && (
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm animate-in fade-in slide-in-from-right-4 duration-300"
+            >
+              {isSaving ? (
+                "Saving..."
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
