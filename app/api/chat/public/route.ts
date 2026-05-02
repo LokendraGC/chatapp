@@ -44,9 +44,9 @@ export async function POST(req: Request) {
             sessionID = payload.sessionID as string;
             widgetId = payload.widgedId as string;
 
-            console.log("JWT payload:", payload);
-            console.log("sessionID from token:", sessionID);
-            console.log("widgetId from token:", widgetId);
+            // console.log("JWT payload:", payload);
+            // console.log("sessionID from token:", sessionID);
+            // console.log("widgetId from token:", widgetId);
 
             if (!sessionID || !widgetId) {
                 return NextResponse.json(
@@ -87,14 +87,14 @@ export async function POST(req: Request) {
                 }
             });
 
-            console.log("Existing conversation found:", existingConversation);
+            // console.log("Existing conversation found:", existingConversation);
 
             if (!existingConversation) {
                 const forwardFor = req.headers.get("X-Forwarded-For");
                 const ip = forwardFor ? forwardFor.split(",")[0] : 'unknown ip';
                 const visitorName = `Visitor ${ip}`;
 
-                console.log("Creating new conversation with sessionID:", sessionID);
+                // console.log("Creating new conversation with sessionID:", sessionID);
 
                 await prisma.conversation.create({
                     data: {

@@ -150,3 +150,23 @@
   color: #ffffff;
   text-decoration: underline;
 }
+
+.chat-message ul, 
+.chat-message ol {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.chat-message li {
+  margin-bottom: 2px;
+}
+
+.chat-message p {
+  margin-bottom: 4px;
+}
+
+.chat-message p:last-child {
+  margin-bottom: 0;
+}

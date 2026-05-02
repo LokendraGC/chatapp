@@ -127,7 +127,7 @@ export default function ChatSimulator({
                   <div className="space-y-2">
                     <div
                       className={cn(
-                        "px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap chat-message",
+                        "px-4 py-3 rounded-2xl text-sm leading-normal shadow-sm break-words whitespace-pre-wrap chat-message",
                         msg.role === "user"
                           ? "bg-muted text-foreground rounded-tr-sm"
                           : "text-white rounded-tl-sm",
