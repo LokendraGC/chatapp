@@ -12,6 +12,8 @@ export async function searchWeb(query: string) {
     timeRange: "day",
   });
 
+  
+
   // Combine useful info
   let webContext = "";
 
