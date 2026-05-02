@@ -109,6 +109,7 @@ export default function ChatbotPage() {
       body: JSON.stringify({
         messages: [...messages, userMessage],
         knowledge_source_ids: sourceIds,
+        section_id: currentSection?.id,
       }),
     });
     if (!res.ok) {

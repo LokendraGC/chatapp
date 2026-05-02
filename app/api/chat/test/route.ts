@@ -21,10 +21,28 @@ export async function POST(req: Request) {
     }),
   });
 
-  let { messages, knowledge_source_ids } = await req.json();
+  let { messages, knowledge_source_ids, section_id } = await req.json();
 
   let context = "";
+  let sectionRules = "";
   const userEmail = (await getWorkspaceEmail(clerkUser) || "");
+
+  // Fetch Section Metadata if section_id is provided
+  if (section_id) {
+    const section = await prisma.section.findUnique({
+      where: { id: section_id }
+    });
+
+    if (section) {
+      sectionRules = `
+BEHAVIORAL RULES FOR THIS SESSION:
+- TONE: ${section.tone}
+${section.allowed_topics ? `- ALLOWED TOPICS: ${section.allowed_topics}` : ""}
+${section.blocked_topics ? `- BLOCKED TOPICS: ${section.blocked_topics}` : ""}
+- MISSION: ${section.description}
+`;
+    }
+  }
 
   // Fetch knowledge sources - use specific IDs if provided, otherwise fetch all for the user
   if (knowledge_source_ids && knowledge_source_ids.length > 0) {
@@ -117,11 +135,14 @@ FORMATTING (HTML only):
 - NO markdown — no **bold**, no [text](url), no ## headings.
 - Keep responses short — 2-4 sentences max unless a list is needed.
 
+${sectionRules}
+
 CONTEXT USAGE:
 - Only use the CONTEXT below to answer questions about the company.
 - Answer only what was asked — never volunteer extra info.
 - First use CONTEXT (company knowledge)
 - If CONTEXT is empty or insufficient, use WEB SEARCH RESULTS
+- STICK TO THE BEHAVIORAL RULES PROVIDED ABOVE (if any).
 - If both are insufficient, say you don't know
 - Never hallucinate
 - If user agrees: "[ESCALATED] Support ticket created. Our team will be in touch soon."
