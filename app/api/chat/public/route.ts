@@ -162,7 +162,7 @@ export async function POST(req: Request) {
             }
 
             if (useWebSearch) {
-                console.log("Using Tavily web search...");
+                // console.log("Using Tavily web search...");
 
                 const webContext = await searchWeb(lastMessage.content);
 
