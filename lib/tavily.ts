@@ -9,6 +9,7 @@ export async function searchWeb(query: string) {
     searchDepth: "advanced",
     includeAnswer: true,
     maxResults: 3,
+    days: 7,
   });
 
   // Combine useful info
