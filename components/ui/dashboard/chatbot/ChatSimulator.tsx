@@ -189,26 +189,19 @@ export default function ChatSimulator({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={!activeSection}
-            placeholder={
-              activeSection
-                ? "Type a message ... "
-                : "Please select a category above to start ... "
-            }
-            className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-foreground bg-muted/30 border-border resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-muted-foreground"
+            placeholder="Type a message..."
+            className="pt-3 min-h-12.5 max-h-37.5 pr-12 outline-none text-foreground bg-muted/30 border-border resize-none rounded-xl placeholder:text-muted-foreground"
           />
           <Button
             size="icon"
             onClick={handleSend}
-            disabled={!activeSection || !input.trim()}
+            disabled={!input.trim()}
             className={cn(
               "absolute right-2 bottom-2 h-8 w-8 transition-colors",
-              !activeSection || !input.trim()
-                ? "bg-muted text-muted-foreground"
-                : "",
+              !input.trim() ? "bg-muted text-muted-foreground" : "",
             )}
             style={
-              activeSection && input.trim()
+              input.trim()
                 ? { backgroundColor: primaryColor, color: "white" }
                 : {}
             }

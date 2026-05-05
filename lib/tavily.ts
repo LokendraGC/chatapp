@@ -4,27 +4,35 @@ const tvly = tavily({
   apiKey: process.env.TAVILY_API_KEY!,
 });
 
+/**
+ * Dynamic Tavily search (advanced + fresh data)
+ */
 export async function searchWeb(query: string) {
-  const res = await tvly.search(query, {
+  const q = query.trim();
+  if (!q) return "";
+
+  const res = await tvly.search(q, {
+    includeAnswer: "basic",
     searchDepth: "advanced",
-    includeAnswer: true,
-    maxResults: 3,
-    timeRange: "day",
+    timeRange: "week", // latest info
   });
 
-  
-
-  // Combine useful info
   let webContext = "";
 
   if (res.answer) {
     webContext += `WEB ANSWER:\n${res.answer}\n\n`;
   }
 
-  if (res.results) {
+  if (res.results?.length) {
     webContext += res.results
-      .map((r: any) => {
-        return `TITLE: ${r.title}\nURL: ${r.url}\nCONTENT: ${r.content}`;
+      .map((r) => {
+        const published = r.publishedDate
+          ? `\nPUBLISHED: ${r.publishedDate}`
+          : "";
+
+        return `TITLE: ${r.title}
+URL: ${r.url}${published}
+CONTENT: ${r.content}`;
       })
       .join("\n\n");
   }

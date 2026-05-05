@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 
 const ApartmentConfig = dynamic(
   () => import("@/components/ui/dashboard/chatbot/ApartmentConfig"),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface ChatBotMetaData {
@@ -49,7 +49,7 @@ export default function ChatbotPage() {
           setMetadata(metaData);
           setPrimaryColor(metaData.color || "#4f46e5");
           setWelcomeMessage(
-            metaData.welcome_message || "Hi there, How can I help you today?"
+            metaData.welcome_message || "Hi there, How can I help you today?",
           );
           setMessages([
             {
@@ -87,7 +87,7 @@ export default function ChatbotPage() {
     }
 
     const currentSection = sections.find(
-      (section) => section.name === activeSection
+      (section) => section.name === activeSection,
     );
     const sourceIds = currentSection?.sourceIds || [];
 

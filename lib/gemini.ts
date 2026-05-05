@@ -49,6 +49,7 @@ ${markdown}`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
+      // model: "gemini-2.0-flash",
       contents: prompt,
       config: {
         temperature: 0.1, // Low temp for factual extraction
@@ -75,7 +76,7 @@ type Message = {
 export async function countConversationTokens(
   messages: Message[],
   context = "",
-  model = "gemini-3-flash-preview"
+  model = "gemini-2.0-flash"
 ): Promise<number> {
   // Combine everything into a single text blob - defined outside try for catch access
   const combinedText = [

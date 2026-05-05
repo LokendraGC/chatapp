@@ -176,23 +176,36 @@ ${section.blocked_topics ? `- BLOCKED TOPICS: ${section.blocked_topics}` : ""}
             // IMPROVED: Increase context size limit to preserve more information
             context = trimContextByChars(context, 12000); // Increased from 6000
 
-            if (!context || context.length < 200) {
+            function isTimeSensitiveQuery(query: string): boolean {
+                const timeKeywords = [
+                    'current', 'latest', 'now', 'today', 'recently', 'who is',
+                    'prime minister', 'president', 'ceo', 'current price',
+                    'stock price', 'weather', 'score', 'news', 'price of'
+                ];
+                const lowerQuery = query.toLowerCase();
+                return timeKeywords.some(keyword => lowerQuery.includes(keyword));
+            }
+
+            // Always use web search for time-sensitive queries
+            if (isTimeSensitiveQuery(lastMessage.content)) {
+                useWebSearch = true;
+            } 
+            // Fallback to web search if no context
+            else if (!context || context.length < 200) {
                 useWebSearch = true;
             }
 
             if (useWebSearch) {
-                // console.log("Using Tavily web search...");
-
                 const webContext = await searchWeb(lastMessage.content);
-
+                // Replace context with fresh web data for these queries
                 context = `
-WEB SEARCH RESULTS:
+WEB SEARCH RESULTS (CURRENT DATA):
 ${webContext}
 
 USER QUESTION:
 ${lastMessage.content}
 `;
-                }
+            }
 
             // Token counting and message summarization
             const tokenCount = await countConversationTokens(messages, context);

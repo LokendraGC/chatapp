@@ -744,12 +744,8 @@ const EmbedPage = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={!showChat || !activeSection}
-                placeholder={
-                  activeSection
-                    ? "Type a message ... "
-                    : "Please select a section to start"
-                }
+                disabled={!showChat}
+                placeholder="Type a message..."
                 className="pt-3 min-h-12.5 max-h-37.5 pr-12 text-xs outline-none text-zinc-900 placeholder:text-zinc-400 bg-white border-zinc-200 resize-none rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
