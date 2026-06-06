@@ -7,6 +7,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 interface HelpProps {
   onWriteMessage?: () => void;
@@ -32,13 +35,29 @@ const fallbackQuestions: FaqItem[] = [
   },
 ];
 
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(1, "Message is required"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 const Help = ({ onWriteMessage, token, domain }: HelpProps) => {
   const [questions, setQuestions] = useState<FaqItem[]>(fallbackQuestions);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: "", email: "", message: "" },
+  });
 
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -61,22 +80,64 @@ const Help = ({ onWriteMessage, token, domain }: HelpProps) => {
     };
     fetchFaqs();
   }, [token, domain]);
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const res = await fetch("/api/help/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, token, domain }),
+      });
+      if (res.ok) {
+        reset();
+        setShowForm(false);
+        setIsSuccess(true);
+        onWriteMessage?.();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-        {showForm ? (
-          <>
-            <PencilIcon className="h-4 w-4" />
-            <span>Write Message</span>
-          </>
-        ) : (
-          <>
-            <HelpCircle className="h-4 w-4" />
-            <span>All questions</span>
-          </>
-        )}
-      </div>
-      {!showForm ? (
+      {!isSuccess && (
+        <div className="flex items-center gap-2 text-sm font-medium text-zinc-900">
+          {showForm ? (
+            <>
+              <PencilIcon className="h-4 w-4" />
+              <span>Write Message</span>
+            </>
+          ) : (
+            <>
+              <HelpCircle className="h-4 w-4" />
+              <span>All questions</span>
+            </>
+          )}
+        </div>
+      )}
+      {isSuccess ? (
+        <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-zinc-900">Email is sent, thank you</p>
+          <button
+            onClick={() => setIsSuccess(false)}
+            className="inline-flex cursor-pointer items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 mt-4"
+          >
+            Go back
+          </button>
+        </div>
+      ) : !showForm ? (
         <>
           <div className="space-y-2">
             {questions.map((item, index) => (
@@ -113,46 +174,56 @@ const Help = ({ onWriteMessage, token, domain }: HelpProps) => {
           </div>
         </>
       ) : (
-        <form
-          className="space-y-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            onWriteMessage?.();
-          }}
-        >
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Your name"
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
-          />
-          <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="Email address"
-            type="email"
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
-          />
-          <textarea
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            placeholder="Your message"
-            rows={4}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
-          />
+        <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <input
+              {...register("name")}
+              placeholder="Your name"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+            />
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              {...register("email")}
+              placeholder="Email address"
+              type="email"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+            />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+          <div>
+            <textarea
+              {...register("message")}
+              placeholder="Your message"
+              rows={4}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+            />
+            {errors.message && (
+              <p className="mt-1 text-xs text-red-500">{errors.message.message}</p>
+            )}
+          </div>
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                reset();
+              }}
               className="inline-flex flex-1 items-center cursor-pointer justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="inline-flex flex-1 items-center cursor-pointer justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-800"
+              disabled={isSubmitting}
+              className="inline-flex flex-1 items-center cursor-pointer justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:opacity-50"
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>
@@ -162,3 +233,4 @@ const Help = ({ onWriteMessage, token, domain }: HelpProps) => {
 };
 
 export default Help;
+
