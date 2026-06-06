@@ -805,6 +805,8 @@ const EmbedContent = () => {
           <div className="mt-2 text-center">
             <Link
               href={"/"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[12px] text-zinc-600 font-medium hover:text-zinc-500 transition-colors"
             >
               Powered by Karmi AI
