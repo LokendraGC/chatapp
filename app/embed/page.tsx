@@ -25,7 +25,7 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,7 +52,14 @@ type ContactInfo = {
   social_media?: SocialItem[];
 };
 
-const EmbedPage = () => {
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  isWelcome?: boolean;
+  section: string | null;
+};
+
+const EmbedContent = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -62,7 +69,7 @@ const EmbedPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [messages, setMessages] = useState<any[]>([
+  const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
       content: "Hi there, How can I help you today?",
@@ -239,7 +246,7 @@ const EmbedPage = () => {
     );
     const sourceIds = currentSection?.source_ids || [];
 
-    const userMessage = {
+    const userMessage: Message = {
       role: "user",
       content: input,
       section: activeSection,
@@ -267,7 +274,7 @@ const EmbedPage = () => {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            role: "assistant",
+            role: "assistant" as const,
             content: data.reply,
             section: null,
           },
@@ -276,7 +283,7 @@ const EmbedPage = () => {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            role: "assistant",
+            role: "assistant" as const,
             content:
               "I'm sorry, I couldn't generate a response. Please try again.",
             section: null,
@@ -396,7 +403,7 @@ const EmbedPage = () => {
 
   const handleClickSection = (sectionName: string) => {
     setActiveSection(sectionName);
-    const userMsg = {
+    const userMsg: Message = {
       role: "user",
       content: `I want to talk about ${sectionName}`,
       section: null,
@@ -405,7 +412,7 @@ const EmbedPage = () => {
     setIsTyping(true);
     setInput("");
     setTimeout(() => {
-      const botResponse = {
+      const botResponse: Message = {
         role: "assistant",
         content: `You can ask me any question related to ${sectionName}`,
         section: sectionName,
@@ -754,7 +761,7 @@ const EmbedPage = () => {
                 className={`self-end px-4 py-3 rounded-xl font-medium text-sm transition-all ${
                   input.trim()
                     ? "hover:brightness-110"
-                    : "opacity-50 cursor-not- allowed"
+                    : "opacity-50 cursor-not-allowed"
                 }`}
                 style={{
                   backgroundColor: input.trim() ? primaryColor : "#E5E7EB",
@@ -806,6 +813,18 @@ const EmbedPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const EmbedPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-zinc-200 border-t-zinc-900 rounded-full animate-spin"></div>
+      </div>
+    }>
+      <EmbedContent />
+    </Suspense>
   );
 };
 

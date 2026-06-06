@@ -1,12 +1,17 @@
 import { getWorkspaceEmail } from "@/lib/workspace";
 import { countConversationTokens } from "@/lib/countConversationTokens";
-import { summarizeMarkdown } from "@/lib/gemini";
+import { summarizeMarkdown, generateContentWithFallback } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import trimContextByChars from "@/lib/trimContextByChars";
 import { searchWeb } from "@/lib/tavily";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+
+interface Message {
+  role: "user" | "assistant" | "system";
+  content: string;
+}
 
 export async function POST(req: Request) {
   const clerkUser = await currentUser();
@@ -21,7 +26,9 @@ export async function POST(req: Request) {
     }),
   });
 
-  let { messages, knowledge_source_ids, section_id } = await req.json();
+  const body = await req.json() as { messages: Message[]; knowledge_source_ids: string[]; section_id: string };
+  let { messages } = body;
+  const { knowledge_source_ids, section_id } = body;
 
   let context = "";
   let sectionRules = "";
@@ -104,7 +111,7 @@ ${lastMessage.content}
     const recentMessages = messages.slice(-10);
     const oldestMessage = messages.slice(0, -10);
     if (oldestMessage.length > 0) {
-      const oldestMessageString = oldestMessage.map((m: any) => `${m.role}: ${m.content}`).join("\n\n");
+      const oldestMessageString = oldestMessage.map((m) => `${m.role}: ${m.content}`).join("\n\n");
       const summary = await summarizeMarkdown(oldestMessageString);
 
       context = `PREVIOUS CONVERSATION SUMMARY: ${summary}\n\n${context}`;
@@ -163,13 +170,9 @@ END CONTEXT`;
   const fullPrompt = `${systemPrompt}${conversationHistory ? `\n\nCONVERSATION HISTORY:\n${conversationHistory}\n\nAssistant:` : ""}`;
 
   try {
-    const completion = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: fullPrompt,
-      config: {
-        temperature: 0.7,
-        maxOutputTokens: 2048,
-      },
+    const completion = await generateContentWithFallback(ai, fullPrompt, {
+      temperature: 0.7,
+      maxOutputTokens: 2048,
     });
     
     let reply = completion.text?.trim() ?? "I'm sorry, couldn't generate a response.";
@@ -199,6 +202,13 @@ END CONTEXT`;
     
   } catch (error) {
     console.error("Error in chat:", error);
+    const status = (error as { status?: number })?.status;
+    if (status === 429) {
+      return NextResponse.json(
+        { error: "Rate limit reached. Please wait a moment and try again." },
+        { status: 429 }
+      );
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

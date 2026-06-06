@@ -1,10 +1,45 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, GenerateContentConfig } from "@google/genai";
 
 // Initialize Gemini client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   ...(process.env.GEMINI_BASE_URL && { baseURL: process.env.GEMINI_BASE_URL }),
 });
+
+const MODEL_FALLBACK_CHAIN = [
+  "gemini-2.0-flash-lite",
+  "gemini-2.0-flash",
+  "gemini-3.5-flash",
+];
+
+/**
+ * Calls generateContent with automatic model fallback on 429 rate-limit errors.
+ * Tries each model in MODEL_FALLBACK_CHAIN in order.
+ */
+export async function generateContentWithFallback(
+  client: GoogleGenAI,
+  contents: string,
+  config?: GenerateContentConfig,
+  preferredModel = "gemini-2.0-flash-lite"
+) {
+  const chain = [
+    preferredModel,
+    ...MODEL_FALLBACK_CHAIN.filter((m) => m !== preferredModel),
+  ];
+
+  let lastError: unknown;
+  for (const model of chain) {
+    try {
+      return await client.models.generateContent({ model, contents, config });
+    } catch (error) {
+      const status = (error as { status?: number })?.status;
+      if (status !== 429 && status !== 404) throw error;
+      console.warn(`Rate limited on ${model}, trying next model...`);
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
 
 /**
  * IMPROVED: Better summarization that preserves critical details
@@ -47,15 +82,10 @@ CRITICAL RULES:
 Input to summarize:
 ${markdown}`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      // model: "gemini-2.0-flash",
-      contents: prompt,
-      config: {
-        temperature: 0.1, // Low temp for factual extraction
-        maxOutputTokens: 6144, // Increased to ensure complete summaries
-        topP: 0.95,
-      },
+    const response = await generateContentWithFallback(ai, prompt, {
+      temperature: 0.1,
+      maxOutputTokens: 6144,
+      topP: 0.95,
     });
 
     return response.text?.trim() ?? "";

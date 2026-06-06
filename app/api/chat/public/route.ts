@@ -1,11 +1,12 @@
-import { countConversationTokens } from "@/lib/countConversationTokens";
-import { summarizeMarkdown } from "@/lib/gemini";
+import { summarizeMarkdown, generateContentWithFallback } from "@/lib/gemini";
 import prisma from "@/lib/prisma";
 import trimContextByChars from "@/lib/trimContextByChars";
 import { searchWeb } from "@/lib/tavily";
 import { GoogleGenAI } from "@google/genai";
 import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
+
+type ChatMessage = { role: string; content: string };
 
 // CORRECT: Named export for POST method
 export async function POST(req: Request) {
@@ -64,7 +65,9 @@ export async function POST(req: Request) {
             );
         }
 
-        let { messages, knowledge_source_ids, section_id } = await req.json();
+        const body = await req.json();
+        let { messages } = body;
+        const { knowledge_source_ids, section_id } = body;
 
         let sectionRules = "";
 
@@ -207,15 +210,16 @@ ${lastMessage.content}
 `;
             }
 
-            // Token counting and message summarization
-            const tokenCount = await countConversationTokens(messages, context);
+            // Token estimation — avoid extra API call that could hit rate limits
+            const combinedForCount = [context, ...messages.map((m: ChatMessage) => `${m.role}: ${m.content}`)].join("\n\n");
+            const tokenCount = Math.ceil(combinedForCount.length / 3.5);
 
             // IMPROVED: Higher threshold before summarizing
             if (tokenCount > 12000) {
                 const recentMessages = messages.slice(-15); // Keep more recent messages
                 const oldestMessage = messages.slice(0, -15);
                 if (oldestMessage.length > 0) {
-                    const oldestMessageString = oldestMessage.map((m: any) => `${m.role}: ${m.content}`).join("\n\n");
+                    const oldestMessageString = oldestMessage.map((m: ChatMessage) => `${m.role}: ${m.content}`).join("\n\n");
                     const summary = await summarizeMarkdown(oldestMessageString);
                     context = `PREVIOUS CONVERSATION SUMMARY: ${summary}\n\n${context}`;
                     messages = recentMessages;
@@ -264,7 +268,7 @@ END CONTEXT`;
 
             // IMPROVED: Better conversation history formatting
             const conversationHistory = messages
-                .map((msg: { role: string; content: string }) => {
+                .map((msg: ChatMessage) => {
                     return `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`;
                 })
                 .join("\n\n");
@@ -276,15 +280,11 @@ END CONTEXT`;
             console.log("Full prompt length:", fullPrompt.length);
 
             try {
-                const completion = await ai.models.generateContent({
-                    model: "gemini-3-flash-preview",
-                    contents: fullPrompt,
-                    config: {
-                        temperature: 0.7,
-                        maxOutputTokens: 2048, // INCREASED from 1000 to allow complete responses
-                        topP: 0.95,
-                        topK: 40,
-                    },
+                const completion = await generateContentWithFallback(ai, fullPrompt, {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                    topP: 0.95,
+                    topK: 40,
                 });
 
                 let reply = completion.text?.trim() ?? "I apologize, but I couldn't generate a response. Please try again.";
@@ -338,6 +338,13 @@ END CONTEXT`;
 
             } catch (error) {
                 console.error("Error in generating response:", error);
+                const status = (error as { status?: number })?.status;
+                if (status === 429) {
+                    return NextResponse.json(
+                        { error: "Rate limit reached. Please wait a moment and try again." },
+                        { status: 429 }
+                    );
+                }
                 return NextResponse.json(
                     { error: "Internal server error", details: error instanceof Error ? error.message : String(error) },
                     { status: 500 }
