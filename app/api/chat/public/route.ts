@@ -8,7 +8,20 @@ import { NextResponse } from "next/server";
 
 type ChatMessage = { role: string; content: string };
 
-// CORRECT: Named export for POST method
+// Simple in-process rate limiter: max 20 messages per session per minute
+const sessionHits = new Map<string, { count: number; resetAt: number }>();
+function isRateLimited(sessionId: string): boolean {
+    const now = Date.now();
+    const entry = sessionHits.get(sessionId);
+    if (!entry || now > entry.resetAt) {
+        sessionHits.set(sessionId, { count: 1, resetAt: now + 60_000 });
+        return false;
+    }
+    entry.count += 1;
+    if (entry.count > 20) return true;
+    return false;
+}
+
 export async function POST(req: Request) {
     try {
         const authHeader = req.headers.get("Authorization");
@@ -57,6 +70,13 @@ export async function POST(req: Request) {
                 );
             }
 
+            if (isRateLimited(sessionID)) {
+                return NextResponse.json(
+                    { error: "Too many messages. Please slow down." },
+                    { status: 429 }
+                );
+            }
+
         } catch (jwtError) {
             console.error("JWT verification error:", jwtError);
             return NextResponse.json(
@@ -68,6 +88,21 @@ export async function POST(req: Request) {
         const body = await req.json();
         let { messages } = body;
         const { knowledge_source_ids, section_id } = body;
+
+        // Guard: message array limits
+        if (!Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json({ error: "Invalid messages" }, { status: 400 });
+        }
+        if (messages.length > 50) {
+            return NextResponse.json({ error: "Too many messages in history" }, { status: 400 });
+        }
+        const lastMsg = messages[messages.length - 1];
+        if (typeof lastMsg?.content !== "string" || lastMsg.content.trim().length === 0) {
+            return NextResponse.json({ error: "Empty message" }, { status: 400 });
+        }
+        if (lastMsg.content.length > 2000) {
+            return NextResponse.json({ error: "Message too long (max 2000 chars)" }, { status: 400 });
+        }
 
         let sectionRules = "";
 

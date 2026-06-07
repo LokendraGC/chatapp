@@ -85,7 +85,15 @@ export async function POST(req: Request) {
       }
     }
 
-    if (requestOrigin && !allowedOrigins.includes(requestOrigin)) {
+    // Require an Origin header — server-side bots (curl, scripts) won't send one
+    if (!requestOrigin) {
+      return new Response(
+        JSON.stringify({ error: "Direct API access is not allowed" }),
+        { status: 403, headers: corsHeaders }
+      );
+    }
+
+    if (!allowedOrigins.includes(requestOrigin)) {
       return new Response(
         JSON.stringify({
           error: "Embedding not allowed on this domain",
